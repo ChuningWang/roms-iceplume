@@ -1129,10 +1129,10 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+10)=' ICESHELF,'
 #endif
+#ifdef ICEPLUME
 !
 !----- iceplume model (Chuning Wang) -----------------------------------
 !
-#ifdef ICEPLUME
       IF (Master) WRITE (stdout,20) 'ICEPLUME',                         &
      &   'Ice Plume model for subglacial discharge.'
       is=LEN_TRIM(Coptions)+1
@@ -1208,10 +1208,9 @@
       Coptions(is:is+10)=' ICEPLUME_DETRAIN_NEUTRAL,'
 # endif
 !
-#endif
-!
 !----- iceplume model end ----------------------------------------------
 !
+#endif
 #if defined IMPACT_INNER        && defined OBS_IMPACT              && \
    (defined IS4DVAR_SENSITIVITY || defined W4DPSAS_FCT_SENSITIVITY || \
     defined W4DPSAS_SENSITIVITY || defined W4DVAR_SENSITIVITY)

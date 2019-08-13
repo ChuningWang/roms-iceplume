@@ -1107,7 +1107,7 @@
   'free-surface western boundary condition'
   'meter'                                          ! [m]
   'zeta_west, scalar, series'
-  'zeta_time'
+  'ocean_time'
   'idZbry(iwest)'
   'nulvar'
   1.0d0
@@ -1116,7 +1116,7 @@
   'free-surface eastern boundary condition'
   'meter'                                          ! [m]
   'zeta_east, scalar, series'
-  'zeta_time'
+  'ocean_time'
   'idZbry(ieast)'
   'nulvar'
   1.0d0
@@ -1125,7 +1125,7 @@
   'free-surface southern boundary condition'
   'meter'                                          ! [m]
   'zeta_south, scalar, series'
-  'zeta_time'
+  'ocean_time'
   'idZbry(isouth)'
   'nulvar'
   1.0d0
@@ -1134,7 +1134,7 @@
   'free-surface northern boundary condition'
   'meter'                                          ! [m]
   'zeta_north, scalar, series'
-  'zeta_time'
+  'ocean_time'
   'idZbry(inorth)'
   'nulvar'
   1.0d0
@@ -1143,7 +1143,7 @@
   '2D u-momentum western boundary condition'
   'meter second-1'                                 ! [m/s]
   'ubar_west, scalar, series'
-  'v2d_time'
+  'ocean_time'
   'idU2bc(iwest)'
   'nulvar'
   1.0d0
@@ -1152,7 +1152,7 @@
   '2D u-momentum eastern boundary condition'
   'meter second-1'                                 ! [m/s]
   'ubar_east, scalar, series'
-  'v2d_time'
+  'ocean_time'
   'idU2bc(ieast)'
   'nulvar'
   1.0d0
@@ -1161,7 +1161,7 @@
   '2D u-momentum southern boundary condition'
   'meter second-1'                                 ! [m/s]
   'ubar_south, scalar, series'
-  'v2d_time'
+  'ocean_time'
   'idU2bc(isouth)'
   'nulvar'
   1.0d0
@@ -1170,7 +1170,7 @@
   '2D u-momentum northern boundary condition'
   'meter second-1'                                 ! [m/s]
   'ubar_north, scalar, series'
-  'v2d_time'
+  'ocean_time'
   'idU2bc(inorth)'
   'nulvar'
   1.0d0
@@ -1179,7 +1179,7 @@
   '2D v-momentum western boundary condition'
   'meter second-1'                                 ! [m/s]
   'vbar_west, scalar, series'
-  'v2d_time'
+  'ocean_time'
   'idV2bc(iwest)'
   'nulvar'
   1.0d0
@@ -1188,7 +1188,7 @@
   '2D v-momentum eastern boundary condition'
   'meter second-1'                                 ! [m/s]
   'vbar_east, scalar, series'
-  'v2d_time'
+  'ocean_time'
   'idV2bc(ieast)'
   'nulvar'
   1.0d0
@@ -1197,7 +1197,7 @@
   '2D v-momentum southern boundary condition'
   'meter second-1'                                 ! [m/s]
   'vbar_south, scalar, series'
-  'v2d_time'
+  'ocean_time'
   'idV2bc(isouth)'
   'nulvar'
   1.0d0
@@ -1206,7 +1206,7 @@
   '2D v-momentum northern boundary condition'
   'meter second-1'                                 ! [m/s]
   'vbar_north, scalar, series'
-  'v2d_time'
+  'ocean_time'
   'idV2bc(inorth)'
   'nulvar'
   1.0d0
@@ -1215,7 +1215,7 @@
   '3D u-momentum western boundary condition'
   'meter second-1'                                 ! [m/s]
   'u_west, scalar, series'
-  'v3d_time'
+  'ocean_time'
   'idU3bc(iwest)'
   'nulvar'
   1.0d0
@@ -1224,7 +1224,7 @@
   '3D u-momentum eastern boundary condition'
   'meter second-1'                                 ! [m/s]
   'u_east, scalar, series'
-  'v3d_time'
+  'ocean_time'
   'idU3bc(ieast)'
   'nulvar'
   1.0d0
@@ -1233,7 +1233,7 @@
   '3D u-momentum southern boundary condition'
   'meter second-1'                                 ! [m/s]
   'u_south, scalar, series'
-  'v3d_time'
+  'ocean_time'
   'idU3bc(isouth)'
   'nulvar'
   1.0d0
@@ -1242,7 +1242,7 @@
   '3D u-momentum northern boundary condition'
   'meter second-1'                                 ! [m/s]
   'u_north, scalar, series'
-  'v3d_time'
+  'ocean_time'
   'idU3bc(inorth)'
   'nulvar'
   1.0d0
@@ -1251,7 +1251,7 @@
   '3D v-momentum western boundary condition'
   'meter second-1'                                 ! [m/s]
   'v_west, scalar, series'
-  'v3d_time'
+  'ocean_time'
   'idV3bc(iwest)'
   'nulvar'
   1.0d0
@@ -1260,7 +1260,7 @@
   '3D v-momentum eastern boundary condition'
   'meter second-1'                                 ! [m/s]
   'v_east, scalar, series'
-  'v3d_time'
+  'ocean_time'
   'idV3bc(ieast)'
   'nulvar'
   1.0d0
@@ -1269,7 +1269,7 @@
   '3D v-momentum southern boundary condition'
   'meter second-1'                                 ! [m/s]
   'v_south, scalar, series'
-  'v3d_time'
+  'ocean_time'
   'idV3bc(isouth)'
   'nulvar'
   1.0d0
@@ -1278,7 +1278,7 @@
   '3D v-momentum northern boundary condition'
   'meter second-1'                                 ! [m/s]
   'v_north, scalar, series'
-  'v3d_time'
+  'ocean_time'
   'idV3bc(inorth)'
   'nulvar'
   1.0d0
@@ -1287,7 +1287,7 @@
   'temperature western boundary condition'
   'Celsius'                                        ! [Celsius]
   'temp_west, scalar, series'
-  'temp_time'
+  'ocean_time'
   'idTbry(iwest,itemp)'
   'nulvar'
   1.0d0
@@ -1296,7 +1296,7 @@
   'temperature eastern boundary condition'
   'Celsius'                                        ! [Celsius]
   'temp_east, scalar, series'
-  'temp_time'
+  'ocean_time'
   'idTbry(ieast,itemp)'
   'nulvar'
   1.0d0
@@ -1305,7 +1305,7 @@
   'temperature southern boundary condition'
   'Celsius'                                        ! [Celsius]
   'temp_south, scalar, series'
-  'temp_time'
+  'ocean_time'
   'idTbry(isouth,itemp)'
   'nulvar'
   1.0d0
@@ -1314,7 +1314,7 @@
   'temperature northern boundary condition'
   'Celsius'                                        ! [Celsius]
   'temp_north, scalar, series'
-  'temp_time'
+  'ocean_time'
   'idTbry(inorth,itemp)'
   'nulvar'
   1.0d0
@@ -1323,7 +1323,7 @@
   'salinity western boundary condition'
   'nondimensional'                                 ! [PSU]
   'salt_west, scalar, series'
-  'salt_time'
+  'ocean_time'
   'idTbry(iwest,isalt)'
   'nulvar'
   1.0d0
@@ -1332,7 +1332,7 @@
   'salinity eastern boundary condition'
   'nondimensional'                                 ! [PSU]
   'salt_east, scalar, series'
-  'salt_time'
+  'ocean_time'
   'idTbry(ieast,isalt)'
   'nulvar'
   1.0d0
@@ -1341,7 +1341,7 @@
   'salinity southern boundary condition'
   'nondimensional'                                 ! [PSU]
   'salt_south, scalar, series'
-  'salt_time'
+  'ocean_time'
   'idTbry(isouth,isalt)'
   'nulvar'
   1.0d0
@@ -1350,7 +1350,7 @@
   'salinity northern boundary condition'
   'nondimensional'                                 ! [PSU]
   'salt_north, scalar, series'
-  'salt_time'
+  'ocean_time'
   'idTbry(inorth,isalt)'
   'nulvar'
   1.0d0
@@ -2371,7 +2371,7 @@
   'dye concentration western boundary condition'
   'kilogram meter-3'                               ! [kg/m3]
   'dye_west_, scalar, series'
-  'dye_time'
+  'ocean_time'
   'idTbry(iwest,inert(i))'
   'nulvar'
   1.0d0
@@ -2380,7 +2380,7 @@
   'dye concentration eastern boundary condition'
   'kilogram meter-3'                               ! [kg/m3]
   'dye_east_, scalar, series'
-  'dye_time'
+  'ocean_time'
   'idTbry(ieast,inert(i))'
   'nulvar'
   1.0d0
@@ -2389,7 +2389,7 @@
   'dye concentration southern boundary condition'
   'kilogram meter-3'                               ! [kg/m3]
   'dye_south_, scalar, series'
-  'dye_time'
+  'ocean_time'
   'idTbry(isouth,inert(i))'
   'nulvar'
   1.0d0
@@ -2398,7 +2398,7 @@
   'dye concentration northern boundary condition'
   'kilogram meter-3'                               ! [kg/m3]
   'dye_north_, scalar, series'
-  'dye_time'
+  'ocean_time'
   'idTbry(inorth,inert(i))'
   'nulvar'
   1.0d0
