@@ -115,6 +115,35 @@
         END IF
       END DO
 # endif
+
+# ifdef ICEPLUME
+!
+!  Subglacial point Source/Sink mass transport.
+!
+      IF (LuvSrc(ng).or.LwSrc(ng)) THEN
+        CALL get_ngfld (ng, iNLM, idSGtra, SSF(ng)%ncid,                &
+     &                  1, SSF(ng), update(1),                          &
+     &                  1, Nsrc(ng), 1, 2, 1, Nsrc(ng), 1,              &
+     &                  SOURCES(ng) % SGbarG)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+      END IF
+#  ifdef SOLVE3D
+!
+!  Tracer Sources/Sinks.
+!
+      DO i=1,NT(ng)
+        IF (LtracerSrc(i,ng)) THEN
+          CALL get_ngfld (ng, iNLM, idSGtrc(i), SSF(ng)%ncid,           &
+     &                    1, SSF(ng), update(1),                        &
+     &                    1, Nsrc(ng), 1, 2, 1, Nsrc(ng), 1,            &
+     &                    SOURCES(ng) % SGtrcG(:,:,i))
+          IF (FoundError(exit_flag, NoError, __LINE__,                  &
+     &                   __FILE__)) RETURN
+        END IF
+      END DO
+#  endif
+# endif
 #endif
 
 #if !(defined ANA_WINDS   || defined FRC_COUPLING) && \

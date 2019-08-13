@@ -147,6 +147,9 @@
 # endif
       USE u3dbc_mod, ONLY : u3dbc_tile
       USE v3dbc_mod, ONLY : v3dbc_tile
+# ifdef ICEPLUME
+      USE mod_iceplume, ONLY : PLUME
+# endif
 !
 !  Imported variable declarations.
 !
@@ -966,6 +969,9 @@
 !
       IF (LuvSrc(ng)) THEN
         DO is=1,Nsrc(ng)
+# ifdef ICEPLUME
+        IF (INT(PLUME(ng)%dir(is)).ne.0) THEN
+# endif
           i=SOURCES(ng)%Isrc(is)
           j=SOURCES(ng)%Jsrc(is)
           IF (((IstrR.le.i).and.(i.le.IendR)).and.                      &
@@ -976,6 +982,11 @@
      &                       0.5_r8*(z_w(i-1,j,k)-z_w(i-1,j,k-1)+       &
      &                               z_w(i  ,j,k)-z_w(i  ,j,k-1)))
                 u(i,j,k,nnew)=SOURCES(ng)%Qsrc(is,k)*cff1
+# if defined ICEPLUME && !defined ICEPLUME_VIRTUAL_MIX
+                u(i,j,k,nnew)=u(i,j,k,nnew)+PLUME(ng)%dir(is)*          &
+     &            (PLUME(ng)%det(is,k)+PLUME(ng)%ent(is,k)+             &
+     &             PLUME(ng)%mB(is,k))*cff1
+# endif
               END DO
             ELSE
               DO k=1,N(ng)
@@ -983,9 +994,17 @@
      &                       0.5_r8*(z_w(i,j-1,k)-z_w(i,j-1,k-1)+       &
      &                               z_w(i,j  ,k)-z_w(i,j  ,k-1)))
                 v(i,j,k,nnew)=SOURCES(ng)%Qsrc(is,k)*cff1
+# if defined ICEPLUME && !defined ICEPLUME_VIRTUAL_MIX
+                v(i,j,k,nnew)=v(i,j,k,nnew)+PLUME(ng)%dir(is)*          &
+     &            (PLUME(ng)%det(is,k)+PLUME(ng)%ent(is,k)+             &
+     &             PLUME(ng)%mB(is,k))*cff1
+# endif
               END DO
             END IF
           END IF
+# ifdef ICEPLUME
+        END IF
+# endif
         END DO
       END IF
 !

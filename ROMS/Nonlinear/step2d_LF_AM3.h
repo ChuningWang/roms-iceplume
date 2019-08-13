@@ -205,6 +205,9 @@
 # ifdef WET_DRY
       USE wetdry_mod, ONLY : wetdry_tile
 # endif
+# ifdef ICEPLUME
+      USE mod_iceplume, ONLY : PLUME
+# endif
 !
 !  Imported variable declarations.
 !
@@ -875,6 +878,11 @@
             zeta(i,j,knew)=zeta(i,j,knew)+                              &
      &                     SOURCES(ng)%Qbar(is)*                        &
      &                     pm(i,j)*pn(i,j)*dtfast(ng)
+# if defined ICEPLUME && !defined ICEPLUME_VIRTUAL_MIX
+            zeta(i,j,knew)=zeta(i,j,knew)+                              &
+     &                     PLUME(ng)%trs(is)*                           &
+     &                     pm(i,j)*pn(i,j)*dtfast(ng)
+# endif
           END IF
         END DO
       END IF
@@ -2437,6 +2445,9 @@
 !
       IF (LuvSrc(ng)) THEN
         DO is=1,Nsrc(ng)
+# ifdef ICEPLUME
+        IF (INT(PLUME(ng)%dir(is)).ne.0) THEN
+# endif
           i=SOURCES(ng)%Isrc(is)
           j=SOURCES(ng)%Jsrc(is)
           IF (((IstrR.le.i).and.(i.le.IendR)).and.                      &
@@ -2446,13 +2457,24 @@
      &                    0.5_r8*(zeta(i-1,j,knew)+h(i-1,j)+            &
      &                            zeta(i  ,j,knew)+h(i  ,j)))
               ubar(i,j,knew)=SOURCES(ng)%Qbar(is)*cff
+# if defined ICEPLUME && !defined ICEPLUME_VIRTUAL_MIX
+              ubar(i,j,knew)=ubar(i,j,knew)+                            &
+     &          PLUME(ng)%trs(is)*PLUME(ng)%dir(is)*cff
+# endif
             ELSE
               cff=1.0_r8/(om_v(i,j)*                                    &
      &                    0.5_r8*(zeta(i,j-1,knew)+h(i,j-1)+            &
      &                            zeta(i,j  ,knew)+h(i,j  )))
               vbar(i,j,knew)=SOURCES(ng)%Qbar(is)*cff
+# if defined ICEPLUME && !defined ICEPLUME_VIRTUAL_MIX
+              vbar(i,j,knew)=vbar(i,j,knew)+                            &
+     &          PLUME(ng)%trs(is)*PLUME(ng)%dir(is)*cff
+# endif
             END IF
           END IF
+# ifdef ICEPLUME
+        END IF
+# endif
         END DO
       END IF
 !

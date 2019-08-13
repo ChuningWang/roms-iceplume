@@ -849,6 +849,32 @@
           END IF
         END DO
 #  endif
+
+#  ifdef ICEPLUME
+        IF (LuvSrc(ng).or.LwSrc(ng)) THEN
+          CALL set_ngfld (ng, iNLM, idSGtra, 1, Nsrc(ng), 1,            &
+     &                    1, Nsrc(ng), 1,                               &
+     &                    SOURCES(ng) % SGbarG,                         &
+     &                    SOURCES(ng) % SGbar,                          &
+     &                    update)
+          IF (FoundError(exit_flag, NoError, __LINE__,                  &
+     &                   __FILE__)) RETURN
+        END IF
+
+#   ifdef SOLVE3D
+        DO itrc=1,NT(ng)
+          IF (LtracerSrc(itrc,ng)) THEN
+            CALL set_ngfld (ng, iNLM, idSGtrc(itrc), 1, Nsrc(ng), 1,    &
+     &                      1, Nsrc(ng), 1,                             &
+     &                      SOURCES(ng) % SGtrcG(:,:,itrc),             &
+     &                      SOURCES(ng) % SGtrc(:,itrc),                &
+     &                      update)
+            IF (FoundError(exit_flag, NoError, __LINE__,                &
+     &                     __FILE__)) RETURN
+          END IF
+        END DO
+#   endif
+#  endif
       END IF
 # endif
 

@@ -5,7 +5,10 @@ Copyright (c) 2002-2019 The ROMS/TOMS Group
   Licensed under a MIT/X style license
   See License_ROMS.txt
 
-svn: $HeadURL$
-svn: $LastChangedBy$
-svn: $LastChangedRevision$
-svn: $LastChangedDate$
+git: $URL https://www.myroms.org/git/src $
+git: $Id$
+
+svn: $HeadURL: https://www.myroms.org/svn/src/trunk/ROMS/Version $
+svn: $LastChangedBy: arango $
+svn: $LastChangedRevision: 981 $
+svn: $LastChangedDate: 2019-08-08 15:59:02 -0400 (Thu, 08 Aug 2019) $

@@ -39,6 +39,34 @@
 !  Tsrc       Tracer (tracer units) point Sources/Sinks.               !
 !  TsrcG      Latest two-time snapshots of tracer (tracer units)       !
 !               point Sources/Sinks.                                   !
+#ifdef ICEPLUME
+!                                                                      !
+!  SGbar      Mass transport (m3/s) of subglacial Sources/Sinks.       !
+!  SGbarG     Latest two-time snapshots of mass transport of           !
+!                subglacial Sources/Sinks.                             !
+!  SGtrc      Tracer (tracer units) of subglacial Sources/Sinks.       !
+!  SGtrcG     Latest two-time snapshots of tracer (tracer units) of    !
+!               subglacial Sources/Sinks.                              !
+!  SGdep      Depth of subglacial point Sources/Sinks (m).             !
+!  SGtyp      Type of subglacial point Sources/Sinks:                  !
+!               TYPEsrc(:) = 1,  No subglaical plume or melt.          !
+!               TYPEsrc(:) = 2,  half-cone.                            !
+!               TYPEsrc(:) = 3,  finite-line.                          !
+!               TYPEsrc(:) = 4,  sheet.                                !
+!               TYPEsrc(:) = 5,  detached.                             !
+!               TYPEsrc(:) = 6,  ellipse.                              !
+!  SGlen      Length of point Sources/Sinks (m).                       !
+# ifdef ICEPLUME_SPREAD
+!  SGgid      River/glacier ID number. The same ID suggests the point  !
+!               sources/sinks belong to the same river/glacier.        !
+# endif
+# ifdef ICEPLUME_DETTRAIN_AVERAGE
+!  SGIrange   Location indices (Istr, Iend) when spacially average     !
+!               density profiles.                                      !
+!  SGJrange   Location indices (Jstr, Jend) when spacially average     !
+!               density profiles.                                      !
+# endif
+#endif
 !                                                                      !
 !=======================================================================
 !
@@ -67,6 +95,27 @@
 #ifndef ANA_PSOURCE
           real(r8), pointer :: QbarG(:,:)
           real(r8), pointer :: TsrcG(:,:,:,:)
+#endif
+
+#ifdef ICEPLUME
+          real(r8), pointer :: SGbar(:)
+          real(r8), pointer :: SGtrc(:,:)
+# ifndef ANA_PSOURCE
+          real(r8), pointer :: SGbarG(:,:)
+          real(r8), pointer :: SGtrcG(:,:,:)
+# endif
+          real(r8), pointer :: SGdep(:)
+          real(r8), pointer :: SGtyp(:)
+          real(r8), pointer :: SGlen(:)
+# ifdef ICEPLUME_SPREAD
+          real(r8), pointer :: SGgid(:)
+# endif
+# ifdef ICEPLUME_DETRAIN_AVERAGE
+          real(r8), pointer :: SGIrangeRaw(:, :)
+          real(r8), pointer :: SGJrangeRaw(:, :)
+          integer, pointer :: SGIrange(:, :)
+          integer, pointer :: SGJrange(:, :)
+# endif
 #endif
 
         END TYPE T_SOURCES
@@ -195,6 +244,51 @@
       allocate ( SOURCES(ng) % TsrcG(Nsrc(ng),N(ng),2,NT(ng)) )
       Dmem(ng)=Dmem(ng)+2.0_r8*REAL(Nsrc(ng)*N(ng)*NT(ng),r8)
 #endif
+
+#ifdef ICEPLUME
+      allocate ( SOURCES(ng) % SGbar(Nsrc(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
+
+      allocate ( SOURCES(ng) % SGtrc(Nsrc(ng),NT(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*NT(ng),r8)
+
+# ifndef ANA_PSOURCE
+      allocate ( SOURCES(ng) % SGbarG(Nsrc(ng),2) )
+      Dmem(ng)=Dmem(ng)+2.0_r8*REAL(Nsrc(ng),r8)
+
+      allocate ( SOURCES(ng) % SGtrcG(Nsrc(ng),2,NT(ng)) )
+      Dmem(ng)=Dmem(ng)+2.0_r8*REAL(Nsrc(ng)*NT(ng),r8)
+
+# endif
+      allocate ( SOURCES(ng) % SGdep(Nsrc(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
+
+      allocate ( SOURCES(ng) % SGtyp(Nsrc(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
+
+      allocate ( SOURCES(ng) % SGlen(Nsrc(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
+
+# ifdef ICEPLUME_SPREAD
+      allocate ( SOURCES(ng) % SGgid(Nsrc(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
+
+# endif
+# ifdef ICEPLUME_DETRAIN_AVERAGE
+      allocate ( SOURCES(ng) % SGIrangeRaw(Nsrc(ng), 2) )
+      Dmem(ng)=Dmem(ng)+2.0_r8*REAL(Nsrc(ng),r8)
+
+      allocate ( SOURCES(ng) % SGJrangeRaw(Nsrc(ng), 2) )
+      Dmem(ng)=Dmem(ng)+2.0_r8*REAL(Nsrc(ng),r8)
+
+      allocate ( SOURCES(ng) % SGIrange(Nsrc(ng), 2) )
+      Dmem(ng)=Dmem(ng)+2.0_r8*REAL(Nsrc(ng),r8)
+
+      allocate ( SOURCES(ng) % SGJrange(Nsrc(ng), 2) )
+      Dmem(ng)=Dmem(ng)+2.0_r8*REAL(Nsrc(ng),r8)
+
+# endif
+#endif
 !
 !-----------------------------------------------------------------------
 !  Initialize module variables.
@@ -230,6 +324,43 @@
           END DO
         END DO
       END DO
+
+#ifdef ICEPLUME
+      DO is=1,Nsrc(ng)
+        SOURCES(ng) % SGbar(is) = IniVal
+        SOURCES(ng) % SGdep(is) = IniVal
+        SOURCES(ng) % SGtyp(is) = IniVal
+        SOURCES(ng) % SGlen(is) = IniVal
+# ifdef ICEPLUME_SPREAD
+        SOURCES(ng) % SGgid(is) = IniVal
+# endif
+# ifdef ICEPLUME_DETRAIN_AVERAGE
+        DO K = 1, 2
+          SOURCES(ng) % SGIrangeRaw(is, K) = IniVal
+          SOURCES(ng) % SGJrangeRaw(is, K) = IniVal
+          SOURCES(ng) % SGIrange(is, K) = 0
+          SOURCES(ng) % SGJrange(is, K) = 0
+        ENDDO
+# endif
+      END DO
+      DO itrc=1,NT(ng)
+        DO is=1,Nsrc(ng)
+          SOURCES(ng) % SGtrc(is,itrc) = IniVal
+        END DO
+      END DO
+# ifndef ANA_PSOURCE
+      DO is=1,Nsrc(ng)
+        SOURCES(ng) % SGbarG(is,1) = IniVal
+        SOURCES(ng) % SGbarG(is,2) = IniVal
+      END DO
+      DO itrc=1,NT(ng)
+        DO is=1,Nsrc(ng)
+          SOURCES(ng) % SGtrcG(is,1,itrc) = IniVal
+          SOURCES(ng) % SGtrcG(is,2,itrc) = IniVal
+        END DO
+      END DO
+# endif
+#endif
 
       RETURN
       END SUBROUTINE allocate_sources

@@ -322,8 +322,13 @@ OS := $(patsubst sn%,UNICOS-sn,$(OS))
 
 CPU := $(shell uname -m | sed 's/[\/ ]/-/g')
 
-SVNURL := $(shell svn info | grep '^URL:' | sed 's/URL: //')
-SVNREV := $(shell svn info | grep '^Revision:' | sed 's/Revision: //')
+GITURL := $(shell git config remote.origin.url)
+GITREV := $(shell git log -n 1 --format=%H)
+
+SVNURL := $(shell grep HeadURL ./ROMS/Version | \
+            sed 's/.* \(https.*\)\/ROMS\/Version.*/\1/')
+SVNREV := $(shell grep Revision ./ROMS/Version | \
+            sed 's/.* \([0-9]*\) .*/\1/')
 
 ROOTDIR := $(shell pwd)
 
@@ -369,6 +374,8 @@ ifdef MY_ANALYTICAL
   CPPFLAGS += -D'MY_ANALYTICAL="$(MY_ANALYTICAL)"'
 endif
 
+CPPFLAGS += -D'GIT_URL="$(GITURL)"'
+CPPFLAGS += -D'GIT_REV="$(GITREV)"'
 CPPFLAGS += -D'SVN_URL="$(SVNURL)"'
 CPPFLAGS += -D'SVN_REV="$(SVNREV)"'
 
@@ -401,7 +408,8 @@ endif
 		ROMS/Nonlinear/Sediment \
 		ROMS/Functionals \
 		ROMS/Utility \
-		ROMS/Modules
+		ROMS/Modules \
+ 		ROMS/IcePlume
 
  includes :=	ROMS/Include
 ifdef MY_ANALYTICAL
@@ -427,7 +435,8 @@ endif
 		ROMS/Nonlinear/Sediment \
 		ROMS/Utility \
 		ROMS/Drivers \
-                ROMS/Functionals
+		ROMS/Functionals
+
 ifdef MY_HEADER_DIR
  includes +=	$(MY_HEADER_DIR)
 endif

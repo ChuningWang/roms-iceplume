@@ -48,6 +48,9 @@
 #ifdef BBL_MODEL
       USE mod_bbl, ONLY : allocate_bbl, initialize_bbl
 #endif
+#if defined SOLVE3D && defined ICEPLUME
+      USE mod_iceplume, ONLY : allocate_iceplume
+#endif
 !
       implicit none
 !
@@ -137,6 +140,9 @@
 #endif
           IF (LuvSrc(ng).or.LwSrc(ng).or.ANY(LtracerSrc(:,ng))) THEN
             CALL allocate_sources (ng)
+# if defined SOLVE3D && defined ICEPLUME
+            CALL allocate_iceplume(ng)
+# endif
           END IF
 !$OMP END MASTER
 !$OMP BARRIER

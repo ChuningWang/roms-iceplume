@@ -466,7 +466,11 @@
         real(dp), allocatable :: maxspeed(:)
         real(dp), allocatable :: maxrho(:)
 !
+#ifdef ICEPLUME
+        real(dp) :: max_speed = 100.0_dp        ! m/s
+#else
         real(dp) :: max_speed = 20.0_dp         ! m/s
+#endif
         real(dp) :: max_rho = 200.0_dp          ! kg/m3
 !
 !  Interpolation scheme.

@@ -521,6 +521,24 @@
         character (len=80 ) :: git_rev, svn_rev
         character (len=256) :: git_url, svn_url
 !
+#if defined SOLVE3D && defined ICEPLUME
+!
+!  Iceplume variable IDs.
+!
+        integer  :: idSGtra        ! subglacial runoff transport
+        integer  :: idSGdep        ! subglacial runoff depth
+        integer  :: idSGtyp        ! subglacial runoff type
+        integer  :: idSGlen        ! subglacial runoff source length
+# ifdef ICEPLUME_SPREAD
+        integer  :: idSGgid        ! glacier id number
+# endif
+# ifdef ICEPLUME_DETRAIN_AVERAGE
+        integer  :: idSGxrange     ! subglacial background average indices, XI direction
+        integer  :: idSGerange     ! subglacial background average indices, ETA direction
+# endif
+!
+        integer, allocatable :: idSGtrc(:)  ! subglacial runoff for tracers
+#endif
       CONTAINS
 !
       SUBROUTINE allocate_ncparam
@@ -731,6 +749,12 @@
         allocate ( idTtlf(MT) )
         Dmem(1)=Dmem(1)+REAL(MT,r8)
       END IF
+#if defined SOLVE3D && defined ICEPLUME
+      IF (.not.allocated(idSGtrc)) THEN
+        allocate ( idSGtrc(MT) )
+        Dmem(1)=Dmem(1)+REAL(MT,r8)
+      END IF
+#endif
 
       IF (.not.allocated(iHUTav)) THEN
         allocate ( iHUTav(MT) )
@@ -1843,6 +1867,34 @@
             CASE ('idMOMf')
               idMOMf=varid
 #endif
+#if defined SOLVE3D && defined ICEPLUME
+            CASE ('idSGtra')
+              idSGtra=varid
+            CASE ('idSGdep')
+              idSGdep=varid
+            CASE ('idSGtyp')
+              idSGtyp=varid
+            CASE ('idSGlen')
+              idSGlen=varid
+            CASE ('idSGtrc(itemp)')
+              idSGtrc(itemp)=varid
+            CASE ('idSGtrc(isalt)')
+              idSGtrc(isalt)=varid
+# ifdef T_PASSIVE
+            CASE ('idSGtrc(inert(i))')
+              load=.TRUE.
+# endif
+# ifdef ICEPLUME_SPREAD
+            CASE ('idSGgid')
+              idSGgid=varid
+# endif
+# ifdef ICEPLUME_DETRAIN_AVERAGE
+            CASE ('idSGxrange')
+              idSGxrange=varid
+            CASE ('idSGerange')
+              idSGerange=varid
+# endif
+#endif
 
 #ifdef BIOLOGY
 # if defined BIO_FENNEL
@@ -2069,6 +2121,30 @@
      &                    TRIM(ADJUSTL(Vinfo(5)))
                   END DO
                 END IF
+# if defined SOLVE3D && defined ICEPLUME
+              CASE ('idSGtrc(inert(i))')
+                IF (NPT.gt.0) THEN
+                  varid=varid-1
+                  DO i=1,NPT
+                    varid=varid+1
+                    idSGtrc(inert(i))=varid
+                    DO ng=1,Ngrids
+                      Fscale(varid,ng)=scale
+                      Iinfo(1,varid,ng)=gtype
+                    END DO
+                    WRITE (Vname(1,varid),'(a,i2.2)')                   &
+     &                    TRIM(ADJUSTL(Vinfo(1))), i
+                    WRITE (Vname(2,varid),'(a,a,i2.2)')                 &
+     &                    TRIM(ADJUSTL(Vinfo(2))), ', type ', i
+                    WRITE (Vname(3,varid),'(a)')                        &
+     &                    TRIM(ADJUSTL(Vinfo(3)))
+                    WRITE (Vname(4,varid),'(a,a)')                      &
+     &                    TRIM(Vname(1,varid)), ', scalar, series'
+                    WRITE (Vname(5,varid),'(a)')                        &
+     &                    TRIM(ADJUSTL(Vinfo(5)))
+                  END DO
+                END IF
+# endif
             END SELECT
 #endif
 #ifdef DIAGNOSTICS_TS

@@ -1129,6 +1129,89 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+10)=' ICESHELF,'
 #endif
+!
+!----- iceplume model (Chuning Wang) -----------------------------------
+!
+#ifdef ICEPLUME
+      IF (Master) WRITE (stdout,20) 'ICEPLUME',                         &
+     &   'Ice Plume model for subglacial discharge.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+10)=' ICEPLUME,'
+!
+# ifdef ICEPLUME_TRACER
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_TRACER',                  &
+     &   'Tracers for plume water in iceplume model.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+10)=' ICEPLUME_TRACER,'
+# endif
+!
+# ifdef ICEPLUME_MELT
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_MELT',                    &
+     &   'Background melting for the iceplume model.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+10)=' ICEPLUME_MELT,'
+# endif
+!
+# ifdef ICEPLUME_MELT_TRACER
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_MELT_TRACER',             &
+     &   'Tracers for background melting in iceplume model.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+10)=' ICEPLUME_MELT_TRACER,'
+# endif
+!
+#ifdef ICEPLUME_VIRTUAL_BOX
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_VIRTUAL_BOX',             &
+     &   'Mixing instead of flux form for iceplume model.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+10)=' ICEPLUME_VIRTUAL_BOX,'
+# endif
+!
+#ifdef ICEPLUME_DETRAIN_NO
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_DETRAIN_NO',              &
+     &   'Suppress detrainment model for iceplume model.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+10)=' ICEPLUME_DETRAIN_NO,'
+# endif
+!
+#ifdef ICEPLUME_DETRAIN_AVERAGE
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_DETRAIN_AVERAGE',         &
+     &   'Average ambient density for detrainment model.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+10)=' ICEPLUME_DETRAIN_AVERAGE,'
+# endif
+!
+#ifdef ICEPLUME_DETRAIN_IWCP
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_DETRAIN_IWCP',            &
+     &   'Use internal wave speed for detrainment model.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+10)=' ICEPLUME_DETRAIN_IWCP,'
+# endif
+!
+#ifdef ICEPLUME_DETRAIN_BULK
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_DETRAIN_BULK',            &
+     &   'Use bulk formula for detrainment model.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+10)=' ICEPLUME_DETRAIN_BULK,'
+# endif
+!
+#ifdef ICEPLUME_DETRAIN_UNIFORM
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_DETRAIN_UNIFORM',         &
+     &   'Use uniform detrainment velocity.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+10)=' ICEPLUME_DETRAIN_UNIFORM,'
+# endif
+!
+#ifdef ICEPLUME_DETRAIN_NEUTRAL
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_DETRAIN_NEUTRAL',         &
+     &   'Use neutral density tracer concentration.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+10)=' ICEPLUME_DETRAIN_NEUTRAL,'
+# endif
+!
+#endif
+!
+!----- iceplume model end ----------------------------------------------
+!
 #if defined IMPACT_INNER        && defined OBS_IMPACT              && \
    (defined IS4DVAR_SENSITIVITY || defined W4DPSAS_FCT_SENSITIVITY || \
     defined W4DPSAS_SENSITIVITY || defined W4DVAR_SENSITIVITY)

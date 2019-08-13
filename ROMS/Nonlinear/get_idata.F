@@ -530,6 +530,63 @@
           SOURCES(ng)%Jsrc(is)=                                         &
      &                MAX(1,MIN(NINT(SOURCES(ng)%Ysrc(is)),Mm(ng)+1))
         END DO
+
+# if defined SOLVE3D && defined ICEPLUME
+        CALL get_ngfld (ng, iNLM, idSGdep, SSF(ng)%ncid,                &
+     &                  1, SSF(ng), update(1),                          &
+     &                  1, Nsrc(ng), 1, 1, 1, Nsrc(ng), 1,              &
+     &                  SOURCES(ng) % SGdep)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+
+        CALL get_ngfld (ng, iNLM, idSGtyp, SSF(ng)%ncid,                &
+     &                  1, SSF(ng), update(1),                          &
+     &                  1, Nsrc(ng), 1, 1, 1, Nsrc(ng), 1,              &
+     &                  SOURCES(ng) % SGtyp)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+
+        CALL get_ngfld (ng, iNLM, idSGlen, SSF(ng)%ncid,                &
+     &                  1, SSF(ng), update(1),                          &
+     &                  1, Nsrc(ng), 1, 1, 1, Nsrc(ng), 1,              &
+     &                  SOURCES(ng) % SGlen)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+
+#  ifdef ICEPLUME_SPREAD
+        CALL get_ngfld (ng, iNLM, idSGgid, SSF(ng)%ncid,                &
+     &                  1, SSF(ng), update(1),                          &
+     &                  1, Nsrc(ng), 1, 1, 1, Nsrc(ng), 1,              &
+     &                  SOURCES(ng) % SGgid)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+
+#  endif
+#  ifdef ICEPLUME_DETRAIN_AVERAGE
+        CALL get_ngfld (ng, iNLM, idSGxrange, SSF(ng)%ncid,             &
+     &                  1, SSF(ng), update(1),                          &
+     &                  1, Nsrc(ng), 2, 1, 1, Nsrc(ng), 2,              &
+     &                  SOURCES(ng) % SGIrangeRaw)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+
+        CALL get_ngfld (ng, iNLM, idSGerange, SSF(ng)%ncid,             &
+     &                  1, SSF(ng), update(1),                          &
+     &                  1, Nsrc(ng), 2, 1, 1, Nsrc(ng), 2,              &
+     &                  SOURCES(ng) % SGJrangeRaw)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+
+        DO is=1,Nsrc(ng)
+          DO itrc=1,2
+          SOURCES(ng) % SGIrange(is,itrc) =                             &
+     &      NINT(SOURCES(ng) % SGIrangeRaw(is,itrc))
+          SOURCES(ng) % SGJrange(is,itrc) =                             &
+     &      NINT(SOURCES(ng) % SGJrangeRaw(is,itrc))
+          ENDDO
+        ENDDO
+#  endif
+# endif
       END IF
 #endif
 
