@@ -531,7 +531,7 @@
      &                MAX(1,MIN(NINT(SOURCES(ng)%Ysrc(is)),Mm(ng)+1))
         END DO
 
-# if defined SOLVE3D && defined ICEPLUME
+# ifdef ICEPLUME
         CALL get_ngfld (ng, iNLM, idSGdep, SSF(ng)%ncid,                &
      &                  1, SSF(ng), update(1),                          &
      &                  1, Nsrc(ng), 1, 1, 1, Nsrc(ng), 1,              &
@@ -562,6 +562,7 @@
      &                 __FILE__)) RETURN
 
 #  endif
+
 #  ifdef ICEPLUME_DETRAIN_AVERAGE
         CALL get_ngfld (ng, iNLM, idSGxrange, SSF(ng)%ncid,             &
      &                  1, SSF(ng), update(1),                          &

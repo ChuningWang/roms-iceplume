@@ -763,6 +763,9 @@
       DO ng=1,Ngrids
 !$OMP MASTER
         CALL get_idata (ng)
+# ifdef ICEPLUME
+        CALL iceplume_init (ng)
+# endif
         CALL get_data (ng)
 !$OMP END MASTER
 #  ifdef DISTRIBUTE

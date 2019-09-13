@@ -211,8 +211,14 @@
               ng=GridNumber(ig,nl)
               DO tile=first_tile(ng),last_tile(ng),+1
                 CALL set_data (ng, tile)
-# if defined SOLVE3D && defined ICEPLUME
+# ifdef ICEPLUME
                 CALL iceplume (ng, tile)
+#  ifdef ICEPLUME_SPREAD
+                CALL iceplume_spread (ng, tile)
+#  endif
+#  ifdef ICEPLUME_VIRTUAL_MIX
+                CALL iceplume_mix (ng, tile)
+#  endif
 # endif
               END DO
 !$OMP BARRIER

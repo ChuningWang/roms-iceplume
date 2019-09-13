@@ -28,6 +28,7 @@ MODULE mod_iceplume
 ! cW        - heat capacity of water [J kg^-1 degC^-1]                 !
 ! cI        - heat capacity of ice [J kg^-1 degC^-1]                   !
 ! L         - latent heat of melting [J kg^-1]                         !
+! tGade     - equavilent temperature of meltwater (Gade Line) [degC]   !
 ! lambda1   - freezing point slope [degC PSU^-1]                       !
 ! lambda2   - freezing point offset [degC]                             !
 ! lambda3   - freezing point depth slope [degC m^-1]                   !
@@ -60,6 +61,7 @@ MODULE mod_iceplume
   real(r8), parameter :: cW         = 3974.0_r8
   real(r8), parameter :: cI         = 2000.0_r8
   real(r8), parameter :: L          = 335000.0_r8
+  real(r8), parameter :: tGade      = -(L - cI*tIce)/cW
   real(r8), parameter :: lambda1    = -0.0573_r8
   real(r8), parameter :: lambda2    = 0.0832_r8
   real(r8), parameter :: lambda3    = 0.000761_r8
@@ -85,6 +87,8 @@ MODULE mod_iceplume
 !                                                                      !
 ! PLUME Type variables                                                 !
 !                                                                      !
+! Isrc, Jsrc    - grid indices acquired from river file.               !
+! dx, dy        - grid lengths in cross/along glacier direction.       !
 ! dir           - direction of plume. +1 for positve direction and     !
 !                 -1 for negative direction. 0 for other situation.    !
 ! trs           - depth integrated total transport [m^3 s^-1]          !
@@ -155,6 +159,10 @@ MODULE mod_iceplume
 !
 ! Depth independent variables.
 !
+    integer,  pointer :: Isrc(:)
+    integer,  pointer :: Jsrc(:)
+    real(r8), pointer :: dx(:)
+    real(r8), pointer :: dy(:)
     real(r8), pointer :: dir(:)
     real(r8), pointer :: trs(:)
 !
@@ -188,7 +196,7 @@ MODULE mod_iceplume
 !
     real(r8), pointer :: ent(:, :)
     real(r8), pointer :: det(:, :)
-    integer(r8), pointer :: detI(:, :)
+    integer,  pointer :: detI(:, :)
     real(r8), pointer :: detFrac(:, :)
 # ifdef ICEPLUME_DETRAIN_NEUTRAL
 !
@@ -243,8 +251,12 @@ MODULE mod_iceplume
 !
 ! Allocate profiles
 !
-      allocate( PLUME(ng) % dir(1:Nsrc(ng)) )
-      allocate( PLUME(ng) % trs(1:Nsrc(ng)) )
+      allocate( PLUME(ng) % Isrc(1:Nsrc(ng)) )
+      allocate( PLUME(ng) % Jsrc(1:Nsrc(ng)) )
+      allocate( PLUME(ng) % dx  (1:Nsrc(ng)) )
+      allocate( PLUME(ng) % dy  (1:Nsrc(ng)) )
+      allocate( PLUME(ng) % dir (1:Nsrc(ng)) )
+      allocate( PLUME(ng) % trs (1:Nsrc(ng)) )
 !
       allocate( PLUME(ng) % zW   (Nsrc(ng), 0:N(ng)) )
       allocate( PLUME(ng) % f    (Nsrc(ng), 0:N(ng)) )

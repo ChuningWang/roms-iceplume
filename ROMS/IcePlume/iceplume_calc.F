@@ -8,7 +8,7 @@
 !                                                                   !
 ! ==================================================================!
 !
-SUBROUTINE ICEPLUME_CALC(ng, I, dx, dy,                                 &
+SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
      &                   fIni, tIni, sIni,                              &
      &                   sgTyp, sgDep, sgLen)
 !
@@ -23,7 +23,6 @@ SUBROUTINE ICEPLUME_CALC(ng, I, dx, dy,                                 &
 !                                                                   !
 ! ng      - grid identifier                                         !
 ! I       - point source index identifier                           !
-! dx, dy  - grid spacing [m]                                        !
 ! fIni    - subglacial runoff volume flux [m^3 s^-1]                !
 ! tIni    - subglacial runoff temperature [degC]                    !
 ! sIni    - subglacial runoff salinity [PSU]                        !
@@ -53,7 +52,6 @@ SUBROUTINE ICEPLUME_CALC(ng, I, dx, dy,                                 &
 ! In/out variables
 !
   integer, intent(in) :: ng, I
-  real(r8), intent(in) :: dx, dy
   real(r8), intent(inout) :: fIni, tIni, sIni
   integer, intent(in) :: sgTyp
   real(r8), intent(in) :: sgDep, sgLen
@@ -220,7 +218,7 @@ SUBROUTINE ICEPLUME_CALC(ng, I, dx, dy,                                 &
 !
     areaP = PLUME(ng) % a(I, K) - PLUME(ng) % a(I, K-1)
     areaP = MAX(areaP, 0.0)
-    areaB = PLUME(ng) % dz(I, K)*dy - areaP
+    areaB = PLUME(ng) % dz(I, K)*PLUME(ng) % dy(I) - areaP
     areaB = MAX(areaB, 0.0)
 !
     IF ( areaP .GT. 0.0 ) THEN

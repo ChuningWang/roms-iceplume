@@ -65,7 +65,6 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
 ! tF          - temperature of total freshwater [degC]              !
 ! tE          - temperature of entrainment                          !
 ! tP          - temperature of plume                                !
-! tGade       - temperature of meltwater (Gade line)                !
 !                                                                   !
 ! sF          - salinity of total freshwater [PSU]                  !
 ! sE          - salinity of entrainment                             !
@@ -111,7 +110,7 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
 ! For variable detrainment tracer concentration
 !
   real(r8) :: volR, volM, volF, volE, volP
-  real(r8) :: tF, tE, tP, tGade, sF, sE, sP, rhoF, rhoE
+  real(r8) :: tF, tE, tP, sF, sE, sP, rhoF, rhoE
 # endif
 !
 ! Other local variables
@@ -455,7 +454,6 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
 ! Temperature. Note that tGade is effective temperature of Gade line.
 !
   tP = PLUME(ng) % trc(I, itemp)
-  tGade = -(L - cI*tIce)/cW
   tF = (tGade*volM + PLUME(ng) % t(I, iceDepthK)*volR)/volF
   tE = (tP*volP-tF*volF)/volE
 !
