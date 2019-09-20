@@ -1828,6 +1828,7 @@
         DO ng=1,Ngrids
           lstr=LEN(S(ng)%name)
           DO i=1,lstr
+            S(ng)%head(i:i)=blank
             S(ng)%base(i:i)=blank
             S(ng)%name(i:i)=blank
           END DO
@@ -1844,6 +1845,7 @@
         DO ng=1,my_Ngrids
           S(ng)%Nfiles=Nfiles(ng)              ! number of multi-files
           S(ng)%Fcount=1                       ! multi-file counter
+          S(ng)%load=1                         ! filename load counter
           S(ng)%Rindex=0                       ! time index
           S(ng)%ncid=-1                        ! closed NetCDF state
           S(ng)%Vid=-1                         ! NetCDF variables IDs
@@ -1858,6 +1860,7 @@
           S(ng)%label=TRIM(label)              ! structure label
           S(ng)%name=TRIM(S(ng)%files(1))      ! load first file
           lstr=LEN_TRIM(S(ng)%name)
+          S(ng)%head=S(ng)%name(1:lstr-3)      ! do not include ".nc"
           S(ng)%base=S(ng)%name(1:lstr-3)      ! do not include ".nc"
           Nfiles(ng)=0                         ! clean file counter
         END DO
@@ -1868,6 +1871,7 @@
           DO ng=igrid+1,Ngrids
             S(ng)%Nfiles=S(igrid)%Nfiles
             S(ng)%Fcount=1
+            S(ng)%load=1
             S(ng)%Rindex=0
             S(ng)%ncid=-1
             S(ng)%Vid=-1
@@ -2056,6 +2060,7 @@
           DO i=1,idim
             lstr=LEN(S(i,ng)%name)
             DO j=1,lstr
+              S(i,ng)%head(j:j)=blank
               S(i,ng)%base(j:j)=blank
               S(i,ng)%name(j:j)=blank
             END DO
@@ -2074,6 +2079,7 @@
           DO i=1,Nfiles(ng)
             S(i,ng)%Nfiles=Ncount(i,ng)         ! number of multi-files
             S(i,ng)%Fcount=1                    ! multi-file counter
+            S(i,ng)%load=1                      ! filename load counter
             S(i,ng)%Rindex=0                    ! time index
             S(i,ng)%ncid=-1                     ! closed NetCDF state
             S(i,ng)%Vid=-1                      ! NetCDF variables IDs
@@ -2088,6 +2094,7 @@
             S(i,ng)%label=TRIM(label)           ! structure label
             S(i,ng)%name=TRIM(S(i,ng)%files(1)) ! load first file
             lstr=LEN_TRIM(S(i,ng)%name)
+            S(i,ng)%head=S(i,ng)%name(1:lstr-3) ! do not include ".nc"
             S(i,ng)%base=S(i,ng)%name(1:lstr-3) ! do not include ".nc"
           END DO
         END DO
@@ -2099,6 +2106,7 @@
             DO i=1,Nfiles(ng)
               S(i,ng)%Nfiles=S(i,igrid)%Nfiles
               S(i,ng)%Fcount=1
+              S(i,ng)%load=1
               S(i,ng)%Rindex=0
               S(i,ng)%ncid=-1
               S(i,ng)%Vid=-1
@@ -2110,8 +2118,9 @@
                 S(i,ng)%time_max(j)=0.0_dp
               END DO
               S(i,ng)%label=TRIM(label)
-              S(i,ng)%name=S(i,igrid)%name
+              S(i,ng)%head=S(i,igrid)%head
               S(i,ng)%base=S(i,igrid)%base
+              S(i,ng)%name=S(i,igrid)%name
               Ncount(i,ng)=0
             END DO
           END DO

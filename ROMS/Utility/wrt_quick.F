@@ -101,7 +101,7 @@
 !  Set time record index.
 !
       QCK(ng)%Rindex=QCK(ng)%Rindex+1
-      Fcount=QCK(ng)%Fcount
+      Fcount=QCK(ng)%load
       QCK(ng)%Nrec(Fcount)=QCK(ng)%Nrec(Fcount)+1
 !
 !  Write out model time (s).
