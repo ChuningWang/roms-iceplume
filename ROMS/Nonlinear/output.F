@@ -74,6 +74,7 @@
       IF (Lanafile) THEN
         Lanafile=.FALSE.
       END IF
+#ifndef NO_HIS
 !
 !  Create output history NetCDF file or prepare existing file to
 !  append new data to it.  Also,  notice that it is possible to
@@ -160,6 +161,7 @@
           END IF
         END IF
       END IF
+#endif
 !
 !-----------------------------------------------------------------------
 !  If appropriate, process nonlinear quicksave NetCDF file.
