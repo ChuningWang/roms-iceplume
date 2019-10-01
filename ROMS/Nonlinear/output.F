@@ -202,7 +202,8 @@
             QCK(ng)%Nrec(Fcount)=0
             ifile=(iic(ng)-1)/ndefQCK(ng)+1
             IF (Master) THEN
-              WRITE (QCK(ng)%name,10) TRIM(QCK(ng)%base), ifile
+              WRITE (QCK(ng)%name,15) TRIM(QCK(ng)%base), ifile
+  15          FORMAT (a,'_',i4.4,'.nc')
             END IF
 # ifdef DISTRIBUTE
             CALL mp_bcasts (ng, iNLM, QCK(ng)%name)
