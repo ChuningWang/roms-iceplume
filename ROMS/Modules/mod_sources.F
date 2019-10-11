@@ -50,7 +50,7 @@
 !  SGdep      Depth of subglacial point Sources/Sinks (m).             !
 !  SGtyp      Type of subglacial point Sources/Sinks:                  !
 !               TYPEsrc(:) = 1,  No subglaical plume or melt.          !
-!               TYPEsrc(:) = 2,  half-cone.                            !
+!               TYPEsrc(:) = 2,  half-cone (point source).             !
 !               TYPEsrc(:) = 3,  finite-line.                          !
 !               TYPEsrc(:) = 4,  sheet (infinite-line).                !
 !               TYPEsrc(:) = 5,  detached.                             !
