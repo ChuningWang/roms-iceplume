@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+# Iceplume test case stuff
+iceplume_test/Build_roms
+iceplume_test/outputs
+iceplume_test/romsM

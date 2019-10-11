@@ -52,7 +52,7 @@
 !               TYPEsrc(:) = 1,  No subglaical plume or melt.          !
 !               TYPEsrc(:) = 2,  half-cone.                            !
 !               TYPEsrc(:) = 3,  finite-line.                          !
-!               TYPEsrc(:) = 4,  sheet.                                !
+!               TYPEsrc(:) = 4,  sheet (infinite-line).                !
 !               TYPEsrc(:) = 5,  detached.                             !
 !               TYPEsrc(:) = 6,  ellipse.                              !
 !  SGlen      Length of point Sources/Sinks (m).                       !
