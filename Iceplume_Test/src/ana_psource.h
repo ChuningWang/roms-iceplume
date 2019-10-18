@@ -141,45 +141,7 @@
 !  mass sources are located at U- or V-points so the grid locations
 !  should range from 1 =< Isrc =< L  and  1 =< Jsrc =< M.
 !
-#if defined RIVERPLUME1
-        IF (Master.and.DOMAIN(ng)%SouthWest_Test(tile)) THEN
-          Nsrc(ng)=1
-          SOURCES(ng)%Dsrc(Nsrc(ng))=0.0_r8
-          SOURCES(ng)%Isrc(Nsrc(ng))=1
-          SOURCES(ng)%Jsrc(Nsrc(ng))=50
-        END IF
-#elif defined RIVERPLUME2
-        IF (Master.and.DOMAIN(ng)%SouthWest_Test(tile)) THEN
-          Nsrc(ng)=1+Lm(ng)*2
-          DO is=1,(Nsrc(ng)-1)/2
-            SOURCES(ng)%Dsrc(is)=1.0_r8
-            SOURCES(ng)%Isrc(is)=is
-            SOURCES(ng)%Jsrc(is)=1
-          END DO
-          DO is=(Nsrc(ng)-1)/2+1,Nsrc(ng)-1
-            SOURCES(ng)%Dsrc(is)=1.0_r8
-            SOURCES(ng)%Isrc(is)=is-Lm(ng)
-            SOURCES(ng)%Jsrc(is)=Mm(ng)+1
-          END DO
-          SOURCES(ng)%Dsrc(Nsrc(ng))=0.0_r8
-          SOURCES(ng)%Isrc(Nsrc(ng))=1
-          SOURCES(ng)%Jsrc(Nsrc(ng))=60
-        END IF
-#elif defined SED_TEST1
-        IF (Master.and.DOMAIN(ng)%SouthWest_Test(tile)) THEN
-          Nsrc(ng)=Mm(ng)*2
-          DO is=1,Nsrc(ng)/2
-            SOURCES(ng)%Dsrc(is)=0.0_r8
-            SOURCES(ng)%Isrc(is)=1
-            SOURCES(ng)%Jsrc(is)=is
-          END DO
-          DO is=Nsrc(ng)/2+1,Nsrc(ng)
-            SOURCES(ng)%Dsrc(is)=0.0_r8
-            SOURCES(ng)%Isrc(is)=Lm(ng)+1
-            SOURCES(ng)%Jsrc(is)=is-Mm(ng)
-          END DO
-        END IF
-#elif defined ICEPLUME_TEST
+#if defined ICEPLUME_TEST
         IF (Master.and.DOMAIN(ng)%SouthWest_Test(tile)) THEN
           Nsrc(ng)=3
           cff=NINT((Mm(ng)+1)/2.0_r8)
@@ -236,72 +198,6 @@
 
 !$OMP BARRIER
 
-# if defined SED_TEST1
-        DO k=1,N(ng)
-          DO is=1,Nsrc(ng)
-            i=SOURCES(ng)%Isrc(is)
-            j=SOURCES(ng)%Jsrc(is)
-            IF (((IstrT.le.i).and.(i.le.IendT)).and.                    &
-     &           ((JstrT.le.j).and.(j.le.JendT))) THEN
-              IF (ubar(i,j,knew).ne.0.0_r8) THEN
-                cff=ABS(u(i,j,k,nnew)/ubar(i,j,knew))
-              ELSE
-                cff=1.0_r8
-              END IF
-              SOURCES(ng)%Qshape(is,k)=cff*                             &
-     &                                 (z_w(i-1,j,k    )-               &
-     &                                  z_w(i-1,j,k-1  )+               &
-     &                                  z_w(i  ,j,k    )-               &
-     &                                  z_w(i  ,j,k-1  ))/              &
-     &                                 (z_w(i-1,j,N(ng))-               &
-     &                                  z_w(i-1,j,0    )+               &
-     &                                  z_w(i  ,j,N(ng))-               &
-     &                                  z_w(i  ,j,0    ))
-            END IF
-          END DO
-        END DO
-#  ifdef DISTRIBUTE
-        Pwrk=RESHAPE(SOURCES(ng)%Qshape,(/Npts/))
-        CALL mp_collect (ng, iNLM, Npts, Pspv, Pwrk)
-        SOURCES(ng)%Qshape=RESHAPE(Pwrk,(/Msrc,N(ng)/))
-#  endif
-
-# elif defined RIVERPLUME2
-        DO k=1,N(ng)
-          DO is=1,Nsrc(ng)-1
-            i=SOURCES(ng)%Isrc(is)
-            j=SOURCES(ng)%Jsrc(is)
-            IF (((IstrT.le.i).and.(i.le.IendT)).and.                    &
-     &          ((JstrT.le.j).and.(j.le.JendT))) THEN
-              IF (vbar(i,j,knew).ne.0.0_r8) THEN
-                cff=ABS(v(i,j,k,nnew)/vbar(i,j,knew))
-              ELSE
-                cff=1.0_r8
-              END IF
-              SOURCES(ng)%Qshape(is,k)=cff*                             &
-     &                                 (z_w(i,j-1,k    )-               &
-     &                                  z_w(i,j-1,k-1  )+               &
-     &                                  z_w(i,j  ,k    )-               &
-     &                                  z_w(i,j  ,k-1  ))/              &
-     &                                 (z_w(i,j-1,N(ng))-               &
-     &                                  z_w(i,j-1,0    )+               &
-     &                                  z_w(i,j  ,N(ng))-               &
-     &                                  z_w(i,j  ,0    ))
-            END IF
-          END DO
-        END DO
-        IF (Master.and.DOMAIN(ng)%SouthWest_Test(tile)) THEN
-          DO k=1,N(ng)
-            SOURCES(ng)%Qshape(Nsrc(ng),k)=1.0_r8/REAL(N(ng),r8)
-          END DO
-        END IF
-#  ifdef DISTRIBUTE
-        Pwrk=RESHAPE(SOURCES(ng)%Qshape,(/Npts/))
-        CALL mp_collect (ng, iNLM, Npts, Pspv, Pwrk)
-        SOURCES(ng)%Qshape=RESHAPE(Pwrk,(/Msrc(ng),N(ng)/))
-#  endif
-
-# else
 !!
 !!  Notice that there is not need for distributed-memory communications
 !!  here since the computation below does not have a parallel tile
@@ -314,7 +210,6 @@
             END DO
           END DO
         END IF
-# endif
 #endif
 !
 !  Set-up vertically integrated mass transport (m3/s) of point
@@ -327,115 +222,7 @@
 
 !$OMP BARRIER
 
-#if defined RIVERPLUME1
-        IF ((tdays(ng)-dstart).lt.0.5_r8) THEN
-          fac=1.0_r8+TANH((time(ng)-43200.0_r8)/43200.0_r8)
-        ELSE
-          fac=1.0_r8
-        END IF
-        DO is=1,Nsrc(ng)
-          SOURCES(ng)%Qbar(is)=fac*1500.0_r8
-        END DO
-
-#elif defined RIVERPLUME2
-        DO is=1,(Nsrc(ng)-1)/2               ! North end
-          i=SOURCES(ng)%Isrc(is)
-          j=SOURCES(ng)%Jsrc(is)
-          IF (((IstrT.le.i).and.(i.le.IendT)).and.                      &
-     &        ((JstrT.le.j).and.(j.le.JendT))) THEN
-            SOURCES(ng)%Qbar(is)=-0.05_r8*om_v(i,j)*                    &
-     &                           (0.5_r8*(zeta(i,j-1,knew)+h(i,j-1)+    &
-     &                                    zeta(i  ,j,knew)+h(i  ,j)))
-          END IF
-        END DO
-        DO is=(Nsrc(ng)-1)/2+1,Nsrc(ng)-1    ! South end
-          i=SOURCES(ng)%Isrc(is)
-          j=SOURCES(ng)%Jsrc(is)
-          IF (((IstrT.le.i).and.(i.le.IendT)).and.                      &
-     &        ((JstrT.le.j).and.(j.le.JendT))) THEN
-            SOURCES(ng)%Qbar(is)=-0.05_r8*om_v(i,j)*                    &
-     &                           (0.5_r8*(zeta(i,j-1,knew)+h(i,j-1)+    &
-     &                                    zeta(i  ,j,knew)+h(i  ,j)))
-          END IF
-        END DO
-        IF (Master.and.DOMAIN(ng)%SouthWest_Test(tile)) THEN
-          SOURCES(ng)%Qbar(Nsrc)=1500.0_r8   ! West wall
-        END IF
-# ifdef DISTRIBUTE
-        CALL mp_collect (ng, iNLM, Msrc(ng), Pspv, SOURCES(ng)%Qbar)
-# endif
-
-#elif defined SED_TEST1
-        my_area_west=0.0_r8                  ! West end
-        fac=-36.0_r8*10.0_r8*1.0_r8
-        DO is=1,Nsrc(ng)/2
-          i=SOURCES(ng)%Isrc(is)
-          j=SOURCES(ng)%Jsrc(is)
-          IF (((IstrT.le.i).and.(i.le.IendT)).and.                      &
-     &        ((JstrT.le.j).and.(j.le.JendT))) THEN
-            cff=0.5_r8*(zeta(i-1,j,knew)+h(i-1,j)+                      &
-     &                  zeta(i  ,j,knew)+h(i  ,j))*on_u(i,j)
-            SOURCES(ng)%Qbar(is)=fac*cff
-            my_area_west=my_area_west+cff
-          END IF
-        END DO
-!
-        my_area_east=0.0_r8                  ! East end
-        fac=-36.0_r8*10.0_r8*1.0_r8
-        DO is=Nsrc(ng)/2+1,Nsrc(ng)
-          i=SOURCES(ng)%Isrc(is)
-          j=SOURCES(ng)%Jsrc(is)
-          IF (((IstrT.le.i).and.(i.le.IendT)).and.                      &
-     &        ((JstrT.le.j).and.(j.le.JendT))) THEN
-            cff=0.5_r8*(zeta(i-1,j,knew)+h(i-1,j)+                      &
-     &                  zeta(i  ,j,knew)+h(i  ,j))*on_u(i,j)
-            SOURCES(ng)%Qbar(is)=fac*cff
-            my_area_east=my_area_east+cff
-          END IF
-        END DO
-!
-# ifdef DISTRIBUTE
-        NSUB=1                           ! distributed-memory
-# else
-        IF (DOMAIN(ng)%SouthWest_Corner(tile).and.                      &
-     &    DOMAIN(ng)%NorthEast_Corner(tile)) THEN
-          NSUB=1                         ! non-tiled application
-        ELSE
-          NSUB=NtileX(ng)*NtileE(ng)     ! tiled application
-        END IF
-# endif
-!$OMP CRITICAL (PSOURCE)
-        IF (tile_count.eq.0) THEN
-          area_west=0.0_r8
-          area_east=0.0_r8
-        END IF
-        area_west=area_west+my_area_west
-        area_east=area_east+my_area_east
-        tile_count=tile_count+1
-        IF (tile_count.eq.NSUB) THEN
-          tile_count=0
-# ifdef DISTRIBUTE
-          buffer(1)=area_west
-          buffer(2)=area_east
-          io_handle(1)='SUM'
-          io_handle(2)='SUM'
-          CALL mp_reduce (ng, iNLM, 2, buffer, io_handle)
-          area_west=buffer(1)
-          area_east=buffer(1)
-# endif
-          DO is=1,Nsrc(ng)/2
-            SOURCES(ng)%Qbar(is)=Qbar(is)/area_west
-          END DO
-          DO is=Nsrc(ng)/2+1,Nsrc(ng)
-            SOURCES(ng)%Qbar(is)=Qbar(is)/area_east
-          END DO
-        END IF
-!$OMP END CRITICAL (PSOURCE)
-
-# ifdef DISTRIBUTE
-        CALL mp_collect (ng, iNLM, Msrc, Pspv, SOURCES(ng)%Qbar)
-# endif
-#elif defined ICEPLUME_TEST
+#if defined ICEPLUME_TEST
         DO is=1,Nsrc(ng)
           SOURCES(ng)%Qbar(is)=0.0_r8
           SOURCES(ng)%SGbar(is)=0.0_r8
@@ -473,28 +260,7 @@
 !
 !  Set-up tracer (tracer units) point Sources/Sinks.
 !
-# if defined RIVERPLUME1
-        IF (DOMAIN(ng)%NorthEast_Test(tile)) THEN
-          DO k=1,N(ng)
-            DO is=1,Nsrc(ng)
-              SOURCES(ng)%Tsrc(is,k,itemp)=T0(ng)
-              SOURCES(ng)%Tsrc(is,k,isalt)=0.0_r8
-            END DO
-          END DO
-        END IF
-
-# elif defined RIVERPLUME2
-        IF (DOMAIN(ng)%NorthEast_Test(tile)) THEN
-          DO k=1,N(ng)
-            DO is=1,Nsrc(ng)-1
-              SOURCES(ng)%Tsrc(is,k,itemp)=T0(ng)
-              SOURCES(ng)%Tsrc(is,k,isalt)=S0(ng)
-            END DO
-            SOURCES(ng)%Tsrc(Nsrc(ng),k,itemp)=T0(ng)
-            SOURCES(ng)%Tsrc(Nsrc(ng),k,isalt)=S0(ng)
-          END DO
-        END IF
-# elif defined ICEPLUME_TEST
+# if defined ICEPLUME_TEST
         IF (DOMAIN(ng)%NorthEast_Test(tile)) THEN
           DO k=1,N(ng)
             DO is=1,Nsrc(ng)

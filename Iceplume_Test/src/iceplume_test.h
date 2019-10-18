@@ -22,11 +22,11 @@
 /* iceplume */
 #define ICEPLUME
 #ifdef ICEPLUME
+# define ICEPLUME_VIRTUAL_MIX
 # define ICEPLUME_DETRAIN_AVERAGE
 # define ICEPLUME_TRACER
 # define ICEPLUME_MELT
 # undef ICEPLUME_MELT_TRACER
-# undef ICEPLUME_VIRTUAL_MIX
 #endif
 
 /* advection, dissipation, pressure grad, etc. */
