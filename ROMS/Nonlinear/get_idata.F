@@ -554,6 +554,15 @@
      &                 __FILE__)) RETURN
 
 #  ifdef ICEPLUME_SPREAD
+        CALL get_ngfld (ng, iNLM, idSGang, SSF(ng)%ncid,                &
+     &                  1, SSF(ng), update(1),                          &
+     &                  1, Nsrc(ng), 1, 1, 1, Nsrc(ng), 1,              &
+     &                  SOURCES(ng) % SGang)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+
+#  endif
+#  ifdef ICEPLUME_SPREAD
         CALL get_ngfld (ng, iNLM, idSGgid, SSF(ng)%ncid,                &
      &                  1, SSF(ng), update(1),                          &
      &                  1, Nsrc(ng), 1, 1, 1, Nsrc(ng), 1,              &
@@ -562,7 +571,6 @@
      &                 __FILE__)) RETURN
 
 #  endif
-
 #  ifdef ICEPLUME_DETRAIN_AVERAGE
         CALL get_ngfld (ng, iNLM, idSGxrange, SSF(ng)%ncid,             &
      &                  1, SSF(ng), update(1),                          &

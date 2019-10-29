@@ -43,7 +43,7 @@ SUBROUTINE iceplume_init (ng)
 !
   CALL wclock_on (ng, iNLM, 3, __LINE__, __FILE__)
 #endif
-  DO is=1,Nsrc(ng)
+  DO is = 1, Nsrc(ng)
     Isrc = SOURCES(ng) % Isrc(is)
     Jsrc = SOURCES(ng) % Jsrc(is)
 !
@@ -168,7 +168,7 @@ SUBROUTINE iceplume_tile (ng, tile)
 # include "set_bounds.h"
 !
   IF ((LuvSrc(ng)) .OR. (LwSrc(ng))) THEN
-    DO is=1,Nsrc(ng)
+    DO is = 1, Nsrc(ng)
       Isrc = PLUME(ng) % Isrc(is)
       Jsrc = PLUME(ng) % Jsrc(is)
       IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.            &
@@ -496,11 +496,34 @@ SUBROUTINE iceplume_mix_tile (ng, tile)
 # include "set_bounds.h"
 !
   IF ((LuvSrc(ng)) .OR. (LwSrc(ng))) THEN
-    DO is=1,Nsrc(ng)
+    DO is = 1, Nsrc(ng)
       Isrc = PLUME(ng) % Isrc(is)
       Jsrc = PLUME(ng) % Jsrc(is)
       IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.            &
      &     ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
+#  ifdef ICEPLUME_SLOPE
+!
+! ==================================================================!
+!                                                                   !
+! Separate the detrainment in horizontal and vertical direction.    !
+!                                                                   !
+! ==================================================================!
+!
+        cff = SIN(pi*(SOURCES(ng) % SGang(is)/180))
+#  else
+        cff = 1.0_r8
+#  endif
+        cff1 = 1.0_r8 - cff
+        PLUME(ng) % trsW(is) = PLUME(ng) % trs(is)*cff
+        PLUME(ng) % trs(is)  = PLUME(ng) % trs(is)*cff1
+        DO K = 1, N(ng)
+          PLUME(ng) % entW(is, K) = PLUME(ng) % ent(is, K)*cff
+          PLUME(ng) % ent(is, K)  = PLUME(ng) % ent(is, K)*cff1
+          PLUME(ng) % detW(is, K) = PLUME(ng) % det(is, K)*cff
+          PLUME(ng) % det(is, K)  = PLUME(ng) % det(is, K)*cff1
+          PLUME(ng) % mBW(is, K)  = PLUME(ng) % mB(is, K)*cff
+          PLUME(ng) % mB(is, K)   = PLUME(ng) % mB(is, K)*cff1
+        ENDDO
 !
 ! ==================================================================!
 !                                                                   !
@@ -514,9 +537,9 @@ SUBROUTINE iceplume_mix_tile (ng, tile)
         PLUME(ng) % zLNew(is, 0) = PLUME(ng) % zW(is, 0)
         DO K = 1, N(ng)
           PLUME(ng) % dzNew(is, K) = PLUME(ng) % dz(is, K) +            &
-     &               (PLUME(ng) % det(is, K) +                          &
-     &                PLUME(ng) % ent(is, K) +                          &
-     &                PLUME(ng) % mB(is, K))*dt(ng)/area
+     &               (PLUME(ng) % detW(is, K) +                         &
+     &                PLUME(ng) % entW(is, K) +                         &
+     &                PLUME(ng) % mBW(is, K))*dt(ng)/area
           PLUME(ng) % zLNew(is, K) =                                    &
      &        PLUME(ng) % zLNew(is, K-1) +                              &
      &        PLUME(ng) % dzNew(is, K)
@@ -526,19 +549,19 @@ SUBROUTINE iceplume_mix_tile (ng, tile)
 !
         DO K = 1, N(ng)
           cff  = area*PLUME(ng) % dz(is, K)
-          cff1 = (PLUME(ng) % det(is, K) +                              &
-     &            PLUME(ng) % ent(is, K) +                              &
-     &            PLUME(ng) % mB(is, K))*dt(ng)
+          cff1 = (PLUME(ng) % detW(is, K) +                             &
+     &            PLUME(ng) % entW(is, K) +                             &
+     &            PLUME(ng) % mBW(is, K))*dt(ng)
           DO itrc = 1, NT(ng)
-            cff2 = (PLUME(ng) % det(is, K)*                             &
+            cff2 = (PLUME(ng) % detW(is, K)*                            &
 #  ifdef ICEPLUME_DETRAIN_NEUTRAL
      &              PLUME(ng) % detTrc(is, K, itrc)+                    &
 #  else
      &              PLUME(ng) % trc(is, itrc)+                          &
 #  endif
-     &              PLUME(ng) % ent(is, K)*                             &
+     &              PLUME(ng) % entW(is, K)*                            &
      &              PLUME(ng) % trcAm(is, K, itrc)+                     &
-     &              PLUME(ng) % mB(is, K)*                              &
+     &              PLUME(ng) % mBW(is, K)*                             &
      &              PLUME(ng) % trcB(is, itrc))*dt(ng)
             PLUME(ng) % trcL(is, K, itrc) =                             &
      &          (PLUME(ng) % trcAm(is, K, itrc)*cff + cff2) /           &
@@ -548,8 +571,8 @@ SUBROUTINE iceplume_mix_tile (ng, tile)
 !
 ! Calculate new W-point location. This section is copied from set_depth.
 !
-        cff= OCEAN(ng) % zeta(Isrc, Jsrc, nstp(ng))+                    &
-     &       PLUME(ng)%trs(is)*dt(ng)/area
+        cff = OCEAN(ng) % zeta(Isrc, Jsrc, nstp(ng))+                   &
+     &        PLUME(ng)%trsW(is)*dt(ng)/area
 !
         IF (Vtransform(ng).eq.3) THEN
           vert_s0 = 90./120.
@@ -625,7 +648,7 @@ SUBROUTINE iceplume_mix_tile (ng, tile)
 !
         OCEAN(ng) % zeta(Isrc, Jsrc, nstp(ng)) =                        &
      &    OCEAN(ng) % zeta(Isrc, Jsrc, nstp(ng))+                       &
-     &    PLUME(ng)%trs(is)*dt(ng)/area
+     &    PLUME(ng)%trsW(is)*dt(ng)/area
 !
 ! Substitute new tracer values (3-D field) back to OCEAN.
 !

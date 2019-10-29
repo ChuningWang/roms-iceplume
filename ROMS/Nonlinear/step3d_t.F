@@ -537,7 +537,7 @@
      &              ((Jstr.le.Jsrc).and.(Jsrc.le.Jend))) THEN
 # endif
                   IF (LtracerSrc(itrc,ng)) THEN
-# if defined ICEPLUME && !defined ICEPLUME_VIRTUAL_MIX
+# ifdef ICEPLUME
                     FX(Isrc,Jsrc)=SOURCES(ng)%Qsrc(is,k)*               &
      &                            SOURCES(ng)%Tsrc(is,k,itrc)
                     FX(Isrc,Jsrc)=FX(Isrc,Jsrc)+PLUME(ng)%dir(is)*(     &
@@ -575,7 +575,7 @@
      &              ((Jstr.le.Jsrc).and.(Jsrc.le.Jend+1))) THEN
 # endif
                   IF (LtracerSrc(itrc,ng)) THEN
-# if defined ICEPLUME && !defined ICEPLUME_VIRTUAL_MIX
+# ifdef ICEPLUME
                     FE(Isrc,Jsrc)=SOURCES(ng)%Qsrc(is,k)*               &
      &                            SOURCES(ng)%Tsrc(is,k,itrc)
                     FE(Isrc,Jsrc)=FE(Isrc,Jsrc)+PLUME(ng)%dir(is)*(     &
@@ -888,7 +888,7 @@
                 DO k=1,N(ng)
                   cff1=cff*SOURCES(ng)%Qsrc(is,k)*                      &
      &                 SOURCES(ng)%Tsrc(is,k,itrc)
-# if defined ICEPLUME && !defined ICEPLUME_VIRTUAL_MIX
+# ifdef ICEPLUME
                   cff1=cff1+cff*(                                       &
 #  ifdef ICEPLUME_DETRAIN_NEUTRAL
      &              PLUME(ng)%det(is,k)*PLUME(ng)%detTrc(is,k,itrc)+    &

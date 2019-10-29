@@ -138,8 +138,13 @@ MODULE mod_iceplume
 ! trcB          - background meltwater tracer concentration            !
 ! trcCum        - accumulative tracer concentration                    !
 ! trcIni        - initial tracer concentration in discharge            !
-!                                                                      !
 # ifdef ICEPLUME_VIRTUAL_MIX
+!                                                                      !
+! trsW          - depth integrated total transport through             !
+!                 con/divergence [m^3 s^-1]                            !
+! entW          - entrainment rate through con/divergence [m^3 s^-1]   !
+! detW          - detrainment rate through con/divergence [m^3 s^-1]   !
+! mBW           - background melt through con/divergence [m^3 s^-1]    !
 !                                                                      !
 ! For calculation of virtual tracer flux                               !
 ! dzNew         - new layer thickness [m]                              !
@@ -225,6 +230,13 @@ MODULE mod_iceplume
     real(r8), pointer :: trcIni(:, :)
 # ifdef ICEPLUME_VIRTUAL_MIX
 !
+! Volume fluxes through convergence/divergence.
+!
+    real(r8), pointer :: trsW(:)
+    real(r8), pointer :: entW(:, :)
+    real(r8), pointer :: detW(:, :)
+    real(r8), pointer :: mBW (:, :)
+!
 ! For calculation of virtual tracer flux.
 !
     real(r8), pointer :: dzNew(:, :)
@@ -300,6 +312,11 @@ MODULE mod_iceplume
       allocate( PLUME(ng) % trcCum (Nsrc(ng), NT(ng)) )
       allocate( PLUME(ng) % trcIni (Nsrc(ng), NT(ng)) )
 # ifdef ICEPLUME_VIRTUAL_MIX
+!
+      allocate( PLUME(ng) % trsW (1:Nsrc(ng)) )
+      allocate( PLUME(ng) % entW (Nsrc(ng), N(ng)) )
+      allocate( PLUME(ng) % detW (Nsrc(ng), N(ng)) )
+      allocate( PLUME(ng) % mBW  (Nsrc(ng), N(ng)) )
 !
       allocate( PLUME(ng) % dzNew  (Nsrc(ng), N(ng)) )
       allocate( PLUME(ng) % zWNew  (Nsrc(ng), 0:N(ng)) )

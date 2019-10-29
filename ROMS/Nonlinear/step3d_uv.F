@@ -982,7 +982,7 @@
      &                       0.5_r8*(z_w(i-1,j,k)-z_w(i-1,j,k-1)+       &
      &                               z_w(i  ,j,k)-z_w(i  ,j,k-1)))
                 u(i,j,k,nnew)=SOURCES(ng)%Qsrc(is,k)*cff1
-# if defined ICEPLUME && !defined ICEPLUME_VIRTUAL_MIX
+# ifdef ICEPLUME
                 u(i,j,k,nnew)=u(i,j,k,nnew)+PLUME(ng)%dir(is)*          &
      &            (PLUME(ng)%det(is,k)+PLUME(ng)%ent(is,k)+             &
      &             PLUME(ng)%mB(is,k))*cff1
@@ -994,7 +994,7 @@
      &                       0.5_r8*(z_w(i,j-1,k)-z_w(i,j-1,k-1)+       &
      &                               z_w(i,j  ,k)-z_w(i,j  ,k-1)))
                 v(i,j,k,nnew)=SOURCES(ng)%Qsrc(is,k)*cff1
-# if defined ICEPLUME && !defined ICEPLUME_VIRTUAL_MIX
+# ifdef ICEPLUME
                 v(i,j,k,nnew)=v(i,j,k,nnew)+PLUME(ng)%dir(is)*          &
      &            (PLUME(ng)%det(is,k)+PLUME(ng)%ent(is,k)+             &
      &             PLUME(ng)%mB(is,k))*cff1

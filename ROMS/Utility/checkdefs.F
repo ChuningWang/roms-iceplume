@@ -1159,11 +1159,18 @@
       Coptions(is:is+22)=' ICEPLUME_MELT_TRACER,'
 # endif
 !
-#ifdef ICEPLUME_VIRTUAL_BOX
-      IF (Master) WRITE (stdout,20) 'ICEPLUME_VIRTUAL_BOX',             &
+#ifdef ICEPLUME_VIRTUAL_MIX
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_VIRTUAL_MIX',             &
      &   'Mixing instead of flux form for iceplume model.'
       is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+22)=' ICEPLUME_VIRTUAL_BOX,'
+      Coptions(is:is+22)=' ICEPLUME_VIRTUAL_MIX,'
+# endif
+!
+#ifdef ICEPLUME_SLOPE
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_SLOPE',                   &
+     &   'A combined adv/mix coupler for iceplume model.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+16)=' ICEPLUME_SLOPE,'
 # endif
 !
 #ifdef ICEPLUME_DETRAIN_NO

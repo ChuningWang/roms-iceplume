@@ -878,7 +878,7 @@
             zeta(i,j,knew)=zeta(i,j,knew)+                              &
      &                     SOURCES(ng)%Qbar(is)*                        &
      &                     pm(i,j)*pn(i,j)*dtfast(ng)
-# if defined ICEPLUME && !defined ICEPLUME_VIRTUAL_MIX
+# ifdef ICEPLUME
             zeta(i,j,knew)=zeta(i,j,knew)+                              &
      &                     PLUME(ng)%trs(is)*                           &
      &                     pm(i,j)*pn(i,j)*dtfast(ng)
@@ -2457,7 +2457,7 @@
      &                    0.5_r8*(zeta(i-1,j,knew)+h(i-1,j)+            &
      &                            zeta(i  ,j,knew)+h(i  ,j)))
               ubar(i,j,knew)=SOURCES(ng)%Qbar(is)*cff
-# if defined ICEPLUME && !defined ICEPLUME_VIRTUAL_MIX
+# ifdef ICEPLUME
               ubar(i,j,knew)=ubar(i,j,knew)+                            &
      &          PLUME(ng)%trs(is)*PLUME(ng)%dir(is)*cff
 # endif
@@ -2466,7 +2466,7 @@
      &                    0.5_r8*(zeta(i,j-1,knew)+h(i,j-1)+            &
      &                            zeta(i,j  ,knew)+h(i,j  )))
               vbar(i,j,knew)=SOURCES(ng)%Qbar(is)*cff
-# if defined ICEPLUME && !defined ICEPLUME_VIRTUAL_MIX
+# ifdef ICEPLUME
               vbar(i,j,knew)=vbar(i,j,knew)+                            &
      &          PLUME(ng)%trs(is)*PLUME(ng)%dir(is)*cff
 # endif

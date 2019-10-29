@@ -529,6 +529,9 @@
         integer  :: idSGdep        ! subglacial runoff depth
         integer  :: idSGtyp        ! subglacial runoff type
         integer  :: idSGlen        ! subglacial runoff source length
+# ifdef ICEPLUME_SLOPE
+        integer  :: idSGang        ! angle of the glacier front
+# endif
 # ifdef ICEPLUME_SPREAD
         integer  :: idSGgid        ! glacier id number
 # endif
@@ -1876,6 +1879,10 @@
               idSGtyp=varid
             CASE ('idSGlen')
               idSGlen=varid
+# ifdef ICEPLUME_SLOPE
+            CASE ('idSGang')
+              idSGang=varid
+# endif
             CASE ('idSGtrc(itemp)')
               idSGtrc(itemp)=varid
             CASE ('idSGtrc(isalt)')

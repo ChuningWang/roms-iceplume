@@ -56,6 +56,9 @@
 !               TYPEsrc(:) = 5,  detached.                             !
 !               TYPEsrc(:) = 6,  ellipse.                              !
 !  SGlen      Length of point Sources/Sinks (m).                       !
+# ifdef ICEPLUME_SLOPE
+!  SGang      Angle of the glacier front (degree).                     !
+# endif
 # ifdef ICEPLUME_SPREAD
 !  SGgid      River/glacier ID number. The same ID suggests the point  !
 !               sources/sinks belong to the same river/glacier.        !
@@ -107,6 +110,9 @@
           real(r8), pointer :: SGdep(:)
           real(r8), pointer :: SGtyp(:)
           real(r8), pointer :: SGlen(:)
+# ifdef ICEPLUME_SLOPE
+          real(r8), pointer :: SGang(:)
+# endif
 # ifdef ICEPLUME_SPREAD
           real(r8), pointer :: SGgid(:)
 # endif
@@ -269,6 +275,11 @@
       allocate ( SOURCES(ng) % SGlen(Nsrc(ng)) )
       Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
 
+# ifdef ICEPLUME_SLOPE
+      allocate ( SOURCES(ng) % SGang(Nsrc(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
+
+# endif
 # ifdef ICEPLUME_SPREAD
       allocate ( SOURCES(ng) % SGgid(Nsrc(ng)) )
       Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
@@ -331,6 +342,9 @@
         SOURCES(ng) % SGdep(is) = IniVal
         SOURCES(ng) % SGtyp(is) = IniVal
         SOURCES(ng) % SGlen(is) = IniVal
+# ifdef ICEPLUME_SLOPE
+        SOURCES(ng) % SGang(is) = IniVal
+# endif
 # ifdef ICEPLUME_SPREAD
         SOURCES(ng) % SGgid(is) = IniVal
 # endif

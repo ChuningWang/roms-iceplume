@@ -2000,6 +2000,15 @@
   'nulvar'
   1.0d0
 
+'subglacial_angle'                                 ! Input
+  'subglacial runoff angle'  
+  'degree'                                         ! [degree]
+  'subglacial_angle, scalar'
+  'river'
+  'idSGang'
+  'nulvar'
+  1.0d0
+
 'subglacial_id'                                    ! Input
   'subglacial runoff id'
   'nondimensional'                                 ! [nondimensional]

@@ -175,7 +175,7 @@
      &               (Huon(ii+1,jj,k)-Huon(ii,jj,k)+                    &
      &                Hvom(ii,jj+1,k)-Hvom(ii,jj,k))+                   &
      &                SOURCES(ng)%Qsrc(is,k)
-# if defined ICEPLUME && !defined ICEPLUME_VIRTUAL_MIX
+# ifdef ICEPLUME
                 W(ii,jj,k)=W(ii,jj,k)+                                  &
      &                     (PLUME(ng)%det(is,k)+PLUME(ng)%ent(is,k)+    &
      &                      PLUME(ng)%mB(is,k))
