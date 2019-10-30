@@ -553,7 +553,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 
-#  ifdef ICEPLUME_SPREAD
+#  ifdef ICEPLUME_SLOPE
         CALL get_ngfld (ng, iNLM, idSGang, SSF(ng)%ncid,                &
      &                  1, SSF(ng), update(1),                          &
      &                  1, Nsrc(ng), 1, 1, 1, Nsrc(ng), 1,              &
