@@ -509,20 +509,20 @@ SUBROUTINE iceplume_mix_tile (ng, tile)
 !                                                                   !
 ! ==================================================================!
 !
-        cff = SIN(pi*(SOURCES(ng) % SGang(is)/180))
+        cff = COS(pi*(SOURCES(ng) % SGang(is)/180))
 #  else
-        cff = 1.0_r8
+        cff = 0.0_r8
 #  endif
         cff1 = 1.0_r8 - cff
-        PLUME(ng) % trsW(is) = PLUME(ng) % trs(is)*cff
-        PLUME(ng) % trs(is)  = PLUME(ng) % trs(is)*cff1
+        PLUME(ng) % trs(is)  = PLUME(ng) % trs(is)*cff
+        PLUME(ng) % trsW(is) = PLUME(ng) % trs(is)*cff1
         DO K = 1, N(ng)
-          PLUME(ng) % entW(is, K) = PLUME(ng) % ent(is, K)*cff
-          PLUME(ng) % ent(is, K)  = PLUME(ng) % ent(is, K)*cff1
-          PLUME(ng) % detW(is, K) = PLUME(ng) % det(is, K)*cff
-          PLUME(ng) % det(is, K)  = PLUME(ng) % det(is, K)*cff1
-          PLUME(ng) % mBW(is, K)  = PLUME(ng) % mB(is, K)*cff
-          PLUME(ng) % mB(is, K)   = PLUME(ng) % mB(is, K)*cff1
+          PLUME(ng) % ent(is, K)  = PLUME(ng) % ent(is, K)*cff
+          PLUME(ng) % det(is, K)  = PLUME(ng) % det(is, K)*cff
+          PLUME(ng) % mB(is, K)   = PLUME(ng) % mB(is, K)*cff
+          PLUME(ng) % entW(is, K) = PLUME(ng) % ent(is, K)*cff1
+          PLUME(ng) % detW(is, K) = PLUME(ng) % det(is, K)*cff1
+          PLUME(ng) % mBW(is, K)  = PLUME(ng) % mB(is, K)*cff1
         ENDDO
 !
 ! ==================================================================!
