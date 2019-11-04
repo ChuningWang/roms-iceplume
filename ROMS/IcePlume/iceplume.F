@@ -471,7 +471,7 @@ SUBROUTINE iceplume_mix_tile (ng, tile)
 !
   USE mod_grid, ONLY : GRID
   USE mod_ocean, ONLY : OCEAN
-  USE mod_stepping, ONLY : nstp
+  USE mod_stepping, ONLY : nstp, kstp
   USE mod_sources
   USE mod_scalars, ONLY : dt, LuvSrc, LwSrc, Vtransform, hc, SCALARS
   USE mod_iceplume
@@ -571,7 +571,7 @@ SUBROUTINE iceplume_mix_tile (ng, tile)
 !
 ! Calculate new W-point location. This section is copied from set_depth.
 !
-        cff = OCEAN(ng) % zeta(Isrc, Jsrc, nstp(ng))+                   &
+        cff = OCEAN(ng) % zeta(Isrc, Jsrc, kstp(ng))+                   &
      &        PLUME(ng)%trsW(is)*dt(ng)/area
 !
         IF (Vtransform(ng).eq.3) THEN
@@ -646,8 +646,8 @@ SUBROUTINE iceplume_mix_tile (ng, tile)
 !
 ! Substitute new zeta values (2-D field) back to OCEAN.
 !
-        OCEAN(ng) % zeta(Isrc, Jsrc, nstp(ng)) =                        &
-     &    OCEAN(ng) % zeta(Isrc, Jsrc, nstp(ng))+                       &
+        OCEAN(ng) % zeta(Isrc, Jsrc, kstp(ng)) =                        &
+     &    OCEAN(ng) % zeta(Isrc, Jsrc, kstp(ng))+                       &
      &    PLUME(ng)%trsW(is)*dt(ng)/area
 !
 ! Substitute new tracer values (3-D field) back to OCEAN.
