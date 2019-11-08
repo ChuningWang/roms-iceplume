@@ -324,7 +324,7 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
      &    PLUME(ng) % m(I, K)*PLUME(ng) % trcIni(I, NT(ng)-1)
       PLUME(ng) % trcCum(I, NT(ng)  ) =                                 &
      &    PLUME(ng) % trcCum(I, NT(ng)  ) +                             &
-     &    (-PLUME(ng) % ent(I, K)*PLUME(ng) % trcAm(I, K, NT(ng)-1))
+     &    (-PLUME(ng) % ent(I, K)*PLUME(ng) % trcAm(I, K, NT(ng)  ))
     ENDDO
 !
 ! Calculate tracer concentration
