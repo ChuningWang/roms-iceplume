@@ -77,6 +77,13 @@
      &                    GRID(ng) % on_u,                              &
      &                    GRID(ng) % on_v,                              &
 # endif
+# ifdef TS_HSIMT
+#  ifdef WET_DRY
+     &                    GRID(ng) % rmask_wet,                         &
+     &                    GRID(ng) % umask_wet,                         &
+     &                    GRID(ng) % vmask_wet,                         &
+#  endif
+# endif
      &                    GRID(ng) % pm,                                &
      &                    GRID(ng) % pn,                                &
      &                    GRID(ng) % Hz,                                &
@@ -112,6 +119,11 @@
 #  endif
      &                          omn, om_u, om_v, on_u, on_v,            &
 # endif
+# ifdef TS_HSIMT
+#  ifdef WET_DRY
+     &                          rmask_wet, umask_wet, vmask_wet,        &
+#  endif
+# endif
      &                          pm, pn,                                 &
      &                          Hz, Huon, Hvom,                         &
      &                          z_r,                                    &
@@ -145,6 +157,9 @@
 # ifdef TS_MPDATA
       USE mpdata_adiff_mod
 # endif
+# ifdef TS_HSIMT
+      USE hsimt_tvd_mod
+# endif
 # ifdef NESTING
       USE nesting_mod, ONLY : bry_fluxes
 # endif
@@ -177,6 +192,13 @@
       real(r8), intent(in) :: om_v(LBi:,LBj:)
       real(r8), intent(in) :: on_u(LBi:,LBj:)
       real(r8), intent(in) :: on_v(LBi:,LBj:)
+#  endif
+#  ifdef TS_HSIMT
+#   ifdef WET_DRY
+      real(r8), intent(in) :: rmask_wet(LBi:,LBj:)
+      real(r8), intent(in) :: umask_wet(LBi:,LBj:)
+      real(r8), intent(in) :: vmask_wet(LBi:,LBj:)
+#   endif
 #  endif
       real(r8), intent(in) :: pm(LBi:,LBj:)
       real(r8), intent(in) :: pn(LBi:,LBj:)
@@ -220,6 +242,13 @@
       real(r8), intent(in) :: om_v(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: on_u(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: on_v(LBi:UBi,LBj:UBj)
+#  endif
+#  ifdef TS_HSIMT
+#   ifdef WET_DRY
+      real(r8), intent(in) :: rmask_wet(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: umask_wet(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: vmask_wet(LBi:UBi,LBj:UBj)
+#   endif
 #  endif
       real(r8), intent(in) :: pm(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: pn(LBi:UBi,LBj:UBj)
@@ -280,6 +309,11 @@
       real(r8), dimension(IminS:ImaxS,JminS:JmaxS,N(ng)) :: Va
       real(r8), dimension(IminS:ImaxS,JminS:JmaxS,0:N(ng)) :: Wa
 # endif
+# ifdef TS_HSIMT
+      real(r8):: rd, rkad, a1, b1, betad, sw, ru, rkau
+      real(r8):: betau, epson, cc1, cc2, cc3
+      real(r8), dimension(0:N(ng)) :: kaz, kaz_inverse, grad_k
+# endif
 
 # include "set_bounds.h"
 
@@ -300,7 +334,7 @@
 !
 !  Compute inverse thickness.
 !
-# ifdef TS_MPDATA
+# if defined TS_MPDATA || defined TS_HSIMT
 #  define I_RANGE Istrm2,Iendp2
 #  define J_RANGE Jstrm2,Jendp2
 # else
@@ -317,7 +351,7 @@
       END DO
 # undef I_RANGE
 # undef J_RANGE
-# ifdef TS_MPDATA
+# if defined TS_MPDATA || defined TS_HSIMT
 !
 !  The MPDATA algorithm requires a three-point footprint, so exchange
 !  boundary data on t(:,:,:,nnew,:) so other processes computed earlier
@@ -384,6 +418,24 @@
      &                cff2*t(i,j  ,k,3,itrc)
             END DO
           END DO
+
+# elif defined TS_HSIMT
+!
+!  Third-order, HSIMT-TVD horizontal advective fluxes.
+!
+          CALL hsimt_tvd_tile (ng, tile,                                &
+     &                         LBi, UBi, LBj, UBj,                      &
+     &                         IminS, ImaxS, JminS, JmaxS,              &
+#  ifdef MASKING
+     &                         rmask, umask, vmask,                     &
+#  endif
+#  ifdef WET_DRY
+     &                         rmask_wet, umask_wet, vmask_wet,         &
+#  endif
+     &                         pm, pn,                                  &
+     &                         Huon(:,:,k), Hvom(:,:,k),                &
+     &                         oHz(:,:,k), t(:,:,k,3,itrc),             &
+     &                         FX, FE)
 
 # else
 !
@@ -529,7 +581,7 @@
               Isrc=SOURCES(ng)%Isrc(is)
               Jsrc=SOURCES(ng)%Jsrc(is)
               IF (INT(SOURCES(ng)%Dsrc(is)).eq.0) THEN
-# ifdef TS_MPDATA
+# if defined TS_MPDATA || defined TS_HSIMT
                 IF (((IstrUm2.le.Isrc).and.(Isrc.le.Iendp3)).and.       &
      &              ((JstrVm2.le.Jsrc).and.(Jsrc.le.Jendp2i))) THEN
 # else
@@ -541,7 +593,7 @@
                     FX(Isrc,Jsrc)=SOURCES(ng)%Qsrc(is,k)*               &
      &                            SOURCES(ng)%Tsrc(is,k,itrc)
                     FX(Isrc,Jsrc)=FX(Isrc,Jsrc)+PLUME(ng)%dir(is)*(     &
-#  ifdef ICEPLUME_DETRAIN_NEUTRAL
+#  ifdef ICEPLUME_DET_NEUTRAL
      &                PLUME(ng)%det(is,k)*PLUME(ng)%detTrc(is,k,itrc)+  &
 #  else
      &                PLUME(ng)%det(is,k)*PLUME(ng)%trc(is,itrc)+       &
@@ -567,7 +619,7 @@
                   END IF
                 END IF
               ELSE IF (INT(SOURCES(ng)%Dsrc(is)).eq.1) THEN
-# ifdef TS_MPDATA
+# if defined TS_MPDATA || defined TS_HSIMT
                 IF (((IstrUm2.le.Isrc).and.(Isrc.le.Iendp2i)).and.      &
      &              ((JstrVm2.le.Jsrc).and.(Jsrc.le.Jendp3))) THEN
 # else
@@ -579,7 +631,7 @@
                     FE(Isrc,Jsrc)=SOURCES(ng)%Qsrc(is,k)*               &
      &                            SOURCES(ng)%Tsrc(is,k,itrc)
                     FE(Isrc,Jsrc)=FE(Isrc,Jsrc)+PLUME(ng)%dir(is)*(     &
-#  ifdef ICEPLUME_DETRAIN_NEUTRAL
+#  ifdef ICEPLUME_DET_NEUTRAL
      &                PLUME(ng)%det(is,k)*PLUME(ng)%detTrc(is,k,itrc)+  &
 #  else
      &                PLUME(ng)%det(is,k)*PLUME(ng)%trc(is,itrc)+       &
@@ -691,6 +743,12 @@
 !  Time-step vertical advection term.
 !-----------------------------------------------------------------------
 !
+# ifdef TS_HSIMT
+      cc1=0.25_r8
+      cc2=0.5_r8
+      cc3=1.0_r8/12.0_r8
+      epson=1.0E-12_r8
+# endif
       DO j=J_RANGE
         DO itrc=1,NT(ng)
 
@@ -817,6 +875,70 @@
 #  endif
             FC(i,N(ng))=0.0_r8
           END DO
+# elif defined TS_HSIMT
+!
+!  Third-order, HSIMT-TVD vertical advective flux.
+!
+          kaz(0)=0.0_r8
+          kaz(N(ng))=0.0_r8
+          kaz_inverse(0)=0.0_r8
+          kaz_inverse(N(ng))=0.0_r8
+          grad_k(0)=0.0_r8
+          grad_k(N(ng))=0.0_r8
+          DO i=I_RANGE
+            DO k=1,N(ng)-1
+              kaz(k)=1.0_r8-abs(w(i,j,k)*pm(i,j)*pn(i,j)*dt(ng)/        &
+     &                         (z_r(i,j,k+1)-z_r(i,j,k)))
+              kaz_inverse(k)=1.0_r8/(kaz(k))
+              grad_k(k)=t(i,j,k+1,3,itrc)-t(i,j,k,3,itrc)
+            END DO
+            DO k=1,N(ng)-1
+              IF (k.eq.1.and.W(i,j,k).ge.0.0_r8) THEN
+                FC(i,k)=W(i,j,k)*t(i,j,k,3,itrc)
+              ELSE IF (k.eq.N(ng)-1.and.W(i,j,k).lt.0.0_r8) THEN
+                FC(i,k)=W(i,j,k)*t(i,j,k+1,3,itrc)
+              ELSE
+                IF (W(i,j,k).ge.0) THEN
+                  IF (abs(grad_k(k)).le.epson) THEN
+                    rd=0.0_r8
+                    rkad=0.0_r8
+                  ELSE
+                    rd=grad_k(k-1)/grad_k(k)
+                    rkad=kaz(k-1)*kaz_inverse(k)
+                  END IF
+                  a1= cc1*kaz(k)+cc2-cc3*kaz_inverse(k)
+                  b1=-cc1*kaz(k)+cc2+cc3*kaz_inverse(k)
+                  betad=a1+b1*rd
+                  sw=t(i,j,k,3,itrc)+                                   &
+     &               0.5_r8*MAX(0.0_r8,                                 &
+     &                          MIN(2.0_r8,2.0_r8*rd*rkad,betad))*      &
+     &                grad_k(k)*kaz(k)
+                ELSE
+                  IF (abs(grad_k(k)).le.epson) THEN
+                    ru=0.0_r8
+                    rkau=0.0_r8
+                  ELSE
+                    ru=grad_k(k+1)/grad_k(k)
+                    rkau=kaz(k+1)*kaz_inverse(k)
+                  END IF
+                  a1= cc1*kaz(k)+cc2-cc3*kaz_inverse(k)
+                  b1=-cc1*kaz(k)+cc2+cc3*kaz_inverse(k)
+                  betau=a1+b1*ru
+                  sw=t(i,j,k+1,3,itrc)-                                 &
+     &               0.5_r8*MAX(0.0_r8,                                 &
+     &                          MIN(2.0_r8,2.0_r8*ru*rkau,betau))*      &
+     &               grad_k(k)*kaz(k)
+                END IF
+                FC(i,k)=W(i,j,k)*sw
+              END IF
+            END DO
+#   ifdef SED_MORPH
+            FC(i,0)=W(i,j,0)*t(i,j,1,3,itrc)
+#   else
+            FC(i,0)=0.0_r8
+#   endif
+            FC(i,N(ng))=0.0_r8
+          END DO
 # else
 !
 !  Fourth-order, central differences vertical advective flux.
@@ -878,7 +1000,7 @@
               Isrc=SOURCES(ng)%Isrc(is)
               Jsrc=SOURCES(ng)%Jsrc(is)
               IF (LtracerSrc(itrc,ng).and.                              &
-# ifdef TS_MPDATA
+# if defined TS_MPDATA || defined TS_HSIMT
      &            ((IstrUm2.le.Isrc).and.(Isrc.le.Iendp2i)).and.        &
 # else
      &            ((IstrR.le.Isrc).and.(Isrc.le.IendR)).and.            &
@@ -890,7 +1012,7 @@
      &                 SOURCES(ng)%Tsrc(is,k,itrc)
 # ifdef ICEPLUME
                   cff1=cff1+cff*(                                       &
-#  ifdef ICEPLUME_DETRAIN_NEUTRAL
+#  ifdef ICEPLUME_DET_NEUTRAL
      &              PLUME(ng)%det(is,k)*PLUME(ng)%detTrc(is,k,itrc)+    &
 #  else
      &              PLUME(ng)%det(is,k)*PLUME(ng)%trc(is,itrc)+         &

@@ -160,7 +160,7 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
 ! Find detrainment depth index, Calculate total detrainment volume
 ! and thickness
 !
-# if defined ICEPLUME_OVERSHOOT_NO && defined ICEPLUME_DETRAIN_NO
+# if defined ICEPLUME_SHOOT_NO && defined ICEPLUME_DET_NO
     plumeDepthK = osDepthK
 # else
     DO K = osDepthK, iceDepthK+1, -1
@@ -361,7 +361,7 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
 !
 ! Write detrainment in outputs.
 !
-# ifdef ICEPLUME_DETRAIN_NO
+# ifdef ICEPLUME_DET_NO
     PLUME(ng) % det(I, plumeDepthK) = det
     PLUME(ng) % detI(I, plumeDepthK) = 1
     PLUME(ng) % detFrac(I, plumeDepthK) = 1.0

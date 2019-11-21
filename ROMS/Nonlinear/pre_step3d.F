@@ -284,7 +284,7 @@
 # if defined DIAGNOSTICS_TS || defined DIAGNOSTICS_UV
       integer :: idiag
 # endif
-# ifdef TS_MPDATA
+# if defined TS_MPDATA || defined TS_HSIMT
       real(r8), parameter :: Gamma = 0.5_r8
 # else
       real(r8), parameter :: Gamma = 1.0_r8/6.0_r8
@@ -365,7 +365,7 @@
             END DO
           END DO
 
-#  elif defined TS_MPDATA
+#  elif defined TS_MPDATA || defined TS_HSIMT
 !
 !  First-order, upstream differences horizontal advective fluxes.
 !
@@ -536,7 +536,7 @@
                     FX(Isrc,Jsrc)=SOURCES(ng)%Qsrc(is,k)*               &
      &                            SOURCES(ng)%Tsrc(is,k,itrc)
                     FX(Isrc,Jsrc)=FX(Isrc,Jsrc)+PLUME(ng)%dir(is)*(     &
-#  ifdef ICEPLUME_DETRAIN_NEUTRAL
+#  ifdef ICEPLUME_DET_NEUTRAL
      &                PLUME(ng)%det(is,k)*PLUME(ng)%detTrc(is,k,itrc)+  &
 #  else
      &                PLUME(ng)%det(is,k)*PLUME(ng)%trc(is,itrc)+       &
@@ -556,7 +556,7 @@
                     FE(Isrc,Jsrc)=SOURCES(ng)%Qsrc(is,k)*               &
      &                            SOURCES(ng)%Tsrc(is,k,itrc)
                     FE(Isrc,Jsrc)=FE(Isrc,Jsrc)+PLUME(ng)%dir(is)*(     &
-#  ifdef ICEPLUME_DETRAIN_NEUTRAL
+#  ifdef ICEPLUME_DET_NEUTRAL
      &                PLUME(ng)%det(is,k)*PLUME(ng)%detTrc(is,k,itrc)+  &
 #  else
      &                PLUME(ng)%det(is,k)*PLUME(ng)%trc(is,itrc)+       &
@@ -761,7 +761,7 @@
             FC(i,N(ng))=0.0_r8
           END DO
 
-#  elif defined TS_MPDATA
+#  elif defined TS_MPDATA || defined TS_HSIMT
 !
 !  First_order, upstream differences vertical advective flux.
 !
@@ -833,7 +833,7 @@
      &                 SOURCES(ng)%Tsrc(is,k,itrc)
 # ifdef ICEPLUME
                   cff1=cff1+cff*(                                       &
-#  ifdef ICEPLUME_DETRAIN_NEUTRAL
+#  ifdef ICEPLUME_DET_NEUTRAL
      &              PLUME(ng)%det(is,k)*PLUME(ng)%detTrc(is,k,itrc)+    &
 #  else
      &              PLUME(ng)%det(is,k)*PLUME(ng)%trc(is,itrc)+         &

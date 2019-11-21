@@ -152,7 +152,7 @@
             SOURCES(ng)%SGdep(is)=-260.0_r8
             SOURCES(ng)%SGtyp(is)=4.0_r8
             SOURCES(ng)%SGlen(is)=220.0_r8
-# ifdef ICEPLUME_DETRAIN_AVERAGE
+# ifdef ICEPLUME_DET_AVERAGE
             SOURCES(ng)%SGIrange(is, 1)=2
             SOURCES(ng)%SGIrange(is, 2)=4
             SOURCES(ng)%SGJrange(is, 1)=cff-2

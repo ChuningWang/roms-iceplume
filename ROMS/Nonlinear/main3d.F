@@ -216,7 +216,7 @@
 #  ifdef ICEPLUME_SPREAD
                 CALL iceplume_spread (ng, tile)
 #  endif
-#  ifdef ICEPLUME_VIRTUAL_MIX
+#  ifdef ICEPLUME_MIX
                 CALL iceplume_mix (ng, tile)
 #  endif
 # endif

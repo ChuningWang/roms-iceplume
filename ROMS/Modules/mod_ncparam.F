@@ -535,7 +535,7 @@
 # ifdef ICEPLUME_SPREAD
         integer  :: idSGgid        ! glacier id number
 # endif
-# ifdef ICEPLUME_DETRAIN_AVERAGE
+# ifdef ICEPLUME_DET_AVERAGE
         integer  :: idSGxrange     ! subglacial background average indices, XI direction
         integer  :: idSGerange     ! subglacial background average indices, ETA direction
 # endif
@@ -1895,7 +1895,7 @@
             CASE ('idSGgid')
               idSGgid=varid
 # endif
-# ifdef ICEPLUME_DETRAIN_AVERAGE
+# ifdef ICEPLUME_DET_AVERAGE
             CASE ('idSGxrange')
               idSGxrange=varid
             CASE ('idSGerange')

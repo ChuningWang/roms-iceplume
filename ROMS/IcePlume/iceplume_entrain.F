@@ -183,7 +183,7 @@ SUBROUTINE ICEPLUME_ENTRAIN(ng, I, iceDepthK,                           &
 ! Calculate plume density (rho = RHO(temp, salt, depth))
 !
       PLUME(ng) % rho(I, K) = RHO(Y(3), Y(4), zIn)
-# ifdef ICEPLUME_OVERSHOOT_NO
+# ifdef ICEPLUME_SHOOT_NO
 !
 ! Calculate ambient density
 !

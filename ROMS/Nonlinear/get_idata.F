@@ -571,7 +571,7 @@
      &                 __FILE__)) RETURN
 
 #  endif
-#  ifdef ICEPLUME_DETRAIN_AVERAGE
+#  ifdef ICEPLUME_DET_AVERAGE
         CALL get_ngfld (ng, iNLM, idSGxrange, SSF(ng)%ncid,             &
      &                  1, SSF(ng), update(1),                          &
      &                  1, Nsrc(ng), 2, 1, 1, Nsrc(ng), 2,              &

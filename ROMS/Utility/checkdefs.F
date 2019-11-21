@@ -1159,11 +1159,11 @@
       Coptions(is:is+22)=' ICEPLUME_MELT_TRACER,'
 # endif
 !
-#ifdef ICEPLUME_VIRTUAL_MIX
-      IF (Master) WRITE (stdout,20) 'ICEPLUME_VIRTUAL_MIX',             &
+#ifdef ICEPLUME_MIX
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_MIX',                     &
      &   'Mixing instead of flux form for iceplume model.'
       is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+22)=' ICEPLUME_VIRTUAL_MIX,'
+      Coptions(is:is+14)=' ICEPLUME_MIX,'
 # endif
 !
 #ifdef ICEPLUME_SLOPE
@@ -1173,46 +1173,53 @@
       Coptions(is:is+16)=' ICEPLUME_SLOPE,'
 # endif
 !
-#ifdef ICEPLUME_DETRAIN_NO
-      IF (Master) WRITE (stdout,20) 'ICEPLUME_DETRAIN_NO',              &
+#ifdef ICEPLUME_SHOOT_NO
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_SHOOT_NO',                &
+     &   'Suppress overshoot of plume in iceplume model.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+19)=' ICEPLUME_SHOOT_NO,'
+# endif
+!
+#ifdef ICEPLUME_DET_NO
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_DET_NO',                  &
      &   'Suppress detrainment model for iceplume model.'
       is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+21)=' ICEPLUME_DETRAIN_NO,'
+      Coptions(is:is+17)=' ICEPLUME_DET_NO,'
 # endif
 !
-#ifdef ICEPLUME_DETRAIN_AVERAGE
-      IF (Master) WRITE (stdout,20) 'ICEPLUME_DETRAIN_AVERAGE',         &
+#ifdef ICEPLUME_DET_AVERAGE
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_DET_AVERAGE',             &
      &   'Average ambient density for detrainment model.'
       is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+26)=' ICEPLUME_DETRAIN_AVERAGE,'
+      Coptions(is:is+22)=' ICEPLUME_DET_AVERAGE,'
 # endif
 !
-#ifdef ICEPLUME_DETRAIN_IWCP
-      IF (Master) WRITE (stdout,20) 'ICEPLUME_DETRAIN_IWCP',            &
+#ifdef ICEPLUME_DET_IWCP
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_DET_IWCP',                &
      &   'Use internal wave speed for detrainment model.'
       is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+23)=' ICEPLUME_DETRAIN_IWCP,'
+      Coptions(is:is+19)=' ICEPLUME_DET_IWCP,'
 # endif
 !
-#ifdef ICEPLUME_DETRAIN_BULK
-      IF (Master) WRITE (stdout,20) 'ICEPLUME_DETRAIN_BULK',            &
+#ifdef ICEPLUME_DET_BULK
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_DET_BULK',                &
      &   'Use bulk formula for detrainment model.'
       is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+23)=' ICEPLUME_DETRAIN_BULK,'
+      Coptions(is:is+19)=' ICEPLUME_DET_BULK,'
 # endif
 !
-#ifdef ICEPLUME_DETRAIN_UNIFORM
-      IF (Master) WRITE (stdout,20) 'ICEPLUME_DETRAIN_UNIFORM',         &
+#ifdef ICEPLUME_DET_UNIFORM
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_DET_UNIFORM',             &
      &   'Use uniform detrainment velocity.'
       is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+26)=' ICEPLUME_DETRAIN_UNIFORM,'
+      Coptions(is:is+22)=' ICEPLUME_DET_UNIFORM,'
 # endif
 !
-#ifdef ICEPLUME_DETRAIN_NEUTRAL
-      IF (Master) WRITE (stdout,20) 'ICEPLUME_DETRAIN_NEUTRAL',         &
+#ifdef ICEPLUME_DET_NEUTRAL
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_DET_NEUTRAL',             &
      &   'Use neutral density tracer concentration.'
       is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+26)=' ICEPLUME_DETRAIN_NEUTRAL,'
+      Coptions(is:is+22)=' ICEPLUME_DET_NEUTRAL,'
 # endif
 !
 !----- iceplume model end ----------------------------------------------
@@ -2512,6 +2519,14 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+18)=' TS_MIX_STABILITY,'
 # endif
+# ifdef TS_HSIMT
+      IF (Master) WRITE (stdout,20) 'TS_HSIMT',                        &
+     &   'HSIMT-TVD 3D advection of tracers (Wu and Zhu, 2010)'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+10)=' TS_HSIMT,'
+      itrcHadv=itrcHadv+1
+      itrcVadv=itrcVadv+1
+# endif
 # ifdef TS_MPDATA
 !
       IF (Master) WRITE (stdout,20) 'TS_MPDATA',                        &
@@ -2598,7 +2613,7 @@
 # endif
 # if !(defined TS_MPDATA       || defined TS_A4HADVECTION || \
        defined TS_C2HADVECTION || defined TS_C4HADVECTION || \
-       defined TS_U3HADVECTION)
+       defined TS_U3HADVECTION || defined TS_HSIMT)
 !
       IF (Master) WRITE (stdout,20) 'TS_C4HADVECTION',                  &
      &   'Fourth-order centered horizontal advection of tracers'
@@ -2676,7 +2691,7 @@
 # endif
 # if !(defined TS_MPDATA       || defined TS_A4VADVECTION || \
        defined TS_C2VADVECTION || defined TS_C4VADVECTION || \
-       defined TS_SVADVECTION)
+       defined TS_SVADVECTION  || defined TS_HSIMT)
 !
       IF (Master) WRITE (stdout,20) 'TS_C4VADVECTION',                  &
      &   'Fourth-order centered vertical advection of tracers'

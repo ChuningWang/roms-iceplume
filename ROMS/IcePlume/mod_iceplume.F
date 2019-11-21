@@ -44,7 +44,7 @@ MODULE mod_iceplume
 ! wIni      - initial (discharge) velocity [m s^-1]                    !
 !                                                                      !
 ! detSigma  - detrainment Gaussian profile standard deviation          !
-# ifdef ICEPLUME_DETRAIN_AVERAGE
+# ifdef ICEPLUME_DET_AVERAGE
 ! avgAlpha  - average weight for exponential smoothing (0 to 1)        !
 # endif
 !                                                                      !
@@ -79,7 +79,7 @@ MODULE mod_iceplume
   real(r8), parameter :: wIni       = 1.0_r8
 !
   real(r8), parameter :: detSigma   = 0.5_r8
-# ifdef ICEPLUME_DETRAIN_AVERAGE
+# ifdef ICEPLUME_DET_AVERAGE
   real(r8), parameter :: avgAlpha   = 1.0_r8
 # endif
 !
@@ -119,7 +119,7 @@ MODULE mod_iceplume
 ! det           - detrainment rate [m^3 s^-1]                          !
 ! detI          - detrainment flag                                     !
 ! detFrac       - fraction of detrainment in vertical direction        !
-# ifdef ICEPLUME_DETRAIN_NEUTRAL
+# ifdef ICEPLUME_DET_NEUTRAL
 !                                                                      !
 ! detF          - detrainment rate of freshwater [m^3 s^-1]            !
 ! detE          - detrainment rate of entrainment [m^3 s^-1]           !
@@ -138,7 +138,7 @@ MODULE mod_iceplume
 ! trcB          - background meltwater tracer concentration            !
 ! trcCum        - accumulative tracer concentration                    !
 ! trcIni        - initial tracer concentration in discharge            !
-# ifdef ICEPLUME_VIRTUAL_MIX
+# ifdef ICEPLUME_MIX
 !                                                                      !
 ! trsW          - depth integrated total transport through             !
 !                 con/divergence [m^3 s^-1]                            !
@@ -203,7 +203,7 @@ MODULE mod_iceplume
     real(r8), pointer :: det(:, :)
     integer,  pointer :: detI(:, :)
     real(r8), pointer :: detFrac(:, :)
-# ifdef ICEPLUME_DETRAIN_NEUTRAL
+# ifdef ICEPLUME_DET_NEUTRAL
 !
 ! For the neutral buoyancy detrainment model.
 !
@@ -228,7 +228,7 @@ MODULE mod_iceplume
     real(r8), pointer :: trc(:, :)
     real(r8), pointer :: trcCum(:, :)
     real(r8), pointer :: trcIni(:, :)
-# ifdef ICEPLUME_VIRTUAL_MIX
+# ifdef ICEPLUME_MIX
 !
 ! Volume fluxes through convergence/divergence.
 !
@@ -294,7 +294,7 @@ MODULE mod_iceplume
       allocate( PLUME(ng) % det  (Nsrc(ng), N(ng)) )
       allocate( PLUME(ng) % detI (Nsrc(ng), N(ng)) )
       allocate( PLUME(ng) % detFrac (Nsrc(ng), N(ng)) )
-# ifdef ICEPLUME_DETRAIN_NEUTRAL
+# ifdef ICEPLUME_DET_NEUTRAL
 !
       allocate( PLUME(ng) % detF    (Nsrc(ng), N(ng)) )
       allocate( PLUME(ng) % detE    (Nsrc(ng), N(ng)) )
@@ -311,7 +311,7 @@ MODULE mod_iceplume
       allocate( PLUME(ng) % trc    (Nsrc(ng), NT(ng)) )
       allocate( PLUME(ng) % trcCum (Nsrc(ng), NT(ng)) )
       allocate( PLUME(ng) % trcIni (Nsrc(ng), NT(ng)) )
-# ifdef ICEPLUME_VIRTUAL_MIX
+# ifdef ICEPLUME_MIX
 !
       allocate( PLUME(ng) % trsW (1:Nsrc(ng)) )
       allocate( PLUME(ng) % entW (Nsrc(ng), N(ng)) )

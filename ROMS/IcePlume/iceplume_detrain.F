@@ -54,7 +54,7 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
 ! h1          - upper layer thickness [m]                           !
 ! h2          - lower layer thickness [m]                           !
 ! gRed        - reduced gravity [m s^-2]                            !
-# ifdef ICEPLUME_DETRAIN_NEUTRAL
+# ifdef ICEPLUME_DET_NEUTRAL
 !                                                                   !
 ! volR        - detrainment volume of runoff [m^3]                  !
 ! volM        - detrainment volume of meltwater                     !
@@ -105,7 +105,7 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
   real(r8) :: maxVel, Fr, Ri
   real(r8) :: rho1, rho2, h1, h2, gRed
   real(r8) :: rhoH, h01, h02
-# ifdef ICEPLUME_DETRAIN_NEUTRAL
+# ifdef ICEPLUME_DET_NEUTRAL
 !
 ! For variable detrainment tracer concentration
 !
@@ -117,7 +117,7 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
 !
   integer  :: KI, K, K1, K2, itrc, counter
   real(r8) :: cff, cff1, cff2, cff3, cff4
-# ifdef ICEPLUME_DETRAIN_NEUTRAL
+# ifdef ICEPLUME_DET_NEUTRAL
 !
 ! Initialize.
 !
@@ -155,7 +155,7 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
 !
   rhoP = RHO(PLUME(ng) % t(I, osDepthK), PLUME(ng) % s(I, osDepthK),    &
      &       PLUME(ng) % zR(I, plumeDepthK))
-# ifdef ICEPLUME_DETRAIN_IWCP
+# ifdef ICEPLUME_DET_IWCP
 !
 ! Use internal wave speed to limited the detrainment flow speed.
 !
@@ -252,7 +252,7 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
   K1 = KI
   K2 = KI
   detDz = 0.0
-# ifdef ICEPLUME_DETRAIN_BULK
+# ifdef ICEPLUME_DET_BULK
 !
 ! Use a bulk formula.
 !
@@ -404,7 +404,7 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
   detVel = det / (lc * detDz)
   DO K = 1,N(ng)
     IF (PLUME(ng) % detI(I, K) .EQ. 1) THEN
-# ifdef ICEPLUME_DETRAIN_UNIFORM
+# ifdef ICEPLUME_DET_UNIFORM
       detWeight = 1.0
 # else
 !
@@ -433,7 +433,7 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
   DO K = 1,N(ng)
     PLUME(ng) % det(I, K) = PLUME(ng) % det(I, K)*det/detSum
   ENDDO
-# ifdef ICEPLUME_DETRAIN_NEUTRAL
+# ifdef ICEPLUME_DET_NEUTRAL
 !
 ! Calculate proportion of each water mass.
 ! There are three main water masses -

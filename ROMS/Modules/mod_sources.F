@@ -63,7 +63,7 @@
 !  SGgid      River/glacier ID number. The same ID suggests the point  !
 !               sources/sinks belong to the same river/glacier.        !
 # endif
-# ifdef ICEPLUME_DETTRAIN_AVERAGE
+# ifdef ICEPLUME_DET_AVERAGE
 !  SGIrange   Location indices (Istr, Iend) when spacially average     !
 !               density profiles.                                      !
 !  SGJrange   Location indices (Jstr, Jend) when spacially average     !
@@ -116,7 +116,7 @@
 # ifdef ICEPLUME_SPREAD
           real(r8), pointer :: SGgid(:)
 # endif
-# ifdef ICEPLUME_DETRAIN_AVERAGE
+# ifdef ICEPLUME_DET_AVERAGE
           real(r8), pointer :: SGIrangeRaw(:, :)
           real(r8), pointer :: SGJrangeRaw(:, :)
           integer, pointer :: SGIrange(:, :)
@@ -285,7 +285,7 @@
       Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
 
 # endif
-# ifdef ICEPLUME_DETRAIN_AVERAGE
+# ifdef ICEPLUME_DET_AVERAGE
       allocate ( SOURCES(ng) % SGIrangeRaw(Nsrc(ng), 2) )
       Dmem(ng)=Dmem(ng)+2.0_r8*REAL(Nsrc(ng),r8)
 
@@ -348,7 +348,7 @@
 # ifdef ICEPLUME_SPREAD
         SOURCES(ng) % SGgid(is) = IniVal
 # endif
-# ifdef ICEPLUME_DETRAIN_AVERAGE
+# ifdef ICEPLUME_DET_AVERAGE
         DO K = 1, 2
           SOURCES(ng) % SGIrangeRaw(is, K) = IniVal
           SOURCES(ng) % SGJrangeRaw(is, K) = IniVal

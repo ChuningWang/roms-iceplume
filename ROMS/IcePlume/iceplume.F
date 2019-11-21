@@ -229,7 +229,7 @@ SUBROUTINE iceplume_tile (ng, tile)
 !
 ! Calculate rho-layer depth, thickness, and ambient density
 !
-# ifdef ICEPLUME_DETRAIN_AVERAGE
+# ifdef ICEPLUME_DET_AVERAGE
         cff4 = REAL(                                                    &
      &      (SOURCES(ng) % SGIrange(is, 2)-                             &
      &       SOURCES(ng) % SGIrange(is, 1)+1) *                         &
@@ -237,7 +237,7 @@ SUBROUTINE iceplume_tile (ng, tile)
      &       SOURCES(ng) % SGJrange(is, 1)+1))
 # endif
         DO K = 1, N(ng)
-# ifdef ICEPLUME_DETRAIN_AVERAGE
+# ifdef ICEPLUME_DET_AVERAGE
 !
 ! Average density profiles in a box to surpress some oscillation
 !
@@ -434,7 +434,7 @@ SUBROUTINE iceplume_spread_tile (ng, tile)
   ENDIF
 END SUBROUTINE iceplume_spread_tile
 # endif
-# ifdef ICEPLUME_VIRTUAL_MIX
+# ifdef ICEPLUME_MIX
 !
 !=======================================================================
 !                                                                      !
@@ -554,7 +554,7 @@ SUBROUTINE iceplume_mix_tile (ng, tile)
      &            PLUME(ng) % mBW(is, K))*dt(ng)
           DO itrc = 1, NT(ng)
             cff2 = (PLUME(ng) % detW(is, K)*                            &
-#  ifdef ICEPLUME_DETRAIN_NEUTRAL
+#  ifdef ICEPLUME_DET_NEUTRAL
      &              PLUME(ng) % detTrc(is, K, itrc)+                    &
 #  else
      &              PLUME(ng) % trc(is, itrc)+                          &
