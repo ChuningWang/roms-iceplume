@@ -110,14 +110,15 @@
 
 # include "set_bounds.h"
 
-!************Declare some constants locally***************************
+!
+!  Declare constants.
+!
       cc1=0.25_r8
       cc2=0.5_r8
       cc3=1.0_r8/12.0_r8
       epson=1.0E-12_r8
 !
       DO j=Jstr,Jend
-!       DO i=Istr-1,Iend+2
         DO i=IstrU-1,Iendp2
           grad_x(i)=(t_k(i,j)-t_k(i-1,j))
           cff=0.125_r8*(pm(i-1,j)+pm(i,j))*(pn(i-1,j)+pn(i,j))*         &
@@ -190,7 +191,6 @@
       END DO
 !
       DO i=Istr,Iend
-!       DO j=Jstr-1,Jend+2
         DO j=JstrV-1,Jendp2
           grad_y(j)=(t_k(i,j)-t_k(i,j-1))
           cff=0.125_r8*(pn(i,j)+pn(i,j-1))*(pm(i,j)+pm(i,j-1))*         &

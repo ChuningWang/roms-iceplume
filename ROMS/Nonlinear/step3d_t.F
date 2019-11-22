@@ -744,6 +744,9 @@
 !-----------------------------------------------------------------------
 !
 # ifdef TS_HSIMT
+!
+!  Declare constants for HSIMT vertical advection.
+!
       cc1=0.25_r8
       cc2=0.5_r8
       cc3=1.0_r8/12.0_r8
@@ -887,8 +890,8 @@
           grad_k(N(ng))=0.0_r8
           DO i=I_RANGE
             DO k=1,N(ng)-1
-              kaz(k)=1.0_r8-abs(w(i,j,k)*pm(i,j)*pn(i,j)*dt(ng)/        &
-     &                         (z_r(i,j,k+1)-z_r(i,j,k)))
+              kaz(k)=1.0_r8-abs(W(i,j,k)*pm(i,j)*pn(i,j)*dt(ng)/        &
+     &                          (z_r(i,j,k+1)-z_r(i,j,k)))
               kaz_inverse(k)=1.0_r8/(kaz(k))
               grad_k(k)=t(i,j,k+1,3,itrc)-t(i,j,k,3,itrc)
             END DO
