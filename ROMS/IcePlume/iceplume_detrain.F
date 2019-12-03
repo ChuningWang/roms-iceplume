@@ -92,10 +92,6 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
   logical  :: isBottom = .FALSE.
   real(r8) :: RHO
 !
-! For BV frequency formula
-!
-  real(r8) :: bvf0, bvf
-!
 ! For detrainment weight function
 !
   real(r8) :: detSum
