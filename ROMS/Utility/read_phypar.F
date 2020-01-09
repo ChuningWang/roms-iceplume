@@ -3628,13 +3628,15 @@
         IF ((nAVG(ng).gt.0).and.(ndefAVG(ng).gt.0)) THEN
           OutFiles=ntimes(ng)/ndefAVG(ng)
           CALL edit_file_struct (ng, OutFiles, AVG)
-        END IF
+          AVG(ng)%load=0       ! because delayed creation of NetCDF file
+        END IF                 ! due to time-aveeraging
 #endif
 #ifdef DIAGNOSTICS
         IF ((nDIA(ng).gt.0).and.(ndefDIA(ng).gt.0)) THEN
           OutFiles=ntimes(ng)/ndefDIA(ng)
           CALL edit_file_struct (ng, OutFiles, DIA)
-        END IF
+          DIA(ng)%load=0       ! because delayed creation of NetCDF file
+        END IF                 ! due to time-aveeraging
 #endif
 #if defined TANGENT || defined TL_IOMS
         IF ((nTLM(ng).gt.0).and.(ndefTLM(ng).gt.0)) THEN
