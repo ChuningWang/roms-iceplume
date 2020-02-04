@@ -7,7 +7,7 @@
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2019 The ROMS/TOMS Group       Andrew M. Moore   !
+!  Copyright (c) 2002-2020 The ROMS/TOMS Group       Andrew M. Moore   !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -200,10 +200,10 @@
 !
       adFac=0.0_r8
 #  ifdef IS4DVAR_SENSITIVITY
-      IF ((mod(iic(ng)-1,nHIS(ng)).eq.0).and.                           &
+      IF ((MOD(iic(ng)-1,nHIS(ng)).eq.0).and.                           &
      &    (DendS(ng).ge.tdays(ng)).and.(tdays(ng).ge.DstrS(ng))) THEN
 #  else
-      IF ((mod(iic(ng)-1,nTLM(ng)).eq.0).and.                           &
+      IF ((MOD(iic(ng)-1,nTLM(ng)).eq.0).and.                           &
      &    (DendS(ng).ge.tdays(ng)).and.(tdays(ng).ge.DstrS(ng))) THEN
 #  endif
           adFac=1.0_r8

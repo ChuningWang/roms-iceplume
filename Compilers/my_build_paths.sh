@@ -1,6 +1,6 @@
 # svn $Id$
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-# Copyright (c) 2002-2019 The ROMS/TOMS Group                           :::
+# Copyright (c) 2002-2020 The ROMS/TOMS Group                           :::
 #   Licensed under a MIT/X style license                                :::
 #   See License_ROMS.txt                                                :::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::: Hernan G. Arango :::
@@ -178,6 +178,7 @@ switch ($FORT)
       setenv NETCDF             /opt/intelsoft/serial/netcdf3
       setenv NETCDF_INCDIR      ${NETCDF}/include
       setenv NETCDF_LIBDIR      ${NETCDF}/lib
+      setenv NETCDF_classic     1
     endif
 
     if ($?USE_HDF5) then

@@ -3,7 +3,7 @@
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2019 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -176,7 +176,6 @@
 #  endif
 # endif
 #endif
-
 !
 !-----------------------------------------------------------------------
 !  Time stepping indices, variables, and clocks.
@@ -192,13 +191,19 @@
 !                    time level n+1.
 !    dt            Size baroclinic timestep (s).
 !    dtfast        Size barotropic timestep (s).
-!    run_time      Total run time for all nested grids (s).
+!    run_time      Total run time for all nested grids (s), it is
+!                    set in Masters/ocean.h
+!    MyRunInterval Total run time for all nested grids (s), it is
+!                    set in Drivers/nl_ocean.h (coupling window)
 !    io_time       Current I/O time (s) processed in "get_state".
 !    tdays         Model time clock (days).
 !    time          Model time clock (s).
 !    time_code     Model time clock (string, YYYY-MM-DD hh:mm:ss.ss)
 !    AVGtime       Model time clock for averages output (s).
 !    DIAtime       Model time clock for diagnostics output (s).
+!    F_code        Final time string for simulation
+!    I_code        Initial time string for simulation
+!    INItime       Nonlinear model initial conditions time (s).
 !    IMPtime       Impulse forcing time (s) to process.
 !    ObsTime       Observation time (s) to process.
 !    FrcTime       Adjoint or tangent linear Impulse forcing time (s).
@@ -229,13 +234,17 @@
         real(dp), allocatable :: AVGtime(:)              ! seconds
         real(dp), allocatable :: DIAtime(:)              ! seconds
         real(dp), allocatable :: IMPtime(:)              ! seconds
+        real(dp), allocatable :: INItime(:)              ! seconds
         real(dp), allocatable :: ObsTime(:)              ! seconds
         real(dp), allocatable :: FrcTime(:)              ! seconds
 
         real(dp) :: dstart = 0.0_dp                      ! days
         real(dp) :: io_time = 0.0_dp                     ! seconds
         real(dp) :: run_time = 0.0_dp                    ! seconds
+        real(dp) :: MyRunInterval = 0.0_dp               ! seconds
         real(dp) :: tide_start = 0.0_dp                  ! days
+
+        character (len=22) :: F_code, I_code
 
         character (len=22), allocatable :: time_code(:)  ! date string
 !$OMP THREADPRIVATE (time_code)
@@ -322,9 +331,20 @@
 
         integer, allocatable :: NrecFrc(:)
 !
+!  HSIMT tracer advection coefficients for the TVD limiter (Wu and Zhu,
+!  2010).
+!
+        real(r8) :: cc1 = 0.25_r8
+        real(r8) :: cc2 = 0.5_r8
+        real(r8) :: cc3 = 1.0_r8/12.0_r8
+!
 !-----------------------------------------------------------------------
 !  Control switches.
 !-----------------------------------------------------------------------
+!
+!  Switch to use three ghost-points in the halo region.
+!
+        logical :: ThreeGhostPoints = .FALSE.
 !
 !  Switch to proccess nudging coefficients for radiation open boundary
 !  conditions.
@@ -861,6 +881,11 @@
         logical, allocatable :: LdefTIDE(:)      ! tide forcing file
         logical, allocatable :: LdefTLM(:)       ! Tangent linear file
         logical, allocatable :: LdefTLF(:)       ! TLM/RPM impulse file
+
+        logical, allocatable :: LreadADM(:)      ! Read ADM multi-files
+        logical, allocatable :: LreadBLK(:)      ! Read NLM bulk fluxes
+        logical, allocatable :: LreadFWD(:)      ! Read NLM trajectory
+        logical, allocatable :: LreadTLM(:)      ! Read TLM multi-files
 
         logical, allocatable :: LwrtADJ(:)       ! Write adjoint file
         logical, allocatable :: LwrtAVG(:)       ! Write average file
@@ -1846,6 +1871,10 @@
         allocate ( IMPtime(Ngrids) )
         Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
       END IF
+      IF (.not.allocated(INItime)) THEN
+        allocate ( INItime(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
       IF (.not.allocated(ObsTime)) THEN
         allocate ( ObsTime(Ngrids) )
         Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
@@ -2506,6 +2535,23 @@
       END IF
       IF (.not.allocated(LdefTLF)) THEN
         allocate ( LdefTLF(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+
+      IF (.not.allocated(LreadADM)) THEN
+        allocate ( LreadADM(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(LreadBLK)) THEN
+        allocate ( LreadBLK(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(LreadFWD)) THEN
+        allocate ( LreadFWD(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(LreadTLM)) THEN
+        allocate ( LreadTLM(Ngrids) )
         Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
       END IF
 
@@ -3392,6 +3438,10 @@
 #else
         LdefTIDE(ng)=.FALSE.
 #endif
+        LreadADM(ng)=.FALSE.
+        LreadBLK(ng)=.FALSE.
+        LreadFWD(ng)=.FALSE.
+        LreadTLM(ng)=.FALSE.
         LwrtADJ(ng)=.FALSE.
         LwrtAVG(ng)=.FALSE.
         LwrtDIA(ng)=.FALSE.
@@ -3409,6 +3459,15 @@
         LwrtTime(ng)=.TRUE.
         ldefout(ng)=.FALSE.
 
+      END DO
+!
+!  Initialize the NLM initial conditions time to a negative number to
+!  check if its value was assigned elsewhere.  It can be used during
+!  the initialization of the adjoint model when DSTART is not the
+!  same as the start of the simulation.
+!
+      DO ng=1,Ngrids
+        INItime(ng)=-1.0_dp
       END DO
 
 # if defined SG_BBL || defined SSW_BBL

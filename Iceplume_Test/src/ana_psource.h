@@ -149,14 +149,16 @@
             SOURCES(ng)%Dsrc(is)=0.0_r8
             SOURCES(ng)%Isrc(is)=2
             SOURCES(ng)%Jsrc(is)=cff+is-2
+# if defined ICEPLUME
             SOURCES(ng)%SGdep(is)=-260.0_r8
             SOURCES(ng)%SGtyp(is)=4.0_r8
             SOURCES(ng)%SGlen(is)=220.0_r8
-# ifdef ICEPLUME_DET_AVERAGE
+#  ifdef ICEPLUME_DET_AVERAGE
             SOURCES(ng)%SGIrange(is, 1)=2
             SOURCES(ng)%SGIrange(is, 2)=4
             SOURCES(ng)%SGJrange(is, 1)=cff-2
             SOURCES(ng)%SGJrange(is, 2)=cff+2
+#  endif
 # endif
           END DO
         END IF
@@ -173,9 +175,11 @@
         CALL mp_bcasti (ng, iNLM, SOURCES(ng)%Jsrc)
         CALL mp_bcastf (ng, iNLM, SOURCES(ng)%Dsrc)
 # if defined ICEPLUME_TEST
+#  if defined ICEPLUME
         CALL mp_bcastf (ng, iNLM, SOURCES(ng)%SGdep)
         CALL mp_bcastf (ng, iNLM, SOURCES(ng)%SGtyp)
         CALL mp_bcastf (ng, iNLM, SOURCES(ng)%SGlen)
+#  endif
 # endif
 #endif
       END IF
@@ -225,9 +229,13 @@
 #if defined ICEPLUME_TEST
         DO is=1,Nsrc(ng)
           SOURCES(ng)%Qbar(is)=0.0_r8
+# if defined ICEPLUME
           SOURCES(ng)%SGbar(is)=0.0_r8
+# endif
         END DO
+# if defined ICEPLUME
         SOURCES(ng)%SGbar(2)=200.0_r8
+# endif
 #else
         ana_psource.h: No values provided for Qbar.
 #endif
@@ -268,11 +276,13 @@
               SOURCES(ng)%Tsrc(is,k,isalt)=0.0_r8
             END DO
           END DO
+#  if defined ICEPLUME
           DO is=1,Nsrc(ng)
             SOURCES(ng)%SGtrc(is,itemp)=0.0_r8
             SOURCES(ng)%SGtrc(is,isalt)=0.0_r8
             SOURCES(ng)%SGtrc(is,3)=1.0_r8
           END DO
+#  endif
         END IF
 # else
         ana_psource.h: No values provided for Tsrc.

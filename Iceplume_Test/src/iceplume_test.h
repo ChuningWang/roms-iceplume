@@ -1,7 +1,7 @@
 /*
 ** svn $Id$
 *******************************************************************************
-** Copyright (c) 2002-2017 The ROMS/TOMS Group                               **
+** Copyright (c) 2002-2020 The ROMS/TOMS Group                               **
 **   Licensed under a MIT/X style license                                    **
 **   See License_ROMS.txt                                                    **
 *******************************************************************************
@@ -22,24 +22,16 @@
 /* iceplume */
 #define ICEPLUME
 #ifdef ICEPLUME
-# define ICEPLUME_MIX
-# define ICEPLUME_DET_AVERAGE
 # define ICEPLUME_TRACER
 # define ICEPLUME_MELT
+# define ICEPLUME_DET_AVERAGE
 # undef ICEPLUME_MELT_TRACER
+# undef ICEPLUME_MIX
 #endif
 
 /* advection, dissipation, pressure grad, etc. */
 #define UV_ADV
 #define UV_COR
-
-#define TS_MPDATA
-#ifndef TS_MPDATA
-# define TS_U3HADVECTION
-# ifdef SOLVE3D
-#  undef TS_C4VADVECTION
-# endif
-#endif
 
 #define UV_VIS2
 #define MIX_S_UV

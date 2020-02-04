@@ -4,7 +4,7 @@
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2019 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -102,7 +102,7 @@
 !  Set time record index.
 !
       TLM(ng)%Rindex=TLM(ng)%Rindex+1
-      Fcount=TLM(ng)%Fcount
+      Fcount=TLM(ng)%load
       TLM(ng)%Nrec(Fcount)=TLM(ng)%Nrec(Fcount)+1
 !
 !  If requested, set time index to recycle time records in the tangent

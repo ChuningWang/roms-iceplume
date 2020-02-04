@@ -4,7 +4,7 @@
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2019 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -107,7 +107,11 @@
             Ldefine=.FALSE.
           END IF
           IF (Ldefine) THEN                     ! create new file or
-            Fcount=HIS(ng)%Fcount               ! inquire existing file
+            IF (iic(ng).eq.ntstart(ng)) THEN    ! inquire existing file
+              HIS(ng)%load=0                    ! reset filename counter
+            END IF
+            HIS(ng)%load=HIS(ng)%load+1
+            Fcount=HIS(ng)%load
             HIS(ng)%Nrec(Fcount)=0
             ifile=(iic(ng)-1)/ndefHIS(ng)+1
             IF (Master) THEN
@@ -117,6 +121,7 @@
 # ifdef DISTRIBUTE
             CALL mp_bcasts (ng, iNLM, HIS(ng)%name)
 # endif
+            HIS(ng)%files(Fcount)=TRIM(HIS(ng)%name)
             IF (HIS(ng)%ncid.ne.-1) THEN
               CALL netcdf_close (ng, iNLM, HIS(ng)%ncid)
             END IF
@@ -198,7 +203,11 @@
             Ldefine=.FALSE.
           END IF
           IF (Ldefine) THEN                     ! create new file or
-            Fcount=QCK(ng)%Fcount               ! inquire existing file
+            IF (iic(ng).eq.ntstart(ng)) THEN    ! inquire existing file
+              QCK(ng)%load=0                    ! reset filename counter
+            END IF
+            QCK(ng)%load=QCK(ng)%load+1
+            Fcount=QCK(ng)%load
             QCK(ng)%Nrec(Fcount)=0
             ifile=(iic(ng)-1)/ndefQCK(ng)+1
             IF (Master) THEN
@@ -208,6 +217,7 @@
 # ifdef DISTRIBUTE
             CALL mp_bcasts (ng, iNLM, QCK(ng)%name)
 # endif
+            QCK(ng)%files(Fcount)=TRIM(QCK(ng)%name)
             IF (QCK(ng)%ncid.ne.-1) THEN
               CALL netcdf_close (ng, iNLM, QCK(ng)%ncid)
             END IF
@@ -292,7 +302,11 @@
             Ldefine=.FALSE.
           END IF
           IF (Ldefine) THEN
-            Fcount=AVG(ng)%Fcount
+            IF (iic(ng).eq.ntstart(ng)) THEN
+              AVG(ng)%load=0                  ! reset filename counter
+            END IF
+            AVG(ng)%load=AVG(ng)%load+1
+            Fcount=AVG(ng)%load
             AVG(ng)%Nrec(Fcount)=0
             IF (ndefAVG(ng).eq.nAVG(ng)) THEN
               ifile=(iic(ng)-1)/ndefAVG(ng)
@@ -306,6 +320,7 @@
 #  ifdef DISTRIBUTE
             CALL mp_bcasts (ng, iNLM, AVG(ng)%name)
 #  endif
+            AVG(ng)%files(Fcount)=TRIM(AVG(ng)%name)
             IF (AVG(ng)%ncid.ne.-1) THEN
               CALL netcdf_close (ng, iNLM, AVG(ng)%ncid)
             END IF
@@ -382,7 +397,11 @@
             Ldefine=.FALSE.
           END IF
           IF (Ldefine) THEN
-            Fcount=DIA(ng)%Fcount
+            IF (iic(ng).eq.ntstart(ng)) THEN
+              DIA(ng)%load=0                  ! reset filename counter
+            END IF
+            DIA(ng)%load=DIA(ng)%load+1
+            Fcount=DIA(ng)%load
             DIA(ng)%Nrec(Fcount)=0
             IF (ndefDIA(ng).eq.nDIA(ng)) THEN
               ifile=(iic(ng)-1)/ndefDIA(ng)
@@ -396,6 +415,7 @@
 #  ifdef DISTRIBUTE
             CALL mp_bcasts (ng, iNLM, DIA(ng)%name)
 #  endif
+            DIA(ng)%files(Fcount)=TRIM(DIA(ng)%name)
             IF (DIA(ng)%ncid.ne.-1) THEN
               CALL netcdf_close (ng, iNLM, DIA(ng)%ncid)
             END IF
