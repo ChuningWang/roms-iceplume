@@ -824,6 +824,7 @@
               IF (LtracerSrc(itrc,ng).and.                              &
      &            ((Istr.le.Isrc).and.(Isrc.le.Iend+1)).and.            &
      &            (j.eq.Jsrc)) THEN
+                cff=0.0_r8
                 DO k=1,N(ng)
                   cff=cff+SOURCES(ng)%Qsrc(is,k)*                       &
      &                    SOURCES(ng)%Tsrc(is,k,itrc)
@@ -839,7 +840,7 @@
      &                    PLUME(ng)%mB    (is,k     )*                  &
      &                    PLUME(ng)%trcB  (is,  itrc)
 # endif
-                  FC(Isrc,k)=FC(Isrc,k)+cff
+                  FC(Isrc,k)=FC(Isrc,k)-cff
                 END DO
               END IF
             END DO
