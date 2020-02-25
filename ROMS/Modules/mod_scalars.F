@@ -480,6 +480,10 @@
         integer :: blowup = 0
         integer :: NoError = 0
 !
+!  Blow-up string.
+!
+        character (len=80) :: blowup_string
+!
 !  Set threshold maximum speed (m/s) and density anomaly (kg/m3) to
 !  test if the model is blowing-up.
 !
@@ -3360,6 +3364,12 @@
       Tobc_in = 0.0_dp
       Tobc_out = 0.0_dp
 #endif
+!
+!  Initialize blowup string.
+!
+      DO i=1,LEN(blowup_string)
+        blowup_string(i:i)=' '
+      END DO
 !
 !  Initialize thread private variables.
 !
