@@ -1741,6 +1741,16 @@
               Npts=load_l(Nval, Cval, Ngrids, Lswitch)
               Hout(idPair,1:Ngrids)=Lswitch(1:Ngrids)
 # endif
+# if defined BULK_FLUXES
+            CASE ('Hout(idTair)')
+              IF (idTair.eq.0) THEN
+                IF (Master) WRITE (out,280) 'idTair'
+                exit_flag=5
+                RETURN
+              END IF
+              Npts=load_l(Nval, Cval, Ngrids, Lswitch)
+              Hout(idTair,1:Ngrids)=Lswitch(1:Ngrids)
+# endif
 # if defined BULK_FLUXES || defined ECOSIM
             CASE ('Hout(idUair)')
               IF (idUair.eq.0) THEN
@@ -2133,6 +2143,11 @@
               Npts=load_l(Nval, Cval, Ngrids, Lswitch)
               Qout(idPair,1:Ngrids)=Lswitch(1:Ngrids)
 # endif
+# if defined BULK_FLUXES
+            CASE ('Qout(idTair)')
+              Npts=load_l(Nval, Cval, Ngrids, Lswitch)
+              Qout(idTair,1:Ngrids)=Lswitch(1:Ngrids)
+# endif
 # if defined BULK_FLUXES || defined ECOSIM
             CASE ('Qout(idUair)')
               Npts=load_l(Nval, Cval, Ngrids, Lswitch)
@@ -2323,6 +2338,11 @@
             CASE ('Aout(idPair)')
               Npts=load_l(Nval, Cval, Ngrids, Lswitch)
               Aout(idPair,1:Ngrids)=Lswitch(1:Ngrids)
+#  endif
+#  if defined BULK_FLUXES
+            CASE ('Aout(idTair)')
+              Npts=load_l(Nval, Cval, Ngrids, Lswitch)
+              Aout(idTair,1:Ngrids)=Lswitch(1:Ngrids)
 #  endif
 #  if defined BULK_FLUXES || defined ECOSIM
             CASE ('Aout(idUair)')
@@ -3289,12 +3309,11 @@
 !
 !  Set switch for three ghost-points in the halo region.
 !
+      ThreeGhostPoints=ANY(Hadvection(:,:)%MPDATA).or.                  &
+     &                 ANY(Hadvection(:,:)%HSIMT)
 #ifdef UV_VIS4
       ThreeGhostPoints=.TRUE.
 #endif
-      IF (ANY(Hadvection(:,:)%MPDATA)) THEN
-        ThreeGhostPoints=.TRUE.
-      END IF
 !
 !  Check if nesting parameters "NestLayers", "GridsInLayer", and
 !  "GridNumber" have been assigned.  The code below is necessary
@@ -4897,6 +4916,11 @@
      &         'Hout(idPair)',                                          &
      &         'Write out surface air pressure.'
 # endif
+# if defined BULK_FLUXES
+            IF (Hout(idTair,ng)) WRITE (out,170) Hout(idTair,ng),       &
+     &         'Hout(idTair)',                                          &
+     &         'Write out surface air temperature.'
+# endif
 # if defined BULK_FLUXES || defined ECOSIM
             IF (Hout(idUair,ng)) WRITE (out,170) Hout(idUair,ng),       &
      &         'Hout(idUair)',                                          &
@@ -5201,6 +5225,11 @@
      &         'Qout(idPair)',                                          &
      &         'Write out surface air pressure.'
 # endif
+# if defined BULK_FLUXES
+            IF (Qout(idTair,ng)) WRITE (out,170) Qout(idTair,ng),       &
+     &         'Qout(idTair)',                                          &
+     &         'Write out surface air temperature.'
+# endif
 # if defined BULK_FLUXES || defined ECOSIM
             IF (Qout(idUair,ng)) WRITE (out,170) Qout(idUair,ng),       &
      &         'Qout(idUair)',                                          &
@@ -5399,6 +5428,11 @@
      &         'Aout(idPair)',                                          &
      &         'Write out averaged surface air pressure.'
 #  endif
+# if defined BULK_FLUXES
+            IF (Aout(idTair,ng)) WRITE (out,170) Aout(idTair,ng),       &
+     &         'Aout(idTair)',                                          &
+     &         'Write out averaged surface air temperature.'
+# endif
 #  if defined BULK_FLUXES || defined ECOSIM
             IF (Aout(idUair,ng)) WRITE (out,170) Aout(idUair,ng),       &
      &         'Aout(idUair)',                                          &
