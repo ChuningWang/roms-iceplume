@@ -6,11 +6,10 @@
 **   See License_ROMS.txt                                                    **
 *******************************************************************************
 **
-** Options for Estuary with Sediment Transport Test.
+** Options for ROMS-ICEPLUME Test.
 **
-** Application flag:   ESTUARY_TEST
-** Input script:       ocean_estuary_test.in
-**                     sediment_estuary_test.in
+** Application flag:   ICEPLUME_TEST
+** Input script:       roms_iceplume_test.in
 */
 
 /* general */
