@@ -175,7 +175,7 @@
       real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: ke2d
       real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: pe2d
 
-      character (len=8 ) :: kechar, pechar
+      character (len=8 ) :: kechar, pechar, maxvalchar
       character (len=60) :: frmt
 
 #include "set_bounds.h"
@@ -490,6 +490,7 @@
      &          (kechar(i:i).eq.'n').or.(pechar(i:i).eq.'n').or.        &
      &          (kechar(i:i).eq.'*').or.(pechar(i:i).eq.'*')) THEN
               exit_flag=1
+              blowup_string='KEchar = '//kechar//', PEchar = '//pechar
             END IF
           END DO
 !
@@ -498,6 +499,8 @@
 !
           IF (maxspeed(ng).gt.max_speed) THEN
             exit_flag=1
+            WRITE (maxvalchar,'(1pe8.1)') maxspeed(ng)
+            blowup_string='MaxSpeed = '//maxvalchar
           END IF
 #ifdef SOLVE3D
 !
@@ -508,6 +511,8 @@
 !
           IF (maxrho(ng).gt.max_rho) THEN
             exit_flag=1
+            WRITE (maxvalchar,'(1pe8.1)') maxrho(ng)
+            blowup_string='MaxDensity = '//maxvalchar
           END IF
 #endif
 !

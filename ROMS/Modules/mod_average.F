@@ -201,6 +201,9 @@
 #  if defined BULK_FLUXES || defined ECOSIM || defined ATM_PRESS
           real(r8), pointer :: avgPair(:,:)
 #  endif
+#  if defined BULK_FLUXES
+          real(r8), pointer :: avgTair(:,:)
+#  endif
 #  if defined BULK_FLUXES || defined ECOSIM
           real(r8), pointer :: avgUwind(:,:)
           real(r8), pointer :: avgVwind(:,:)
@@ -456,6 +459,12 @@
 #  if defined BULK_FLUXES || defined ECOSIM || defined ATM_PRESS
       IF (Aout(idPair,ng)) THEN
         allocate ( AVERAGE(ng) % avgPair(LBi:UBi,LBj:UBj) )
+        Dmem(ng)=Dmem(ng)+size2d
+      END IF
+#  endif
+#  if defined BULK_FLUXES
+      IF (Aout(idTair,ng)) THEN
+        allocate ( AVERAGE(ng) % avgTair(LBi:UBi,LBj:UBj) )
         Dmem(ng)=Dmem(ng)+size2d
       END IF
 #  endif
@@ -982,6 +991,15 @@
         DO j=Jmin,Jmax
           DO i=Imin,Imax
             AVERAGE(ng) % avgPair(i,j) = IniVal
+          END DO
+        END DO
+      END IF
+#  endif
+#  if defined BULK_FLUXES
+      IF (Aout(idTair,ng)) THEN
+        DO j=Jmin,Jmax
+          DO i=Imin,Imax
+            AVERAGE(ng) % avgTair(i,j) = IniVal
           END DO
         END DO
       END IF

@@ -235,7 +235,8 @@
 !
 !  Local variable declarations.
 !
-      logical :: LapplySrc, Lmpdata
+      logical :: LapplySrc, Lhsimt, Lmpdata
+!
 # ifdef NESTING
       integer :: ILB, IUB, JLB, JUB
       integer :: dg, cr, rg
@@ -299,10 +300,13 @@
 !  Time-step horizontal advection term.
 !-----------------------------------------------------------------------
 !
-!  Allocate local arrays for MPDATA.
-!
+      Lhsimt =ANY(Hadvection(:,ng)%HSIMT).and.                          &
+     &        ANY(Vadvection(:,ng)%HSIMT)
       Lmpdata=ANY(Hadvection(:,ng)%MPDATA).and.                         &
      &        ANY(Vadvection(:,ng)%MPDATA)
+!
+!  Allocate local arrays for MPDATA.
+!
       IF (Lmpdata) THEN
 # ifdef DIAGNOSTICS_TS
         IF (.not.allocated(Dhadv)) THEN
@@ -334,25 +338,23 @@
 !
 !  Compute reciprocal thickness, 1/Hz.
 !
-      IF (ANY(Vadvection(:,ng)%MPDATA).or.                              &
-     &    ANY(Vadvection(:,ng)%HSIMT)) THEN
-        IminT=Istrm2
-        ImaxT=Iendp2
-        JminT=Jstrm2
-        JmaxT=Jendp2
-      ELSE
-        IminT=Istr
-        ImaxT=Iend
-        JminT=Jstr
-        JmaxT=Jend
-      END IF
-      DO k=1,N(ng)
-        DO j=JminT,JmaxT
-          DO i=IminT,ImaxT
-            oHz(i,j,k)=1.0_r8/Hz(i,j,k)
+      IF (Lmpdata.or.Lhsimt) THEN
+        DO k=1,N(ng)
+          DO j=Jstrm2,Jendp2
+            DO i=Istrm2,Iendp2
+              oHz(i,j,k)=1.0_r8/Hz(i,j,k)
+            END DO
           END DO
         END DO
-      END DO
+      ELSE
+        DO k=1,N(ng)
+          DO j=Jstr,Jend
+            DO i=Istr,Iend
+              oHz(i,j,k)=1.0_r8/Hz(i,j,k)
+            END DO
+          END DO
+        END DO
+      END IF
 !
 !  Horizontal tracer advection.  It is possible to have a different
 !  advection schme for each tracer.
@@ -1079,10 +1081,10 @@
                     a1= cc1*KaZ(k)+cc2-cc3*oKaZ(k)
                     b1=-cc1*KaZ(k)+cc2+cc3*oKaZ(k)
                     betaD=a1+b1*rD
-                    sw=t(i,j,k,3,itrc)+                                 &
-     &                 0.5_r8*MAX(0.0_r8,                               &
-     &                            MIN(2.0_r8, 2.0_r8*rD*rkaD, betaD))*  &
-     &                 gradZ(k)*KaZ(k)
+                    cff=0.5_r8*MAX(0.0_r8,                              &
+     &                             MIN(2.0_r8, 2.0_r8*rD*rkaD, betaD))* &
+     &                  gradZ(k)*KaZ(k)
+                    sw=t(i,j,k,3,itrc)+cff
                   ELSE
                     IF (ABS(gradZ(k)).le.eps1) THEN
                       rU=0.0_r8
@@ -1094,10 +1096,10 @@
                     a1= cc1*KaZ(k)+cc2-cc3*oKaZ(k)
                     b1=-cc1*KaZ(k)+cc2+cc3*oKaZ(k)
                     betaU=a1+b1*rU
-                    sw=t(i,j,k+1,3,itrc)-                               &
-     &                 0.5_r8*MAX(0.0_r8,                               &
-     &                            MIN(2.0_r8, 2.0_r8*rU*rkaU, betaU))*  &
-     &                 gradZ(k)*KaZ(k)
+                    cff=0.5_r8*MAX(0.0_r8,                              &
+     &                             MIN(2.0_r8, 2.0_r8*rU*rkaU, betaU))* &
+     &                  gradZ(k)*KaZ(k)
+                    sw=t(i,j,k+1,3,itrc)-cff
                   END IF
                   FC(i,k)=W(i,j,k)*sw
                 END IF
@@ -1154,7 +1156,8 @@
               Isrc=SOURCES(ng)%Isrc(is)
               Jsrc=SOURCES(ng)%Jsrc(is)
               IF (LtracerSrc(itrc,ng)) THEN
-                IF (Vadvection(itrc,ng)%MPDATA) THEN
+                IF ((Vadvection(itrc,ng)%MPDATA).or.                    &
+     &              (Vadvection(itrc,ng)%HSIMT)) THEN
                   LapplySrc=(IstrUm2.le.Isrc).and.                      &
      &                      (Isrc.le.Iendp2i).and.(j.eq.Jsrc)
                 ELSE
@@ -1417,42 +1420,42 @@
 !  at horizontal RHO-points and vertical W-points.
 !  Also set FC at the top and bottom levels.
 !
-          cff=-dt(ng)*lambda
-          DO k=1,N(ng)-1
-            DO i=Istr,Iend
-              cff1=1.0_r8/(z_r(i,j,k+1)-z_r(i,j,k))
-              FC(i,k)=cff*cff1*Akt(i,j,k,ltrc)
+            cff=-dt(ng)*lambda
+            DO k=1,N(ng)-1
+              DO i=Istr,Iend
+                cff1=1.0_r8/(z_r(i,j,k+1)-z_r(i,j,k))
+                FC(i,k)=cff*cff1*Akt(i,j,k,ltrc)
+              END DO
             END DO
-          END DO
-          DO i=Istr,Iend
-            FC(i,0)=0.0_r8
-            FC(i,N(ng))=0.0_r8
-          END DO
+            DO i=Istr,Iend
+              FC(i,0)=0.0_r8
+              FC(i,N(ng))=0.0_r8
+            END DO
 !
 !  Compute diagonal matrix coefficients BC and load right-hand-side
 !  terms for the tracer equation into DC.
 !
-          DO k=1,N(ng)
-            DO i=Istr,Iend
-              BC(i,k)=Hz(i,j,k)-FC(i,k)-FC(i,k-1)
-              DC(i,k)=t(i,j,k,nnew,itrc)
+            DO k=1,N(ng)
+              DO i=Istr,Iend
+                BC(i,k)=Hz(i,j,k)-FC(i,k)-FC(i,k-1)
+                DC(i,k)=t(i,j,k,nnew,itrc)
+              END DO
             END DO
-          END DO
 !
 !  Solve the tridiagonal system.
 !
-          DO i=Istr,Iend
-            cff=1.0_r8/BC(i,1)
-            CF(i,1)=cff*FC(i,1)
-            DC(i,1)=cff*DC(i,1)
-          END DO
-          DO k=2,N(ng)-1
             DO i=Istr,Iend
-              cff=1.0_r8/(BC(i,k)-FC(i,k-1)*CF(i,k-1))
-              CF(i,k)=cff*FC(i,k)
-              DC(i,k)=cff*(DC(i,k)-FC(i,k-1)*DC(i,k-1))
+              cff=1.0_r8/BC(i,1)
+              CF(i,1)=cff*FC(i,1)
+              DC(i,1)=cff*DC(i,1)
             END DO
-          END DO
+            DO k=2,N(ng)-1
+              DO i=Istr,Iend
+                cff=1.0_r8/(BC(i,k)-FC(i,k-1)*CF(i,k-1))
+                CF(i,k)=cff*FC(i,k)
+                DC(i,k)=cff*(DC(i,k)-FC(i,k-1)*DC(i,k-1))
+              END DO
+            END DO
 !
 !  Compute new solution by back substitution.
 !
