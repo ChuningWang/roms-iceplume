@@ -296,8 +296,8 @@
           xr(i,j)=dx*(REAL(i-1,r8)+0.5_r8)
           xu(i,j)=xp(i,j)
           xv(i,j)=xr(i,j)
-          yp(i,j)=dy*REAL(j-1,r8)
-          yr(i,j)=dy*(REAL(j-1,r8)+0.5_r8)
+          yp(i,j)=dy*REAL(j-1,r8)-Esize*0.5_r8
+          yr(i,j)=dy*(REAL(j-1,r8)+0.5_r8)-Esize*0.5_r8
           yu(i,j)=yr(i,j)
           yv(i,j)=yp(i,j)
         END DO

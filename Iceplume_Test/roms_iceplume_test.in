@@ -189,10 +189,9 @@ ad_Vadvection == C4       \                     ! temperature
    LBC(isUvel) ==   Clo     Clo     RadNud  Clo         ! 3D U-momentum
    LBC(isVvel) ==   Clo     Clo     RadNud  Clo         ! 3D V-momentum
    LBC(isMtke) ==   Clo     Clo     Gra     Clo         ! mixing TKE
-                                          
+                                                  
    LBC(isTvar) ==   Clo     Clo     RadNud  Clo \       ! temperature
-                    Clo     Clo     RadNud  Clo \       ! salinity
-                    Clo     Clo     RadNud  Clo         ! inert tracer 
+                    Clo     Clo     RadNud  Clo         ! salinity
 
 ! Adjoint-based algorithms can have different lateral boundary
 ! conditions keywords.
@@ -224,9 +223,9 @@ ad_VolCons(north) ==  F                            ! northern boundary
 
 ! Time-Stepping parameters.
 
-      NTIMES == 86400
-          DT == 1.0d0
-     NDTFAST == 1
+      NTIMES == 8640
+          DT == 10.0d0
+     NDTFAST == 5
 
 ! Number of timesteps for computing observation impacts during the
 ! analysis-forecast cycle.
@@ -253,23 +252,23 @@ ad_VolCons(north) ==  F                            ! northern boundary
 
        NRREC == 0
    LcycleRST == T
-        NRST == 3600
+        NRST == 360
         NSTA == 1
         NFLT == 1
-       NINFO == 3600
+       NINFO == 360
 
 ! Output history, quicksave, average, and diagnostic files parameters.
 
      LDEFOUT == T
-        NHIS == 3600
+        NHIS == 360
      NDEFHIS == 0
         NQCK == 0
      NDEFQCK == 0
       NTSAVG == 1
-        NAVG == 3600
+        NAVG == 360
      NDEFAVG == 0
       NTSDIA == 1
-        NDIA == 3600
+        NDIA == 360
      NDEFDIA == 0
 
 ! Output tangent linear and adjoint models parameters.
@@ -451,8 +450,8 @@ LtracerSponge == F F                            ! temperature, salinity, inert
 ! point Sources/Sinks (like river runoff transport) and mass point
 ! Sources/Sinks (like volume vertical influx), [1:Ngrids].
 
-      LuvSrc == F                          ! horizontal momentum transport
-       LwSrc == T                          ! volume vertical influx
+      LuvSrc == T                          ! horizontal momentum transport
+       LwSrc == F                          ! volume vertical influx
 
 ! Logical switches (TRUE/FALSE) to activate tracers point Sources/Sinks
 ! (like river runoff) and to specify which tracer variables to consider:
