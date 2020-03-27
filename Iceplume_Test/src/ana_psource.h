@@ -113,6 +113,7 @@
 !  Local variable declarations.
 !
       integer :: Npts, NSUB, is, i, j, k, ised
+      integer :: isc
 
       real(r8) :: Pspv = 0.0_r8
       real(r8), save :: area_east, area_west
@@ -144,11 +145,11 @@
 #if defined ICEPLUME_TEST
         IF (Master.and.DOMAIN(ng)%SouthWest_Test(tile)) THEN
           Nsrc(ng)=3
-          cff=NINT((Mm(ng)+1)/2.0_r8)
+          isc=NINT((Mm(ng)+1)/2.0_r8)
           DO is=1,Nsrc(ng)
             SOURCES(ng)%Dsrc(is)=0.0_r8
             SOURCES(ng)%Isrc(is)=2
-            SOURCES(ng)%Jsrc(is)=cff+is-2
+            SOURCES(ng)%Jsrc(is)=isc+is-2
 # if defined ICEPLUME
             SOURCES(ng)%SGdep(is)=-260.0_r8
             SOURCES(ng)%SGtyp(is)=4.0_r8
@@ -156,8 +157,8 @@
 #  ifdef ICEPLUME_DET_AVERAGE
             SOURCES(ng)%SGIrange(is, 1)=2
             SOURCES(ng)%SGIrange(is, 2)=4
-            SOURCES(ng)%SGJrange(is, 1)=cff-2
-            SOURCES(ng)%SGJrange(is, 2)=cff+2
+            SOURCES(ng)%SGJrange(is, 1)=isc-2
+            SOURCES(ng)%SGJrange(is, 2)=isc+2
 #  endif
 # endif
           END DO
@@ -234,7 +235,8 @@
 # endif
         END DO
 # if defined ICEPLUME
-        SOURCES(ng)%SGbar(2)=200.0_r8
+        is=NINT((Nsrc(ng)+1)/2.0_r8)
+        SOURCES(ng)%SGbar(is)=200.0_r8
 # endif
 #else
         ana_psource.h: No values provided for Qbar.
