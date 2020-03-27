@@ -1631,13 +1631,6 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+19)=' NO_CORRECT_TRACER,'
 #endif
-#ifdef NO_HIS
-!
-      IF (Master) WRITE (stdout,20) 'NO_HIS',                           &
-     &   'Turn off writing of history files.'
-      is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+8)=' NO_HIS,'
-#endif
 #ifdef NO_LBC_ATT
 !
       IF (Master) WRITE (stdout,20) 'NO_LBC_ATT',                       &
