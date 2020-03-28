@@ -150,7 +150,7 @@
             BOUNDARY(ng)%t_north(i,k,itemp)=T0(ng)
 # ifdef SALINITY
             BOUNDARY(ng)%t_north(i,k,isalt)=S0(ng)-(S0(ng)-USER(2))*    &
-     &        0.5_r8*(TANH(0.2_r8*pi*(z_r(i,Jend-1,k)+USER(1)))+1.0_r8)
+     &        0.5_r8*(TANH(0.2_r8*pi*(z_r(i,Jend+1,k)+USER(1)))+1.0_r8)
 # endif
 # ifdef SEDIMENT
             DO ised=1,NST
