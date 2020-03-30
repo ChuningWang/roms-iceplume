@@ -49,12 +49,13 @@
 !               subglacial Sources/Sinks.                              !
 !  SGdep      Depth of subglacial point Sources/Sinks (m).             !
 !  SGtyp      Type of subglacial point Sources/Sinks:                  !
-!               TYPEsrc(:) = 1,  No subglaical plume or melt.          !
-!               TYPEsrc(:) = 2,  half-cone (point source).             !
-!               TYPEsrc(:) = 3,  finite-line.                          !
-!               TYPEsrc(:) = 4,  sheet (infinite-line).                !
-!               TYPEsrc(:) = 5,  detached.                             !
-!               TYPEsrc(:) = 6,  ellipse.                              !
+!               SGtyp(:) = 1,  No subglaical discharge or melt.        !
+!               SGtyp(:) = 2,  half-cone (point source).               !
+!               SGtyp(:) = 3,  finite-line.                            !
+!               SGtyp(:) = 4,  sheet (infinite-line).                  !
+!               SGtyp(:) = 5,  detached.                               !
+!               SGtyp(:) = 6,  ellipse.                                !
+!               SGtyp(:) = ... other types to be determined.           !
 !  SGlen      Length of point Sources/Sinks (m).                       !
 # ifdef ICEPLUME_SLOPE
 !  SGang      Angle of the glacier front (degree).                     !
