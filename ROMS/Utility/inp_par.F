@@ -52,6 +52,8 @@
       real(r8), parameter :: epsilon = 1.0E-8_r8
       real(r8), parameter :: spv = 0.0_r8
 !
+      SourceFile=__FILE__
+!
 !-----------------------------------------------------------------------
 !  Read in and report input model parameters.
 !-----------------------------------------------------------------------
@@ -195,8 +197,10 @@
 !
 !  Set switch for three ghost-points in the halo region.
 !
+#ifdef SOLVE3D
       ThreeGhostPoints=ANY(Hadvection(:,:)%MPDATA).or.                  &
      &                 ANY(Hadvection(:,:)%HSIMT)
+#endif
 #ifdef UV_VIS4
       ThreeGhostPoints=.TRUE.
 #endif
