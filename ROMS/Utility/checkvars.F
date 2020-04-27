@@ -349,8 +349,10 @@
 #  ifdef LMD_NONLOCAL
         ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idGhat(itemp)))) THEN
           have_var(idGhat(itemp))=.TRUE.
+#   ifdef SALINITY
         ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idGhat(isalt)))) THEN
           have_var(idGhat(isalt))=.TRUE.
+#   endif
 #  endif
 # endif
 # if defined GLS_MIXING || defined MY25_MIXING

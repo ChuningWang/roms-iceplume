@@ -95,7 +95,9 @@
           DO j=JstrT,JendT
             DO i=IstrT,IendT
               CLIMA(ng)%tclm(i,j,k,itemp)=???
+# ifdef SALINITY
               CLIMA(ng)%tclm(i,j,k,isalt)=???
+# endif
             END DO
           END DO
         END DO

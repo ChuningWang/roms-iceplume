@@ -185,7 +185,7 @@
 !  Write out model time (s).
 !
       CALL netcdf_put_fvar (ng, iNLM, DAI(ng)%name,                     &
-     &                      TRIM(Vname(idtime,ng)), time(ng:),          &
+     &                      TRIM(Vname(1,idtime)), time(ng:),           &
      &                      (/DAI(ng)%Rindex/), (/1/),                  &
      &                      ncid = DAI(ng)%ncid,                        &
      &                      varid = DAI(ng)%Vid(idtime))

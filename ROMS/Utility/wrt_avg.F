@@ -89,7 +89,7 @@
 !  Write out averaged time.
 !
       CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                     &
-     &                      TRIM(Vname(idtime,ng)), AVGtime(ng:),       &
+     &                      TRIM(Vname(1,idtime)), AVGtime(ng:),        &
      &                      (/AVG(ng)%Rindex/), (/1/),                  &
      &                      ncid = AVG(ng)%ncid,                        &
      &                      varid = AVG(ng)%Vid(idtime))

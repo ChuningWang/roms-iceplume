@@ -155,7 +155,9 @@
      &                 (1.0_r8-(h(i,j)+z_w(i,j,k))/                     &
      &                  (h(i,j)+zeta(i,j,knew)))
             Akt(i,j,k,itemp)=Akv(i,j,k)*0.49_r8/0.39_r8
+# ifdef SALINITY
             Akt(i,j,k,isalt)=Akt(i,j,k,itemp)
+# endif
           END DO
         END DO
       END DO
@@ -243,7 +245,9 @@
         DO j=JstrT,JendT
           DO i=IstrT,IendT
             Akt(i,j,k,itemp)=Akt_bak(itemp,ng)
+# ifdef SALINITY
             Akt(i,j,k,isalt)=Akt_bak(isalt,ng)
+# endif
           END DO
         END DO
       END DO
@@ -252,7 +256,9 @@
         DO j=JstrT,JendT
           DO i=IstrT,IendT
             Akt(i,j,k,itemp)=Akv(i,j,k)
+# ifdef SALINITY
             Akt(i,j,k,isalt)=Akv(i,j,k)
+# endif
           END DO
         END DO
       END DO
@@ -261,7 +267,9 @@
         DO j=JstrT,JendT
           DO i=IstrT,IendT
             Akt(i,j,k,itemp)=Akt_bak(itemp,ng)
+# ifdef SALINITY
             Akt(i,j,k,isalt)=Akt_bak(isalt,ng)
+# endif
           END DO
         END DO
       END DO
@@ -271,7 +279,9 @@
           DO i=IstrT,IendT
             Akt(i,j,k,itemp)=1.0E-05_r8+                                &
      &                       2.0E-06_r8*EXP(z_r(i,j,k)/10.0_r8)
+# ifdef SALINITY
             Akt(i,j,k,isalt)=Akt(i,j,k,itemp)
+# endif
           END DO
         END DO
       END DO
@@ -280,7 +290,9 @@
         DO j=JstrT,JendT
           DO i=IstrT,IendT
             Akt(i,j,k,itemp)=Akv(i,j,k)
+# ifdef SALINITY
             Akt(i,j,k,isalt)=Akv(i,j,k)
+# endif
           END DO
         END DO
       END DO
@@ -289,7 +301,9 @@
         DO j=JstrT,JendT
           DO i=IstrT,IendT
             Akt(i,j,k,itemp)=Akv(i,j,k)
+# ifdef SALINITY
             Akt(i,j,k,isalt)=Akv(i,j,k)
+# endif
           END DO
         END DO
       END DO
@@ -298,7 +312,9 @@
         DO j=JstrT,JendT
           DO i=IstrT,IendT
             Akt(i,j,k,itemp)=Akv(i,j,k)*0.49_r8/0.39_r8
+# ifdef SALINITY
             Akt(i,j,k,isalt)=Akt(i,j,k,itemp)
+# endif
           END DO
         END DO
       END DO
@@ -307,7 +323,9 @@
         DO j=JstrT,JendT
           DO i=IstrT,IendT
             Akt(i,j,k,itemp)=Akt_bak(itemp,ng)
+# ifdef SALINITY
             Akt(i,j,k,isalt)=Akt_bak(isalt,ng)
+# endif
           END DO
         END DO
       END DO

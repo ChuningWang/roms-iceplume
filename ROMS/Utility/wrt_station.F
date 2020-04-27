@@ -652,6 +652,8 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
       END IF
+
+#  ifdef SALINITY
 !
 !  Write out surface salt flux.
 !
@@ -670,6 +672,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
       END IF
+#  endif
 
 #  ifdef BULK_FLUXES
 !

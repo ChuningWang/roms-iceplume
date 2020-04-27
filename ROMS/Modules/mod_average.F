@@ -482,10 +482,12 @@
         allocate ( AVERAGE(ng) % avgstf(LBi:UBi,LBj:UBj) )
         Dmem(ng)=Dmem(ng)+size2d
       END IF
+#  ifdef SALINITY
       IF (Aout(idTsur(isalt),ng)) THEN
         allocate ( AVERAGE(ng) % avgswf(LBi:UBi,LBj:UBj) )
         Dmem(ng)=Dmem(ng)+size2d
       END IF
+#  endif
 #  ifdef SHORTWAVE
       IF (Aout(idSrad,ng)) THEN
         allocate ( AVERAGE(ng) % avgsrf(LBi:UBi,LBj:UBj) )
@@ -1027,6 +1029,7 @@
           END DO
         END DO
       END IF
+#  ifdef SALINITY
       IF (Aout(idTsur(isalt),ng)) THEN
         DO j=Jmin,Jmax
           DO i=Imin,Imax
@@ -1034,7 +1037,7 @@
           END DO
         END DO
       END IF
-
+#  endif
 #  ifdef SHORTWAVE
       IF (Aout(idSrad,ng)) THEN
         DO j=Jmin,Jmax

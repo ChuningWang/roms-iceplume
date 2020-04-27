@@ -87,7 +87,7 @@
       DO itrc=1,nTvar
         lvar=MAX(lvar, LEN_TRIM(Vname(1,idTvar(itrc))))
       END DO
-      WRITE (frmt,10) lvar+4
+      WRITE (frmt,10) MAX(10,lvar)+4
   10  FORMAT ("(a,':',t",i2.2,',a,a,a)')
 !
 !  Initialize attribute.

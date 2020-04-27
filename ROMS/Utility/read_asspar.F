@@ -324,9 +324,11 @@
                 Cnorm(1,i)=Ltracer(itrc)
               END DO
 #  endif
+#  ifdef SALINITY
             CASE ('balance(isSalt)')
               Npts=load_l(Nval, Cval, 1, Lvalue)
               balance(isTvar(isalt))=Lvalue(1)
+#  endif
             CASE ('balance(isFsur)')
               Npts=load_l(Nval, Cval, 1, Lvalue)
               balance(isFsur)=Lvalue(1)
@@ -710,6 +712,7 @@
 !-----------------------------------------------------------------------
 !
 #   ifdef SOLVE3D
+#    ifdef SALINITY
       IF (.not.balance(isTvar(isalt)).and.balance(isFsur)) THEN
         balance(isTvar(isalt))=.TRUE.
       END IF
@@ -719,6 +722,7 @@
       IF (balance(isTvar(isalt))) THEN
         balance(isTvar(itemp))=.TRUE.
       END IF
+#    endif
       IF (balance(isVvel)) THEN
         balance(isUvel)=.TRUE.
       END IF
@@ -799,8 +803,10 @@
           WRITE (out,70) balance(isFsur), 'balance(isFsur)',            &
                   'Switch to include free-surface in balance operator.'
 #    ifdef SOLVE3D
+#     ifdef SALINITY
           WRITE (out,70) balance(isTvar(isalt)), 'balance(isSalt)',     &
                   'Switch to include salinity in balance operator.'
+#     endif
           WRITE (out,70) balance(isVvel), 'balance(isVvel)',            &
                   'Switch to include 3D momentum in balance operator.'
 #    else

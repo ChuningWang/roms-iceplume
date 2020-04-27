@@ -448,7 +448,9 @@
           DO k=1,N(ng)
             DO is=1,Nsrc(ng)
               SOURCES(ng)%Tsrc(is,k,itemp)=T0(ng)
+#  ifdef SALINITY
               SOURCES(ng)%Tsrc(is,k,isalt)=0.0_r8
+#  endif
             END DO
           END DO
         END IF
@@ -458,10 +460,14 @@
           DO k=1,N(ng)
             DO is=1,Nsrc(ng)-1
               SOURCES(ng)%Tsrc(is,k,itemp)=T0(ng)
+#  ifdef SALINITY
               SOURCES(ng)%Tsrc(is,k,isalt)=S0(ng)
+#  endif
             END DO
             SOURCES(ng)%Tsrc(Nsrc(ng),k,itemp)=T0(ng)
+#  ifdef SALINITY
             SOURCES(ng)%Tsrc(Nsrc(ng),k,isalt)=S0(ng)
+#  endif
           END DO
         END IF
 # else

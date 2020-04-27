@@ -680,6 +680,8 @@
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
         END IF
+
+#  ifdef SALINITY
 !
 !  Define surface net salt flux.
 !
@@ -699,6 +701,8 @@
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
         END IF
+#  endif
+
 #  ifdef BULK_FLUXES
 !
 !  Define latent heat flux.
