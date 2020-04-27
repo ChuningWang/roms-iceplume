@@ -35,6 +35,7 @@
 !!                                W4DVAR  data assimilation system     !
 !!  rp_ocean.h                  Representer tangent linear model       !
 !!                                driver                               !
+!!  saddle_point.h              Saddle point 4DVar driver              !
 !!  so_ocean.h                  Stochastic optimals driver             !
 !!  so_semi_ocean.h             Stochastic optimals, semi-norm driver  !
 !!  symmetry.h                  Representer matrix, symmetry driver    !
@@ -98,6 +99,8 @@
 # include "w4dpsas_ocean.h"
 #elif defined W4DVAR
 # include "w4dvar_ocean.h"
+#elif defined SP4DVAR
+# include "saddle_point.h"
 #elif defined W4DPSAS_FCT_SENSITIVITY
 # include "obs_sen_w4dpsas_forecast.h"
 #elif defined W4DPSAS_SENSITIVITY

@@ -56,6 +56,10 @@
 # if defined IS4DVAR || defined WEAK_CONSTRAINT
       integer :: MinnerDim, MouterDim, NinnerDim, NouterDim, threeDim
 # endif
+# ifdef SP4DVAR
+      integer :: NinnerDim1
+      integer :: NinnerDim2
+# endif
 # if defined BALANCE_OPERATOR && defined ZETA_ELLIPTIC
       integer :: RetaDim, RxiDim
 # endif
@@ -203,6 +207,18 @@
 
 # ifdef FOUR_DVAR
 #  if defined IS4DVAR || defined WEAK_CONSTRAINT
+#   ifdef SP4DVAR
+        status=def_dim(ng, iNLM, DAV(ng)%ncid, ncname, 'Ninner1',       &
+     &                 Ninner+1, NinnerDim1)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+
+        status=def_dim(ng, iNLM, DAV(ng)%ncid, ncname, 'Ninner2',       &
+     &                 Ninner+2, NinnerDim2)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+
+#   endif
         status=def_dim(ng, iNLM, DAV(ng)%ncid, ncname, 'Ninner',        &
      &                 Ninner, NinnerDim)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -509,7 +525,7 @@
 
 # if defined IS4DVAR || defined WEAK_CONSTRAINT
 !
-!  Outer and inner loop contours.
+!  Outer and inner loop counters.
 !
         Vinfo( 1)='outer'
         Vinfo( 2)='outer loop counter'
@@ -936,7 +952,8 @@
      &                 __FILE__)) RETURN
 # endif
 # if defined TL_W4DPSAS || defined W4DPSAS_FCT_SENSITIVITY || \
-     defined W4DPSAS    || defined W4DPSAS_SENSITIVITY
+     defined W4DPSAS    || defined W4DPSAS_SENSITIVITY     || \
+     defined SP4DVAR
 !
 !  Define NLM initial and final data penalty function.
 !
@@ -1008,6 +1025,7 @@
      &                 SetParAccess = .FALSE.)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
+#  ifndef SP4DVAR
 !
 !  Define model penalty function.
 !
@@ -1078,6 +1096,7 @@
      &                 SetParAccess = .FALSE.)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
+#   endif
 # endif
 !
 !  Observations survey time.
@@ -1744,6 +1763,73 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
+# ifdef SP4DVAR
+!
+!  Define saved values of ADmodVal.
+!
+        Vinfo( 1)='ADmodVal_S'
+        Vinfo( 2)='adjoint model at observation locations'
+        vardim(1)=datumDim
+        vardim(2)=NinnerDim2
+        Vinfo(24)='_FillValue'
+        Aval(6)=spval
+        status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
+     &                 2, vardim, Aval, Vinfo, ncname)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+!
+!  Define saved values of harnoldi.
+!
+        Vinfo( 1)='harnoldi'
+        Vinfo( 2)='GMRES upper Hessenberg matrix'
+        vardim(1)=NinnerDim1
+        vardim(2)=NinnerDim
+        vardim(3)=NouterDim
+        Vinfo(24)='_FillValue'
+        Aval(6)=spval
+        status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
+     &                 3, vardim, Aval, Vinfo, ncname)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+!
+!  Define saved values of gmze, the Arnoldi vector weights.
+!
+        Vinfo( 1)='gmze'
+        Vinfo( 2)='GMRES Arnoldi vector weights'
+        vardim(1)=NinnerDim
+        vardim(2)=NouterDim
+        Vinfo(24)='_FillValue'
+        Aval(6)=spval
+        status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
+     &                 2, vardim, Aval, Vinfo, ncname)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+!
+!  Define saved values of cg_beta0.
+!
+        Vinfo( 1)='cg_beta0'
+        Vinfo( 2)='Residual norm'
+        vardim(1)=NouterDim
+        Vinfo(24)='_FillValue'
+        Aval(6)=spval
+        status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
+     &                 1, vardim, Aval, Vinfo, ncname)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+!
+!  Define saved values of Jobs.
+!
+        Vinfo( 1)='Jobs'
+        Vinfo( 2)='Obs cost function'
+        vardim(1)=NinnerDim1
+        vardim(2)=NouterDim
+        Vinfo(24)='_FillValue'
+        Aval(6)=spval
+        status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
+     &                 2, vardim, Aval, Vinfo, ncname)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+# endif
 # if defined TL_W4DVAR          || defined W4DVAR             || \
      defined W4DVAR_SENSITIVITY
 !
@@ -2122,9 +2208,9 @@
 # endif
       END IF QUERY
 
-  10  FORMAT (/,6x,'DEF_MOD     - creating model/observation data',     &
+  10  FORMAT (/,6x,'DEF_MOD   - creating model/observation data',       &
      &        ' file, Grid ',i2.2,': ',a)
-  20  FORMAT (/,6x,'DEF_MOD     - inquiring model/observation data',    &
+  20  FORMAT (/,6x,'DEF_MOD   - inquiring model/observation data',      &
      &        ' file Grid ',i2.2,': ',a)
   30  FORMAT (/,' DEF_MOD - unable to open observation/model file: ',a)
   40  FORMAT (/,' DEF_MOD - unable to create model/observation file:',  &

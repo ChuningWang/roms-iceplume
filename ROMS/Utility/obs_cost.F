@@ -114,7 +114,7 @@
       END IF
 
 # elif defined TL_W4DPSAS          || defined W4DPSAS || \
-       defined W4DPSAS_SENSITIVITY
+       defined W4DPSAS_SENSITIVITY || defined SP4DVAR
 !
 !  Compute nonlinear model data penalty function.
 !
@@ -196,7 +196,7 @@
           END DO
         END IF
 # elif defined TL_W4DPSAS          || defined W4DPSAS || \
-       defined W4DPSAS_SENSITIVITY
+       defined W4DPSAS_SENSITIVITY || defined SP4DVAR
         IF (model.eq.iNLM) THEN
           DO ivar=0,NobsVar(ng)
             FOURDVAR(ng)%NLPenalty(ivar)=my_ObsCost(ivar)+              &

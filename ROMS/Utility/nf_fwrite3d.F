@@ -29,11 +29,13 @@
 !     Ascl         Factor to scale field before writing (real).        !
 !     A            Field to write out (real).                          !
 !     SetFillVal   Logical switch to set fill value in land areas      !
-!                    (optional).                                       !
+!                    (OPTIONAL).                                       !
 !                                                                      !
 !  On Output:                                                          !
 !                                                                      !
 !     nf_fwrite3d  Error flag (integer).                               !
+!     MinValue     Minimum value (real, OPTIONAL).                     !
+!     MaxValue     Maximum value (real, OPTIONAL).                     !
 !                                                                      !
 #ifdef POSITIVE_ZERO
 !  Starting F95 zero values can be signed (-0 or +0) following the     !
@@ -57,7 +59,7 @@
 # ifdef MASKING
      &                      Amask,                                      &
 # endif
-     &                      A,  SetFillVal)
+     &                      A,  SetFillVal, MinValue, MaxValue)
 !***********************************************************************
 !
       USE mod_param
@@ -91,6 +93,8 @@
 #  endif
       real(r8), intent(in) :: A(LBi:UBi,LBj:UBj,LBk:UBk)
 # endif
+      real(r8), intent(out), optional :: MinValue
+      real(r8), intent(out), optional :: MaxValue
 !
 !  Local variable declarations.
 !
@@ -374,7 +378,7 @@
 # ifdef MASKING
      &                      Amask,                                      &
 # endif
-     &                      A,  SetFillVal)
+     &                      A, SetFillVal, MinValue, MaxValue)
 !***********************************************************************
 !
       USE mod_param
@@ -413,6 +417,8 @@
 #  endif
       real(r8), intent(in) :: A(LBi:UBi,LBj:UBj,LBk:UBk)
 # endif
+      real(r8), intent(out), optional :: MinValue
+      real(r8), intent(out), optional :: MaxValue
 !
 !  Local variable declarations.
 !
@@ -492,6 +498,13 @@
       END IF
 # endif
 !
+!  If appropriate, initialize minimum and maximum processed values.
+!
+      IF (PRESENT(MinValue)) THEN
+        MinValue=spval
+        MaxValue=-spval
+      END IF
+!
 !  Initialize local array to avoid denormalized numbers. This
 !  facilitates processing and debugging.
 !
@@ -534,6 +547,21 @@
 #  endif
 !
 !-----------------------------------------------------------------------
+!  If applicable, compute output field minimum and maximum values.
+!-----------------------------------------------------------------------
+!
+        IF (PRESENT(MinValue)) THEN
+          IF (OutThread) THEN
+            DO i=1,Npts
+              IF (ABS(Awrk(i)).lt.spval) THEN
+                MinValue=MIN(MinValue,Awrk(i))
+                MaxValue=MAX(MaxValue,Awrk(i))
+              END IF
+            END DO
+          END IF
+        END IF
+!
+!-----------------------------------------------------------------------
 !  Write output buffer into NetCDF file.
 !-----------------------------------------------------------------------
 !
@@ -574,6 +602,7 @@
 #  ifdef INLINE_2DIO
       END DO
 #  endif
+
 # else
 !
 !-----------------------------------------------------------------------
@@ -618,6 +647,21 @@
           END DO
         END DO
 #  endif
+      END IF
+!
+!-----------------------------------------------------------------------
+!  If applicable, compute output field minimum and maximum values.
+!-----------------------------------------------------------------------
+!
+      IF (PRESENT(MinValue)) THEN
+        IF (OutThread) THEN
+          DO i=1,Npts
+            IF (ABS(Awrk(i)).lt.spval) THEN
+              MinValue=MIN(MinValue,Awrk(i))
+              MaxValue=MAX(MaxValue,Awrk(i))
+            END IF
+          END DO
+        END IF
       END IF
 !
 !-----------------------------------------------------------------------

@@ -209,10 +209,12 @@
             Ifirst=MAX(Ifirst,i)
           END IF
         END DO
+# ifndef SP4DVAR
         IF (Ifirst.eq.0) THEN
           WRITE (stdout,30) tend, tdays(ng)
           STOP
         END IF
+# endif
       ELSE
         Ifirst=Nsurvey(ng)
         tend=(time(ng)+ntimes(ng)*dt(ng))*sec2day
@@ -222,10 +224,12 @@
             Ifirst=MIN(Ifirst,i)
           END IF
         END DO
+# ifndef SP4DVAR
         IF (Ifirst.eq.0) THEN
           WRITE (stdout,30) tdays(ng), tend
           STOP
         END IF
+# endif
       END IF
       ObsTime(ng)=FOURDVAR(ng)%SurveyTime(Ifirst)*day2sec
 !
@@ -291,9 +295,23 @@
 !
       DO i=1,Mobs
         NLmodVal(i)=IniVal
-        TLmodVal(i)=IniVal
         ObsVetting(i)=IniVal
+#  ifndef SP4DVAR
+        TLmodVal(i)=IniVal
+#  endif
+#  if defined SP4DVAR           && defined DISJOINTED && \
+      defined CONCURRENT_KERNEL
+        TLmodVal(i)=IniVal
+#  endif
       END DO
+#  if defined SP4DVAR           && defined DISJOINTED && \
+     !defined CONCURRENT_KERNEL
+      IF (model.ne.iADM) THEN
+        DO i=1,Mobs
+          TLmodVal(i)=IniVal
+        END DO
+      END IF
+#  endif
 # endif
 !
   20  FORMAT (/,' OBS_INITIAL - unable to open input NetCDF file: ',a)

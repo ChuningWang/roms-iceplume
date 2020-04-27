@@ -344,6 +344,8 @@
       USE mod_ocean,         ONLY : initialize_ocean
       USE normalization_mod, ONLY : normalization
       USE strings_mod,       ONLY : FoundError, uppercase
+      USE strings_mod,       ONLY : FoundError
+      USE wrt_ini_mod,       ONLY : wrt_ini
 #if defined BALANCE_OPERATOR && defined ZETA_ELLIPTIC
       USE zeta_balance_mod,  ONLY : balance_ref, biconj
 #endif

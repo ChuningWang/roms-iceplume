@@ -144,7 +144,7 @@
         IF (LwrtPER(ng)) THEN
           Tval(1)=REAL(ADM(ng)%Rindex,r8)*day2sec
         ELSE
-# ifdef WEAK_CONSTRAINT
+# if defined WEAK_CONSTRAINT && !defined WEAK_NOINTERP
           Tval(1)=ForceTime(ng)
 # else
           Tval(1)=time(ng)

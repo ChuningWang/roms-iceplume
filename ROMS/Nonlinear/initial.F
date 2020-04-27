@@ -85,6 +85,9 @@
     defined ADJUST_STFLUX   || defined ADJUST_WSTRESS
       integer :: irec
 #endif
+#ifdef SP4DVAR
+      real(dp) :: my_dstart
+#endif
 !
 !=======================================================================
 !   Initialize model variables.
@@ -137,7 +140,15 @@
 !
         synchro_flag(ng)=.TRUE.
         first_time(ng)=0
+#ifdef SP4DVAR
+        IF (INItime(ng).lt.0.0_dp) THEN
+          my_dstart=dstart
+        ELSE
+          my_dstart=INItime(ng)/86400.0_dp
+        END IF
+#else
         tdays(ng)=dstart
+#endif
         time(ng)=tdays(ng)*day2sec
 !$OMP MASTER
         ntstart(ng)=INT((time(ng)-dstart*day2sec)/dt(ng))+1

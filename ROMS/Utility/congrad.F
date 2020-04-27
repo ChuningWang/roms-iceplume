@@ -1,6 +1,6 @@
 #include "cppdefs.h"
 
-#if defined WEAK_CONSTRAINT && !defined RPCG
+#if defined WEAK_CONSTRAINT && !defined RPCG && !defined SP4DVAR
       SUBROUTINE congrad (ng, model, outLoop, innLoop, NinnLoop,        &
      &                    Lcgini)
 !

@@ -26,6 +26,7 @@
       USE mod_parallel
       USE mod_iounits
       USE mod_strings
+
 #ifdef DISTRIBUTE
 !
       USE distribute_mod, ONLY : mp_barrier
@@ -50,6 +51,7 @@
 #ifndef DISTRIBUTE
       integer :: my_threadnum
 #else
+      integer :: MyCOMM, nPETs, PETrank
 # ifdef ROMS_STDOUT
       integer :: node
       integer, parameter :: Pspv = 0
@@ -60,12 +62,21 @@
       real(r8) :: my_wtime
 !
 !-----------------------------------------------------------------------
-! Initialize timing for all threads.
+!  Initialize timing for all threads.
 !-----------------------------------------------------------------------
 !
 !  Set number of subdivisions, same as for global reductions.
 !
-#ifdef MPI
+#ifdef DISTRIBUTE
+# ifdef DISJOINTED
+      MyCOMM=FULL_COMM_WORLD
+      nPETs=FullSize
+      PETrank=FullRank
+# else
+      MyCOMM=OCN_COMM_WORLD
+      nPETs=numthreads
+      PETrank=MyRank
+# endif
       NSUB=1
 #else
       NSUB=numthreads
@@ -93,23 +104,23 @@
 !$OMP CRITICAL (START_WCLOCK)
         IF (ng.eq.1) THEN
 #ifdef DISTRIBUTE
-          CALL mp_barrier (ng, model)
+          CALL mp_barrier (ng, model, MyCOMM)
 # ifdef ROMS_STDOUT
           IF (.not.allocated(Pids)) THEN
-            allocate ( Pids(numthreads) )
+            allocate ( Pids(nPETs) )
             Pids=0
           END IF
-          Pids(MyRank+1)=proc(0,MyModel,ng)
-          CALL mp_collect (ng, model, numthreads, Pspv, Pids)
+          Pids(PETrank+1)=proc(0,MyModel,ng)
+          CALL mp_collect (ng, model, nPETs, Pspv, Pids, MyCOMM)
           IF (Master) THEN
-            DO node=1,numthreads
+            DO node=1,nPETs
               WRITE (stdout,10) ' Node #', node-1,                      &
      &                      ' (pid=',Pids(node),') is active.'
             END DO
           END IF
           IF (allocated(Pids)) deallocate (Pids)
 # else
-          WRITE (stdout,10) ' Node #', MyRank,                          &
+          WRITE (stdout,10) ' Node #', PETrank,                         &
      &                      ' (pid=',proc(0,MyModel,ng),') is active.'
 # endif
           CALL my_flush (stdout)
@@ -137,7 +148,7 @@
 !                                                                      !
 !     ng         Nested grid number (integer)                          !
 !     model      Calling model identifier (integer)                    !
-!     region     Profiling reagion number (integer)                    !
+!     region     Profiling region number (integer)                     !
 !     line       Calling model routine line (integer)                  !
 !     routine    Calling model routine (string)                        !
 !                                                                      !
@@ -147,6 +158,7 @@
       USE mod_parallel
       USE mod_iounits
       USE mod_strings
+
 #ifdef DISTRIBUTE
 !
       USE distribute_mod, ONLY : mp_barrier, mp_reduce
@@ -166,8 +178,11 @@
 !  Local variable declarations.
 !
       integer :: imodel, iregion, MyModel, NSUB
-#if defined DISTRIBUTE && defined ROMS_STDOUT
+#ifdef DISTRIBUTE
+      integer :: MyCOMM, nPETs, PETrank
+# ifdef ROMS_STDOUT
       integer :: node
+# endif
 #endif
       integer :: my_threadnum
 
@@ -194,7 +209,16 @@
 !
 !  Set number of subdivisions, same as for global reductions.
 !
-#ifdef MPI
+#ifdef DISTRIBUTE
+# ifdef DISJOINTED
+      MyCOMM=FULL_COMM_WORLD
+      nPETs=FullSize
+      PETrank=FullRank
+# else
+      MyCOMM=OCN_COMM_WORLD
+      nPETs=numthreads
+      PETrank=MyRank
+# endif
       NSUB=1
 #else
       NSUB=numthreads
@@ -239,23 +263,23 @@
 !
         IF (ng.eq.1) THEN
 #ifdef DISTRIBUTE
-          CALL mp_barrier (ng, model)
+          CALL mp_barrier (ng, model, MyCOMM)
 # ifdef ROMS_STDOUT
           IF (.not.allocated(Tend)) THEN
-            allocate ( Tend(numthreads) )
+            allocate ( Tend(nPETs) )
             Tend=0.0_r8
           END IF
-          Tend(MyRank+1)=Cend(region,MyModel,ng)
-          CALL mp_collect (ng, model, numthreads, Tspv, Tend)
+          Tend(PETrank+1)=Cend(region,MyModel,ng)
+          CALL mp_collect (ng, model, nPETs, Tspv, Tend, MyCOMM)
           IF (Master) THEN
-            DO node=1,numthreads
+            DO node=1,nPETs
                WRITE (stdout,10) ' Node   #', node-1,                   &
      &                           ' CPU:', Tend(node)
             END DO
           END IF
           IF (allocated(Tend)) deallocate (Tend)
 # else
-          WRITE (stdout,10) ' Node   #', MyRank, ' CPU:',               &
+          WRITE (stdout,10) ' Node   #', PETrank, ' CPU:',              &
      &                      Cend(region,MyModel,ng)
 # endif
           CALL my_flush (stdout)
@@ -287,7 +311,7 @@
               buffer(iregion)=Csum(iregion,imodel,ng)
             END DO
             CALL mp_reduce (ng, MyModel, Nregion+1, buffer(0:),         &
-     &                      op_handle(0:))
+     &                      op_handle(0:), MyCOMM)
             DO iregion=0,Nregion
               Csum(iregion,imodel,ng)=buffer(iregion)
             END DO

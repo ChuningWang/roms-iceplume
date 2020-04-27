@@ -169,6 +169,12 @@
 !-----------------------------------------------------------------------
 !
         DO ng=1,Ngrids
+#  ifdef SP4DVAR
+!
+!  Skip assimilation of obs on first timestep unless inter=Nsaddle.
+!
+          IF ((iic(ng).ne.ntstart(ng)).or.Lsadd(ng)) THEN
+#  endif
 #  ifdef SENSITIVITY_4DVAR
           IF (.not.LsenPSAS(ng)) THEN
 #  endif
@@ -197,6 +203,9 @@
             IF (FoundError(exit_flag, NoError, __LINE__,                &
      &                     __FILE__)) RETURN
 #  ifdef SENSITIVITY_4DVAR
+          END IF
+#  endif
+#  ifdef SP4DVAR
           END IF
 #  endif
         END DO
@@ -491,7 +500,7 @@
         END DO
 # endif
 
-# ifdef WEAK_CONSTRAINT
+# if defined WEAK_CONSTRAINT && !defined SP4DVAR
 !
 !-----------------------------------------------------------------------
 !  Gather weak constraint forcing to storage arrays.
@@ -520,7 +529,7 @@
      &                   __FILE__)) RETURN
         END DO
 
-# ifdef WEAK_CONSTRAINT
+# if defined WEAK_CONSTRAINT && !defined SP4DVAR
 !
 !-----------------------------------------------------------------------
 !  Copy storage arrays index 1 into index 2, and clear index 1.

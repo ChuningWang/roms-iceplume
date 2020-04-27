@@ -286,6 +286,7 @@
       USE posterior_var_mod, ONLY : posterior_var
 #endif
       USE strings_mod,       ONLY : FoundError
+      USE wrt_ini_mod,       ONLY : wrt_ini
 #if defined BALANCE_OPERATOR && defined ZETA_ELLIPTIC
       USE zeta_balance_mod,  ONLY : balance_ref, biconj
 #endif

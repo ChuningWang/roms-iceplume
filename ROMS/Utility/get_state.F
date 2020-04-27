@@ -182,7 +182,8 @@
 !
 !  Turn on time wall clock.
 !
-      CALL wclock_on (ng, IDmod, 42, __LINE__, __FILE__)
+      CALL wclock_on (ng, IDmod, 42, __LINE__,                          &
+     &                __FILE__)
 #endif
 !
 !  Set switch to process variables for nonlinear model perfect restart.
@@ -6119,7 +6120,8 @@
 !
 !  Turn off time wall clock.
 !
-      CALL wclock_off (ng, IDmod, 42, __LINE__, __FILE__)
+      CALL wclock_off (ng, IDmod, 42, __LINE__,                         &
+     &                 __FILE__)
 #endif
 !
   10  FORMAT (/,a,'GET_STATE - unable to open input NetCDF file: ',a)

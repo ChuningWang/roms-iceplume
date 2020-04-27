@@ -154,7 +154,7 @@
           END IF
 #  endif
         END IF
-#  ifdef TLM_OBS
+#  if defined TLM_OBS && !defined SP4DVAR
         IF (wrtTLmod(ng).or.wrtRPmod(ng)) THEN
           DO iobs=Mstr,Mend
             TLmodVal(iobs)=IniVal

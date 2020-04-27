@@ -295,6 +295,16 @@
           type='ROMS/TOMS quicksave file'
         ELSE IF (ncid.eq.RST(ng)%ncid) THEN
           type='ROMS/TOMS restart file'
+# ifdef SP4DVAR
+        ELSE IF (ncid.eq.SCA(ng)%ncid) THEN
+          type='ROMS/TOMS AD scratch file'
+        ELSE IF (ncid.eq.SCT(ng)%ncid) THEN
+          type='ROMS/TOMS TL scratch file'
+        ELSE IF (ncid.eq.SPA(ng)%ncid) THEN
+          type='ROMS/TOMS AD Arnoldi file'
+        ELSE IF (ncid.eq.SPT(ng)%ncid) THEN
+          type='ROMS/TOMS TL Arnoldi file'
+# endif
         ELSE IF (ncid.eq.STA(ng)%ncid) THEN
           type='ROMS/TOMS station file'
         ELSE IF (ncid.eq.TLF(ng)%ncid) THEN

@@ -43,13 +43,13 @@
 #                                                                       :::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-which_MPI=openmpi                             # default, overwritten below
+export which_MPI=openmpi                       # default, overwritten below
 
 parallel=0
 clean=1
 dprint=0
 
-MY_CPP_FLAGS=
+export MY_CPP_FLAGS=
 
 while [ $# -gt 0 ]
 do

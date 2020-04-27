@@ -75,8 +75,10 @@
 
       real(r8) :: my_time, scale
 
-# ifdef RPCG
+# if defined RPCG
       character (len=35) :: string
+# elif defined SP4DVAR
+      character (len=31) :: string
 # else
       character (len=15) :: string
 # endif
@@ -103,9 +105,9 @@
 !  points (gfactor=-1) fields only.
 !
 # if defined WRITE_WATER && defined MASKING
-       gfactor=-1
+      gfactor=-1
 # else
-       gfactor=1
+      gfactor=1
 # endif
 !
 !  Write out model time (s). Use the "tdays" variable here because of
@@ -140,7 +142,7 @@
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
-          WRITE (stdout,10) TRIM(Vname(1,idFsur)), OutRec
+          WRITE (stdout,20) TRIM(Vname(1,idFsur)), OutRec
         END IF
         exit_flag=3
         ioerror=status
@@ -163,7 +165,7 @@
         IF (FoundError(status, nf90_noerr, __LINE__,                    &
      &                 __FILE__)) THEN
           IF (Master) THEN
-            WRITE (stdout,10) TRIM(Vname(1,idSbry(isFsur))), OutRec
+            WRITE (stdout,20) TRIM(Vname(1,idSbry(isFsur))), OutRec
           END IF
           exit_flag=3
           ioerror=status
@@ -186,7 +188,7 @@
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
-          WRITE (stdout,10) TRIM(Vname(1,idUbar)), OutRec
+          WRITE (stdout,20) TRIM(Vname(1,idUbar)), OutRec
         END IF
         exit_flag=3
         ioerror=status
@@ -209,7 +211,7 @@
         IF (FoundError(status, nf90_noerr, __LINE__,                    &
      &                 __FILE__)) THEN
           IF (Master) THEN
-            WRITE (stdout,10) TRIM(Vname(1,idSbry(isUbar))), OutRec
+            WRITE (stdout,20) TRIM(Vname(1,idSbry(isUbar))), OutRec
           END IF
           exit_flag=3
           ioerror=status
@@ -232,7 +234,7 @@
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
-          WRITE (stdout,10) TRIM(Vname(1,idVbar)), OutRec
+          WRITE (stdout,20) TRIM(Vname(1,idVbar)), OutRec
         END IF
         exit_flag=3
         ioerror=status
@@ -255,7 +257,7 @@
         IF (FoundError(status, nf90_noerr, __LINE__,                    &
      &                 __FILE__)) THEN
           IF (Master) THEN
-            WRITE (stdout,10) TRIM(Vname(1,idSbry(isVbar))), OutRec
+            WRITE (stdout,20) TRIM(Vname(1,idSbry(isVbar))), OutRec
           END IF
           exit_flag=3
           ioerror=status
@@ -281,7 +283,7 @@
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
-          WRITE (stdout,10) TRIM(Vname(1,idUsms)), OutRec
+          WRITE (stdout,20) TRIM(Vname(1,idUsms)), OutRec
         END IF
         exit_flag=3
         ioerror=status
@@ -302,7 +304,7 @@
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
-          WRITE (stdout,10) TRIM(Vname(1,idVsms)), OutRec
+          WRITE (stdout,20) TRIM(Vname(1,idVsms)), OutRec
         END IF
         exit_flag=3
         ioerror=status
@@ -325,7 +327,7 @@
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
-          WRITE (stdout,10) TRIM(Vname(1,idUvel)), OutRec
+          WRITE (stdout,20) TRIM(Vname(1,idUvel)), OutRec
         END IF
         exit_flag=3
         ioerror=status
@@ -348,7 +350,7 @@
         IF (FoundError(status, nf90_noerr, __LINE__,                    &
      &                 __FILE__)) THEN
           IF (Master) THEN
-            WRITE (stdout,10) TRIM(Vname(1,idSbry(isUvel))), OutRec
+            WRITE (stdout,20) TRIM(Vname(1,idSbry(isUvel))), OutRec
           END IF
           exit_flag=3
           ioerror=status
@@ -371,7 +373,7 @@
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
-          WRITE (stdout,10) TRIM(Vname(1,idVvel)), OutRec
+          WRITE (stdout,20) TRIM(Vname(1,idVvel)), OutRec
         END IF
         exit_flag=3
         ioerror=status
@@ -394,7 +396,7 @@
         IF (FoundError(status, nf90_noerr, __LINE__,                    &
      &                 __FILE__)) THEN
           IF (Master) THEN
-            WRITE (stdout,10) TRIM(Vname(1,idSbry(isVvel))), OutRec
+            WRITE (stdout,20) TRIM(Vname(1,idSbry(isVvel))), OutRec
           END IF
           exit_flag=3
           ioerror=status
@@ -408,7 +410,7 @@
       DO itrc=1,NT(ng)
         scale=1.0_r8
         gtype=gfactor*r3dvar
-3        status=nf_fwrite3d(ng, iTLM, ITL(ng)%ncid, ITL(ng)%Tid(itrc),  &
+        status=nf_fwrite3d(ng, iTLM, ITL(ng)%ncid, ITL(ng)%Tid(itrc),   &
      &                     OutRec, gtype,                               &
      &                     LBi, UBi, LBj, UBj, 1, N(ng), scale,         &
 #  ifdef MASKING
@@ -418,7 +420,7 @@
         IF (FoundError(status, nf90_noerr, __LINE__,                    &
      &                 __FILE__)) THEN
           IF (Master) THEN
-            WRITE (stdout,10) TRIM(Vname(1,idTvar(itrc))), OutRec
+            WRITE (stdout,20) TRIM(Vname(1,idTvar(itrc))), OutRec
           END IF
           exit_flag=3
           ioerror=status
@@ -444,7 +446,7 @@
           IF (FoundError(status, nf90_noerr, __LINE__,                  &
      &                   __FILE__)) THEN
             IF (Master) THEN
-              WRITE (stdout,10) TRIM(Vname(1,idSbry(isTvar(itrc)))),    &
+              WRITE (stdout,20) TRIM(Vname(1,idSbry(isTvar(itrc)))),    &
      &                          OutRec
             END IF
             exit_flag=3
@@ -475,7 +477,7 @@
           IF (FoundError(status, nf90_noerr, __LINE__,                  &
      &                   __FILE__)) THEN
             IF (Master) THEN
-              WRITE (stdout,10) TRIM(Vname(1,idTsur(itrc))),            &
+              WRITE (stdout,20) TRIM(Vname(1,idTsur(itrc))),            &
      &                          OutRec
             END IF
             exit_flag=3
@@ -549,7 +551,7 @@
 # endif
 !
       IF (Master) THEN
-# ifdef RPCG
+# if defined RPCG
         IF (OutRec.eq.1) THEN
           string='inner-loop initial fields          '
         ELSE IF (OutRec.eq.2) THEN
@@ -560,6 +562,14 @@
           string='sum of adjoint solutions           '
         ELSE IF (OutRec.eq.5) THEN
           string='augmented correction term          '
+        END IF
+# elif defined SP4DVAR
+        IF (OutRec.eq.1) THEN
+          string='TLM initial fields             '
+        ELSE IF ((2.le.OutRec).and.(OutRec.le.Nsaddle+1)) THEN
+          string='TLM saddle-point starting field'
+        ELSE IF ((Nsaddle+2.le.OutRec).and.(OutRec.le.2*Nsaddle+2)) THEN
+          string='ADM saddle-point starting field'
         END IF
 # else
         IF (OutRec.eq.1) THEN
@@ -573,19 +583,20 @@
         END IF
 # endif
 # ifdef SOLVE3D
-        WRITE (stdout,20) string, Nrun, Tindex, Tindex, OutRec
+        WRITE (stdout,30) string, Nrun, Tindex, Tindex, OutRec
 # else
-        WRITE (stdout,20) string, Nrun, Tindex, OutRec
+        WRITE (stdout,30) string, Nrun, Tindex, OutRec
 # endif
       END IF
 !
-  10  FORMAT (/,' TL_WRT_INI - error while writing variable: ',a,/,14x, &
+  10  FORMAT (/,' TL_WRT_INI - unable to open initial NetCDF file: ',a)
+  20  FORMAT (/,' TL_WRT_INI - error while writing variable: ',a,/,14x, &
      &        'into tangent initial NetCDF file for time record: ',i4)
 # ifdef SOLVE3D
-  20  FORMAT (3x,'TL_WRT_INI   - wrote ',a,' (Iter=',i4.4,', Index=',   &
+  30  FORMAT (3x,'TL_WRT_INI   - wrote ',a,' (Iter=',i4.4,', Index=',   &
      &        i1,',',i1,', Rec=',i4.4,')')
 # else
-  20  FORMAT (3x,'TL_WRT_INI   - wrote ',a,' (Iter=',i4.4,', Index=',   &
+  30  FORMAT (3x,'TL_WRT_INI   - wrote ',a,' (Iter=',i4.4,', Index=',   &
      &        i1,', Rec=',i4.4,')')
 # endif
 

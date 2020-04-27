@@ -367,6 +367,8 @@
       USE normalization_mod, ONLY : normalization
       USE mod_forces,        ONLY : initialize_forces
       USE strings_mod,       ONLY : FoundError
+      USE strings_mod,       ONLY : FoundError
+      USE wrt_ini_mod,       ONLY : wrt_ini
 #if defined BALANCE_OPERATOR && defined ZETA_ELLIPTIC
       USE zeta_balance_mod,  ONLY : balance_ref, biconj
 #endif

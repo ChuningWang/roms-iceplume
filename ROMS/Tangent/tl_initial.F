@@ -22,6 +22,9 @@
 #  ifdef SOLVE3D
       USE mod_coupling
 #  endif
+#  ifdef SP4DVAR
+      USE mod_forces
+#  endif
       USE mod_fourdvar
 # endif
       USE mod_grid
@@ -145,7 +148,7 @@
         tl_ubar_xs=0.0_r8
       END IF
 
-# ifdef GENERIC_DSTART
+# if defined GENERIC_DSTART
 !
 !  Rarely, the tangent linear model is initialized from a NetCDF file,
 !  so we do not know its actual initialization time. Usually, it is
@@ -424,6 +427,10 @@
         CALL initialize_ocean (ng, tile, iTLM)
 #   ifdef SOLVE3D
         CALL initialize_coupling (ng, tile, 0)
+#   endif
+#   ifdef SP4DVAR
+        CALL initialize_ocean (ng, tile, iNLM)
+        CALL initialize_forces (ng, tile, iNLM)
 #   endif
       END DO
 !$OMP BARRIER

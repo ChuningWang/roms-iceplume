@@ -158,7 +158,7 @@
       time(ng)=tdays(ng)*day2sec
 !$OMP MASTER
       ntstart(ng)=INT((time(ng)-dstart*day2sec)/dt(ng))+1
-      ntend(ng)=ntstart(ng)-ntimes(ng)-1
+      ntend(ng)=ntstart(ng)-ntimes(ng)
       ntfirst(ng)=ntend(ng)
 !$OMP END MASTER
 !$OMP BARRIER
@@ -407,6 +407,7 @@
 !
       DO tile=first_tile(ng),last_tile(ng),+1
         CALL initialize_ocean (ng, tile, iNLM)
+        CALL initialize_forces (ng, tile, iNLM)
         CALL initialize_ocean (ng, tile, iADM)
 #  if defined SOLVE3D
         CALL initialize_coupling (ng, tile, iADM)

@@ -148,6 +148,17 @@
         IF (QCK(ng)%ncid.ne.-1) THEN
           CALL netcdf_close (ng, iNLM, QCK(ng)%ncid, QCK(ng)%name)
         END IF
+#ifdef SP4DVAR
+        IF (SPT(ng)%ncid.ne.-1) THEN
+          CALL netcdf_close (ng, iTLM, SPT(ng)%ncid, SPT(ng)%name)
+        END IF
+        IF (SCT(ng)%ncid.ne.-1) THEN
+          CALL netcdf_close (ng, iTLM, SCT(ng)%ncid, SCT(ng)%name)
+        END IF
+        IF (SPA(ng)%ncid.ne.-1) THEN
+          CALL netcdf_close (ng, iADM, SPA(ng)%ncid, SPA(ng)%name)
+        END IF
+#endif
 #ifdef ADJOINT
         IF (ADM(ng)%ncid.ne.-1) THEN
           CALL netcdf_close (ng, iADM, ADM(ng)%ncid, ADM(ng)%name)
