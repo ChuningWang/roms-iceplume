@@ -1,4 +1,4 @@
-#!/usr/bin/env csh
+#!/bin/csh -f
 #
 # svn $Id$
 #######################################################################
@@ -7,7 +7,7 @@
 #   See License_ROMS.txt                                              #
 #######################################################################
 #                                                                     #
-# Strong/Weak constraint R4D-Var job script:                          #
+# Strong/Weak constraint R4D-Var job CSH script:                      #
 #                                                                     #
 # This script NEEDS to be run before any run:                         #
 #                                                                     #

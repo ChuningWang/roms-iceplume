@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-
+#!/bin/bash
+#
 # svn $Id$
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Copyright (c) 2002-2020 The ROMS/TOMS Group                           :::
@@ -7,7 +7,7 @@
 #   See License_ROMS.txt                                                :::
 #:::::::::::::::::::::::::::::::::::::::::::::::::::::: David Robertson :::
 #                                                                       :::
-# ROMS/TOMS NetCDF file checker between simulations:                    :::
+# ROMS NetCDF file checker between simulations:                         :::
 #                                                                       :::
 # This script compares the binary differences of all ROMS/TOMS output   :::
 # NetCDF files between two simulations of the same application.  The    :::

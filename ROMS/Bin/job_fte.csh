@@ -1,4 +1,4 @@
-#!/usr/bin/env csh
+#!/bin/csh -f
 #
 # svn $Id$
 #######################################################################
@@ -9,7 +9,7 @@
 #                                                                     #
 #  Generalized Stability Theory: Finite Time Eigenmodes               #
 #                                                                     #
-#  This script is used to run the ROMS/TOMS Finite Time Eigenmodes    #
+#  This script is used to set-up ROMS Finite Time Eigenmodes          #
 #  algorithm.                                                         #
 #                                                                     #
 #######################################################################

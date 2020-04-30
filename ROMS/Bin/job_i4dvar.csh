@@ -1,4 +1,4 @@
-#!/bin/env csh
+#!/bin/csh -f
 #
 # svn $Id$
 #######################################################################
@@ -7,7 +7,7 @@
 #   See License_ROMS.txt                                              #
 #######################################################################
 #                                                                     #
-# Incremental strong constraint I4D-Var job script:                   #
+# Incremental strong constraint I4D-Var job CSH script:               #
 #                                                                     #
 # This script NEEDS to be run before any run:                         #
 #                                                                     #

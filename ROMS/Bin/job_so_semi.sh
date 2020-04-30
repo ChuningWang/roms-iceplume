@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #
 # svn $Id$
 #######################################################################
@@ -9,7 +9,7 @@
 #                                                                     #
 #  Generalized Stability Theory: Stochastic Optimals, seminorm        #
 #                                                                     #
-#  This script is used to run the ROMS/TOMS stochastic optimals with  #
+#  This script is used to set-up ROMS stochastic optimals with        #
 #  respect to the seminorm of the chosen functional.                  #
 #                                                                     #
 #######################################################################

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #
 # svn $Id$
 #######################################################################
@@ -7,7 +7,7 @@
 #   See License_ROMS.txt                                              #
 #######################################################################
 #                                                                     #
-# Strong/Weak constraint R4D-Var job script:                          #
+# Strong/Weak constraint R4D-Var job BASH script:                     #
 #                                                                     #
 # This script NEEDS to be run before any run:                         #
 #                                                                     #

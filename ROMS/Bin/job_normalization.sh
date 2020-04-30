@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #
 # svn $Id$
 #######################################################################
@@ -7,7 +7,7 @@
 #   See License_ROMS.txt                                              #
 #######################################################################
 #                                                                     #
-# 4D-Var error covariance normalization coefficients job script:      #
+# 4D-Var error covariance normalization coefficients job BASH script: #
 #                                                                     #
 # This script NEEDS to be run before any run:                         #
 #                                                                     #

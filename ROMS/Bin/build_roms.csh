@@ -1,4 +1,4 @@
-#!/usr/bin/env csh
+#!/bin/csh -f
 #
 # svn $Id$
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -7,7 +7,7 @@
 #   See License_ROMS.txt                                                :::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::: Hernan G. Arango :::
 #                                                                       :::
-# ROMS/TOMS Compiling CSH Script                                        :::
+# ROMS Compiling CSH Script                                             :::
 #                                                                       :::
 # Script to compile an user application where the application-specific  :::
 # files are kept separate from the ROMS source code.                    :::
@@ -25,7 +25,7 @@
 #                                                                       :::
 # Usage:                                                                :::
 #                                                                       :::
-#    ./build_roms.sh [options]                                          :::
+#    ./build_roms.csh [options]                                         :::
 #                                                                       :::
 # Options:                                                              :::
 #                                                                       :::
@@ -34,7 +34,7 @@
 #                                                                       :::
 #    -p macro    Prints any Makefile macro value. For example,          :::
 #                                                                       :::
-#                  build.sh -p FFLAGS                                   :::
+#                  build_roms.csh -p FFLAGS                             :::
 #                                                                       :::
 #    -noclean    Do not clean already compiled objects                  :::
 #                                                                       :::
@@ -87,7 +87,7 @@ while ( ($#argv) > 0 )
       echo "              omit argument for all avaliable CPUs"
       echo ""
       echo "-p macro    Prints any Makefile macro value"
-      echo "              For example:  build.sh -p FFLAGS"
+      echo "              For example:  build.csh -p FFLAGS"
       echo ""
       echo "-noclean    Do not clean already compiled objects"
       echo ""
@@ -211,7 +211,7 @@ endif
  setenv USE_MY_LIBS no           # use system default library paths
 #setenv USE_MY_LIBS yes          # use my customized library paths
 
-set MY_PATHS = ${COMPILERS}/my_build_paths.sh
+set MY_PATHS = ${COMPILERS}/my_build_paths.csh
 
 if ($USE_MY_LIBS == 'yes') then
   source ${MY_PATHS} ${MY_PATHS}

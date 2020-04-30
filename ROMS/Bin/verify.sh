@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #
 # svn $Id$
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -15,7 +15,7 @@
 #                                                                       :::
 # Usage:                                                                :::
 #                                                                       :::
-#    verify.bash [options]                                              :::
+#    verify.sh [options]                                                :::
 #                                                                       :::
 # Options:                                                              :::
 #                                                                       :::
@@ -41,12 +41,12 @@
 #                                                                       :::
 # Examples:                                                             :::
 #                                                                       :::
-# (1) verify.bash -in roms_upwelling.in branches/arango nesting         :::
+# (1) verify.sh - in roms_upwelling.in branches/arango nesting          :::
 #                                                                       :::
 #                 It will compile, run and compare all configurations   :::
 #                   of branches/arango and nesting                      :::
 #                                                                       :::
-# (2) verify.bash -nobuild -in roms_upwelling.in                        :::
+# (2) verify.sh - nobuild -in roms_upwelling.in                         :::
 #                 /Users/arango/ocean/repository/trunk                  :::
 #                                                                       :::
 #                 This run and compare all configuration of trunk       :::

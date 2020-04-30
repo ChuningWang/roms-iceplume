@@ -1,4 +1,4 @@
-#!/usr/bin/env csh
+#!/bin/csh -f
 #
 # svn $Id$
 #######################################################################
@@ -9,7 +9,7 @@
 #                                                                     #
 #  Generalized Stability Theory: Forcing Singular Vectors             #
 #                                                                     #
-#  This script is used to run the ROMS/TOMS Forcing Singular Vectors  #
+#  This script is used to set-up ROMS Forcing Singular Vectors        #
 #  algorithm.                                                         #
 #                                                                     #
 #######################################################################

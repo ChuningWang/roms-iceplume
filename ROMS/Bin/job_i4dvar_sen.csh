@@ -1,4 +1,4 @@
-#!/usr/bin/env csh
+#!/bin/csh -f
 #
 # svn $Id$
 #######################################################################
@@ -7,7 +7,7 @@
 #   See License_ROMS.txt                                              #
 #######################################################################
 #                                                                     #
-# Incremental I4D-Var observations impact job script:                 #
+# Incremental I4D-Var observations impact job CSH script:             #
 #                                                                     #
 # This script NEEDS to be run before any run:                         #
 #                                                                     #

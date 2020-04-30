@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #
 # svn $Id$
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -7,7 +7,7 @@
 #   See License_ROMS.txt                                                :::
 #:::::::::::::::::::::::::::::::::::::::::::::::::::::: David Robertson :::
 #                                                                       :::
-# ROMS/TOMS Copyright Update Script                                     :::
+# ROMS Copyright Update BASH Script                                     :::
 #                                                                       :::
 # Script to update the copyright information on ROMS source files.      :::
 # This script replaces the copyright string in the source files and     :::
@@ -16,7 +16,7 @@
 #                                                                       :::
 # Usage:                                                                :::
 #                                                                       :::
-#    ./ROMS/Bin/copyright.bash [options]                                :::
+#    ./ROMS/Bin/copyright.sh [options]                                  :::
 #                                                                       :::
 # Options:                                                              :::
 #                                                                       :::

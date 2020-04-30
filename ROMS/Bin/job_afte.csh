@@ -1,4 +1,4 @@
-#!/usr/bin/env csh
+#!/bin/csh -f
 #
 # svn $Id$
 #######################################################################
@@ -9,8 +9,8 @@
 #                                                                     #
 #  Generalized Stability Theory: Adjoint Finite Time Eigenmodes       #
 #                                                                     #
-#  This script is used to run the ROMS/TOMS Adjoint Finite Time       #
-#  Eigenmodes algorithm.                                              #
+#  This script is used to set-up ROMS Adjoint Finite Time Eigenmodes  #
+#  algorithm.                                                         #
 #                                                                     #
 #######################################################################
 

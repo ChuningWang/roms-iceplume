@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #
 # svn $Id$
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -7,7 +7,7 @@
 #   See License_ROMS.txt                                                :::
 #:::::::::::::::::::::::::::::::::::::::::::::::::::::: David Robertson :::
 #                                                                       :::
-# ROMS/TOMS White Space Removal Script                                  :::
+# ROMS White Space Removal BASH Script                                  :::
 #                                                                       :::
 # Script to remove trailing white space (including tabs) and report all :::
 # files that contain tabs (excluding the makefile) so you can remove    :::
@@ -15,7 +15,7 @@
 #                                                                       :::
 # Usage:                                                                :::
 #                                                                       :::
-#    ws_remove.bash [options]                                           :::
+#    ws_remove.sh [options]                                             :::
 #                                                                       :::
 # Options:                                                              :::
 #                                                                       :::

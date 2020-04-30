@@ -1,4 +1,4 @@
-#!/usr/bin/env csh
+#!/bin/csh -f
 #
 # svn $Id$
 #######################################################################
@@ -8,7 +8,7 @@
 #######################################################################
 #                                                                     #
 # Strong/Weak constraint 4D-PSAS observation impact or sensitivity    #
-# job script:                                                         #
+# job CSH script:                                                     #
 #                                                                     #
 # This script NEEDS to be run before any run:                         #
 #                                                                     #

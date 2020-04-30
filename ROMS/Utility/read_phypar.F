@@ -3253,6 +3253,16 @@
               NBCcount(1:max_Ffiles,1:Ngrids)=0
             CASE ('BRYNAME')
               label='BRY - lateral open boundary conditions'
+              DO ng=1,Ngrids
+                IF (nBCfiles(ng).lt.0) THEN
+                  IF (Master) WRITE (out,290) 'nBCfiles = ',            &
+     &                                        nBCfiles(ng),             &
+     &              'KeyWord ''NBCFILES'' unread or misssing from '//   &
+     &              'input script ''roms.in''.'
+                  exit_flag=4
+                  RETURN
+                END IF
+              END DO
               Npts=load_s2d(Nval, Cval, Cdim, line, label, ibcfile,     &
      &                      igrid, Ngrids, nBCfiles, NBCcount,          &
      &                      max_Ffiles, BRY)
@@ -3275,6 +3285,16 @@
               NCLMcount(1:max_Ffiles,1:Ngrids)=0
             CASE ('CLMNAME')
               label='CLM - climatology fields'
+              DO ng=1,Ngrids
+                IF (nCLMfiles(ng).lt.0) THEN
+                  IF (Master) WRITE (out,290) 'nCLMfiles = ',         &
+     &                                        nCLMfiles(ng),            &
+     &              'KeyWord ''NCLMFILES'' unread or misssing from '//  &
+     &              'input script ''roms.in''.'
+                  exit_flag=4
+                  RETURN
+                END IF
+              END DO
               Npts=load_s2d(Nval, Cval, Cdim, line, label, iclmfile,    &
      &                      igrid, Ngrids, nCLMfiles, NCLMcount,        &
      &                      max_Ffiles, CLM)
@@ -3310,6 +3330,16 @@
               Ncount(1:max_Ffiles,1:Ngrids)=0
             CASE ('FRCNAME')
               label='FRC - forcing fields'
+              DO ng=1,Ngrids
+                IF (nFfiles(ng).lt.0) THEN
+                  IF (Master) WRITE (out,290) 'nFfiles = ',             &
+     &                                        nFfiles(ng),              &
+     &              'KeyWord ''NFFILES'' unread or misssing from '//    &
+     &              'input script ''roms.in''.'
+                  exit_flag=4
+                  RETURN
+                END IF
+              END DO
               Npts=load_s2d(Nval, Cval, Cdim, line, label, ifile,       &
      &                      igrid, Ngrids, nFfiles, Ncount, max_Ffiles, &
      &                      FRC)
@@ -6449,7 +6479,7 @@
  270  FORMAT (/,' READ_PHYPAR - Grid ',i2.2,                            &
      &        ', could not find input file:  ',a)
  280  FORMAT (/,' READ_PHYPAR - Variable index not yet loaded, ', a)
- 290  FORMAT (/,' READ_PHYPAR - Invalid dimension parameter, ',a,i4,    &
+ 290  FORMAT (/,' READ_PHYPAR - Invalid dimension parameter, ',a,i0,    &
      &        /,15x,a)
  300  FORMAT (/,' READ_PHYPAR - Invalid dimension parameter, ',a,'(',   &
      &        i2.2,')',/,15x,a)
