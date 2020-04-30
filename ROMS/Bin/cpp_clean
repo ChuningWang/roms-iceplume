@@ -17,6 +17,9 @@
 #       5) Fixes placement of trailing '&'
 #
 
+use strict;
+
+my ($root, $ind, $l, $t, $t2, $sp, $i);
 my $file = $ARGV[0];
 my $slash = rindex($file,"/");
 if($slash lt 0) {
@@ -34,21 +37,21 @@ while (<FILE>) {
    next if /^!!/;
    next if /^!\$\!/;
    next if /^\s*$/;
-   $a=rindex($_,"&");
-   if(/\&(\ )*$/ && $a!=72){
+   $ind=rindex($_,"&");
+   if(/\&(\ )*$/ && $ind!=72){
       $l=length();
-      if($a<72){
-	 $t=($a-1)-72;
-	 $t2=-$t;
-	 $sp="";
-	 for($i=1;$i<$t2;$i++){
-	    $sp=$sp . " ";
+      if($ind<72){
+	      $t=($ind-1)-72;
+	      $t2=-$t;
+	      $sp="";
+	      for($i=1;$i<$t2;$i++){
+	         $sp=$sp . " ";
          }
-	 substr($_,-2,-$t-1)="$sp&\n";
+	      substr($_,-2,-$t-1)="$sp&\n";
       }
-      if($a>72){
-	 $t=72-($l);
-	 substr($_,$t,-$t-1) = "&";
+      if($ind>72){
+	      $t=72-($l);
+	      substr($_,$t,-$t-1) = "&";
       }
    }
    print TMP;

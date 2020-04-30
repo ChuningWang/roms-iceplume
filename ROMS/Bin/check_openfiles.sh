@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/usr/bin/env bash
 #
 # svn $Id$
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -35,13 +35,13 @@
 
 # Set report file.
 
-set report="fort.1000"
+report="fort.1000"
 
 # Get the number of files created, opened, and closed.
 
-set CREATED=`grep CREATE ${report} | wc -l`
-set OPENED=`grep OPEN  ${report} | wc -l`
-set CLOSED=`grep CLOSE ${report} | wc -l`
+CREATED=`grep CREATE ${report} | wc -l`
+OPENED=`grep OPEN  ${report} | wc -l`
+CLOSED=`grep CLOSE ${report} | wc -l`
 
 # Report ROMS I/O NetCDF files.
 

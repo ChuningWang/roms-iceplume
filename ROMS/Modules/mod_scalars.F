@@ -603,13 +603,23 @@
 !
 !  Minimun and maximum grid spacing
 !
-        real(dp), allocatable :: DXmin(:)
+        real(dp), allocatable :: DXmin(:)       ! all grid points
         real(dp), allocatable :: DXmax(:)
         real(dp), allocatable :: DYmin(:)
         real(dp), allocatable :: DYmax(:)
+#ifdef MASKING
+        real(dp), allocatable :: DXminW(:)      ! only water points
+        real(dp), allocatable :: DXmaxW(:)
+        real(dp), allocatable :: DYminW(:)
+        real(dp), allocatable :: DYmaxW(:)
+#endif
 #ifdef SOLVE3D
-        real(dp), allocatable :: DZmin(:)
+        real(dp), allocatable :: DZmin(:)       ! all grid points
         real(dp), allocatable :: DZmax(:)
+# ifdef MASKING
+        real(dp), allocatable :: DZminW(:)      ! only water points
+        real(dp), allocatable :: DZmaxW(:)
+# endif
 #endif
 !
 !  Maximum size of a grid node (m) over the whole curvilinear grid
@@ -2224,6 +2234,27 @@
         allocate ( DYmax(Ngrids) )
         Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
       END IF
+
+#ifdef MASKING
+      IF (.not.allocated(DXminW)) THEN
+        allocate ( DXminW(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(DXmaxW)) THEN
+        allocate ( DXmaxW(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(DYminW)) THEN
+        allocate ( DYminW(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(DYmaxW)) THEN
+        allocate ( DYmaxW(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+#endif
+
+
 #ifdef SOLVE3D
       IF (.not.allocated(DZmin)) THEN
         allocate ( DZmin(Ngrids) )
@@ -2233,6 +2264,16 @@
         allocate ( DZmax(Ngrids) )
         Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
       END IF
+# ifdef MASKING
+      IF (.not.allocated(DZminW)) THEN
+        allocate ( DZminW(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(DZmaxW)) THEN
+        allocate ( DZmaxW(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+# endif
 #endif
 
       IF (.not.allocated(grdmax)) THEN
@@ -3351,9 +3392,19 @@
         DXmax(ng)=-Large
         DYmin(ng)= Large
         DYmax(ng)=-Large
+#ifdef MASKING
+        DXminW(ng)= Large
+        DXmaxW(ng)=-Large
+        DYminW(ng)= Large
+        DYmaxW(ng)=-Large
+#endif
 #ifdef SOLVE3D
         DZmin(ng)= Large
         DZmax(ng)=-Large
+# ifdef MASKING
+        DZminW(ng)= Large
+        DZmaxW(ng)=-Large
+# endif
 #endif
         grdmax(ng)=-Large
 #ifdef DIFF_3DCOEF

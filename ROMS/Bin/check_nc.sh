@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/usr/bin/env bash
 
 # svn $Id$
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -20,9 +20,9 @@
 #                                                                       :::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-set dir1=$1
-set dir2=$2
-set diffs=0
+dir1=$1
+dir2=$2
+diffs=0
 
 # diff the file pairs one by one and increment $diffs if necessary.
 #
@@ -30,14 +30,15 @@ set diffs=0
 # If $? is non-zero it means that differences were found so we should
 # increment $diffs.
 
-foreach file ($dir1/*.nc)
-  set f = `basename $file`
+for file in $dir1/*.nc
+do
+  f=`basename $file`
   diff -q ${dir1}/${f} ${dir2}/${f} >& /dev/null
-  if( $? != 0 ) then
+  if [ $? -ne 0 ]; then
     echo "${dir1}/${f} and ${dir2}/${f} differ!"
-    @ diffs +=1
-  endif
-end
+    let "diffs+=1"
+  fi
+done
 
 # Exit and set exit code to $diffs so we can sum total differences
 # (hopefully 0) in the calling script.

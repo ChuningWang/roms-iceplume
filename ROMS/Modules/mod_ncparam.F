@@ -463,8 +463,10 @@
         integer  :: isBv3d                    ! 3D V-variables
         integer  :: isBw3d                    ! 3D W-variables
 !
-!  Input forcing NetCDF files IDs.
+!  Input lateral boundary, climatology, and forcing NetCDF files IDs.
 !
+        integer, allocatable :: ncBRYid(:,:)
+        integer, allocatable :: ncCLMid(:,:)
         integer, allocatable :: ncFRCid(:,:)
 !
 !  Flags to create output files.
@@ -799,6 +801,14 @@
         Dmem(1)=Dmem(1)+REAL(MAXVAL(NSV)+1,r8)
       END IF
 
+      IF (.not.allocated(ncBRYid)) THEN
+        allocate ( ncBRYid(NV,Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(NV*Ngrids,r8)
+      END IF
+      IF (.not.allocated(ncCLMid)) THEN
+        allocate ( ncCLMid(NV,Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(NV*Ngrids,r8)
+      END IF
       IF (.not.allocated(ncFRCid)) THEN
         allocate ( ncFRCid(NV,Ngrids) )
         Dmem(1)=Dmem(1)+REAL(NV*Ngrids,r8)
@@ -1080,6 +1090,8 @@
           Tintrp(2,i,ng)=0.0_dp
           Vtime(1,i,ng)=0.0_dp
           Vtime(2,i,ng)=0.0_dp
+          ncBRYid(i,ng)=-1
+          ncCLMid(i,ng)=-1
           ncFRCid(i,ng)=-1
         END DO
       END DO

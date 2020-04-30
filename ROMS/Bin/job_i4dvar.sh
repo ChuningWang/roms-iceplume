@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/usr/bin/env bash
 #
 # svn $Id$
 #######################################################################
@@ -29,11 +29,11 @@
 
 # Set path definition to one directory up in the tree.
 
- set Dir=`dirname ${PWD}`
+ Dir=`dirname ${PWD}`
 
 # Set string manipulations perl script.
 
- set SUBSTITUTE=${ROMS_ROOT}/ROMS/Bin/substitute
+ SUBSTITUTE=${ROMS_ROOT}/ROMS/Bin/substitute
 
 # Copy nonlinear model initial conditions file.
 
@@ -42,20 +42,20 @@
 # Set initial conditions, boundary conditions and surface forcing
 # error covariance standard deviations files.
 
- set STDnameI=${Dir}/Data/wc13_std_i.nc
- set STDnameB=${Dir}/Data/wc13_std_b.nc
- set STDnameF=${Dir}/Data/wc13_std_f.nc
+ STDnameI=${Dir}/Data/wc13_std_i.nc
+ STDnameB=${Dir}/Data/wc13_std_b.nc
+ STDnameF=${Dir}/Data/wc13_std_f.nc
 
 # Set initial conditions, boundary conditions and surface forcing
 # error covariance normalization factors files.
 
- set NRMnameI=${Dir}/Data/wc13_nrm_i.nc
- set NRMnameB=${Dir}/Data/wc13_nrm_b.nc
- set NRMnameF=${Dir}/Data/wc13_nrm_f.nc
+ NRMnameI=${Dir}/Data/wc13_nrm_i.nc
+ NRMnameB=${Dir}/Data/wc13_nrm_b.nc
+ NRMnameF=${Dir}/Data/wc13_nrm_f.nc
 
 # Set observations file.
 
- set OBSname=wc13_obs.nc
+ OBSname=wc13_obs.nc
 
 # Get a clean copy of the observation file.  This is really
 # important since this file is modified.
@@ -64,10 +64,10 @@
 
 # Modify 4D-Var template input script and specify above files.
 
- set I4DVAR=i4dvar.in
- if (-e $I4DVAR) then
+ I4DVAR=i4dvar.in
+ if [ -f $I4DVAR ]; then
    /bin/rm $I4DVAR
- endif
+ fi
  cp s4dvar.in $I4DVAR
 
  $SUBSTITUTE $I4DVAR roms_std_i.nc $STDnameI

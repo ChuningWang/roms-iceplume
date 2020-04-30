@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env csh
 #
 # svn $Id$
 #######################################################################
@@ -14,10 +14,11 @@
 #  needs to have the following directory structure:                   #
 #                                                                     #
 #    $MYROOT/                                                         #
-#    $MYROOT/Data                                                     #
-#    $MYROOT/Forward                                                  #
-#    $MYROOT/IS4DVAR                                                  #
-#    $MYROOT/OBS                                                      #
+#           /Data                                                     #
+#           /Forward                                                  #
+#           /IS4DVAR                                                  #
+#           /OBS                                                      #
+#           /Storage                                                  #
 #                                                                     #
 #  and storage directory:                                             #
 #                                                                     #
@@ -26,7 +27,7 @@
 #  To submit a job in the batch queue.  Use the following command     #
 #  in MPI applications to avoid running on the head node NO_LOCAL:    #
 #                                                                     #
-#      batch now -f submit_i4dvar.bash                                #
+#      batch now -f submit.sh                                         #
 #                                                                     #
 #  To check batch use:                                                #
 #                                                                     #
@@ -47,23 +48,23 @@ echo "***"
 
 #  Set ROOT of the directory to run 4DVar.
 
-MYROOT="/home/arango/ocean/toms/adjoint/Test/SW06c"
+set MYROOT="/home/arango/ocean/toms/adjoint/Test/SW06c"
 
 #  Set ROMS/TOMS ROOT directory.
 
-ROMS_ROOT="/home/arango/ocean/toms/adjoint/src/ROMS"
+set ROMS_ROOT="/home/arango/ocean/toms/adjoint/src/ROMS"
 
 #  Set storage directory for some of the relevant output NetCDF files.
 
-STORAGE="/home/arango/ocean/toms/adjoint/Test/SW06c/Storage"
+set STORAGE="/home/arango/ocean/toms/adjoint/Test/SW06c/Storage"
 
 #---------------------------------------------------------------------
 #  Application title and IO file prefix.
 #---------------------------------------------------------------------
 
-TITLE="ROMS/TOMS 3.0 - Shallow Water Acoustics 2006, Coarse Grid"
+set TITLE="ROMS/TOMS 3.0 - Shallow Water Acoustics 2006, Coarse Grid"
 
-PREFIX="sw06c"
+set PREFIX="sw06c"
 
 echo "***  $TITLE"
 echo "***"
@@ -75,27 +76,27 @@ echo "   "
 
 # Set grid NetCDF file.
 
-GRDname=${MYROOT}/Data/sw06_grid_2.nc
+set GRDname=${MYROOT}/Data/sw06_grid_2.nc
 
 # Set Open boundary conditions file, if any.
 
-BRYname=/home/wilkin/roms/sw06/in/sw06_bndy_ggg_g2v2rd.nc
+set BRYname=/home/wilkin/roms/sw06/in/sw06_bndy_ggg_g2v2rd.nc
 
 # Set starting sequential assimilation first guess.
 
-FIRST_GUESS=${MYROOT}/Data/sw06c_bck_run45.nc
+set FIRST_GUESS=${MYROOT}/Data/sw06c_bck_run45.nc
 
 # Set background-error covariance standard deviations file.
 
-STDname=${MYROOT}/Data/sw06c_std_notide.nc
+set STDname=${MYROOT}/Data/sw06c_std_notide.nc
 
 # Set background-error covariance normalization factor file
 
-NRMname=${MYROOT}/Data/sw06c_nrm_rnd_20k5m.nc
+set NRMname=${MYROOT}/Data/sw06c_nrm_rnd_20k5m.nc
 
 # Set observations file.
 
-OBSname=sw06.gliders_ssh_sst.grid_2.2.nc
+set OBSname=sw06.gliders.4dvar.grid_2.v2.nc
 
 #---------------------------------------------------------------------
 #  Executables and standard input files
@@ -103,30 +104,30 @@ OBSname=sw06.gliders_ssh_sst.grid_2.2.nc
 
 #  Set ROMS nonlinear and data assimilation executables.
 
-NL_ROMS="nl_romsM"
-DA_ROMS="da_romsM"
+set NL_ROMS="nl_romsM"
+set DA_ROMS="da_romsM"
 
 #  Set ROMS nonlinear and data assimilation standard input scripts.
 
-NL_TEMPLATE=nl_roms.tmp
-DA_TEMPLATE=da_roms.tmp
+set NL_TEMPLATE=nl_roms.tmp
+set DA_TEMPLATE=da_roms.tmp
 
-NL_STDINP=nl_roms_${PREFIX}.in
-DA_STDINP=da_roms_${PREFIX}.in
+set NL_STDINP=nl_roms_${PREFIX}.in
+set DA_STDINP=da_roms_${PREFIX}.in
 
 #  Set ROMS Metatada variables file.
 
-VARINFO=${MYROOT}/Data/varinfo.dat
+set VARINFO=${MYROOT}/Data/varinfo.dat
 
 #  Set 4DVar input script.
 
-IS4DVAR_TEMPLATE=s4dvar.in
+set IS4DVAR_TEMPLATE=s4dvar.in
 
-IS4DVAR_PARAM=is4dvar.in
+set IS4DVAR_PARAM=is4dvar.in
 
 #  Set string manipulations perl script.
 
-SUBSTITUTE=${ROMS_ROOT}/Bin/substitute
+set SUBSTITUTE=${ROMS_ROOT}/Bin/substitute
 
 #---------------------------------------------------------------------
 #  Time window to consider.
@@ -135,12 +136,12 @@ SUBSTITUTE=${ROMS_ROOT}/Bin/substitute
 #  Set starting and ending year day of the sequential data assimilation.
 #  (Reference time: days since 2006-01-01 00:00:00)
 
-STR_DAY=192                # July 12, 2006 00:00:00 UTC/GMT
-END_DAY=200
+set STR_DAY=192                # July 12, 2006 00:00:00 UTC/GMT
+set END_DAY=200
 
 #  Set data assimilation cycle time window (days).
 
-DayStep=2
+set DayStep=2
 
 #---------------------------------------------------------------------
 #  Set few Parameters.
@@ -148,47 +149,46 @@ DayStep=2
 
 #  Set model parallel partition.
 
-NtileI=2
-NtileJ=2
+set NtileI=2
+set NtileJ=2
 
 #  Set number of parallel nodes to use, NCPUS = NtileI * NtileJ.
 
-NCPUS=4
+set NCPUS=4
 
 #  Set number of outer and inner loops.
 
-Nouter=6
-Ninner=5
+set Nouter=6
+set Ninner=5
 
 #  Set number of timesteps to write RESTART file.  This is VERY
 #  Important since we are using the restart file of the nonlinear
 #  model run as the first guess fot the next assimilation cycle.
 #  It MUST be equal to NTIMES.
 
-NRST=480
+set NRST=480
 
 #  Set enviromental variables to avoid running in the head node.
 
-NO_LOCAL=1
-EXCLUDE=10
-export NO_LOCAL EXCLUDE
+setenv NO_LOCAL 1
+setenv EXCLUDE 10
 
 ######################################################################
 #  Start sequential data assimilation
 ######################################################################
 
-cycle=0
+set cycle=0
 
-DAY=$STR_DAY
+set DAY=$STR_DAY
 
 #  Set starting initial conditions file name.
 
-INIname=${PREFIX}_ini_${DAY}.nc
-ITLname=${PREFIX}_itl_${DAY}.nc
+set INIname=${PREFIX}_ini_${DAY}.nc
+set ITLname=${PREFIX}_itl_${DAY}.nc
 
-while [ $DAY -le $END_DAY ]; do
+while ($DAY <= $END_DAY)
 
-  let "cycle+=1"
+  @ cycle += 1
 
   echo ">>> Starting data assimilation cycle: $cycle"
   echo ">>>"
@@ -201,18 +201,18 @@ while [ $DAY -le $END_DAY ]; do
 
 # Clean directory by removing all existing NetCDF files.
 
-  if [ -e $ITLname ]; then
+  if (-e $ITLname) then
     /bin/rm -f $MYROOT/IS4DVAR/*.nc
-  fi
-  ITLname=${PREFIX}_itl_${DAY}.nc
+  endif
+  set ITLname=${PREFIX}_itl_${DAY}.nc
 
 # Set backgound (first guess) state file.
 
-  if [ $DAY -eq $STR_DAY ]; then
-    cp -p ${FIRST_GUESS} $INIname
+  if ($DAY == $STR_DAY) then
+    cp -p $FIRST_GUESS $INIname
   else
     cp -p ${STORAGE}/$INIname .
-  fi
+  endif
 
 # Set tangent linear model initial conditions file.
 
@@ -227,9 +227,9 @@ while [ $DAY -le $END_DAY ]; do
 
 # Modify 4DVar template input script and specify above files.
 
-  if [ -e $IS4DVAR_PARAM ]; then
+  if (-e $IS4DVAR_PARAM) then
     /bin/rm $IS4DVAR_PARAM
-  fi
+  endif
   cp $IS4DVAR_TEMPLATE $IS4DVAR_PARAM
 
   $SUBSTITUTE $IS4DVAR_PARAM roms_std.nc $STDname
@@ -239,9 +239,9 @@ while [ $DAY -le $END_DAY ]; do
 
 # Modify 4DVar ROMS standard input script.
 
-  if [ -e $DA_STDINP ]; then
+  if (-e $DA_STDINP) then
     /bin/rm $DA_STDINP
-  fi
+  endif
   cp $DA_TEMPLATE $DA_STDINP
 
   $SUBSTITUTE $DA_STDINP MyTITLE $TITLE
@@ -269,9 +269,9 @@ while [ $DAY -le $END_DAY ]; do
 
   echo ">>> Running IS4DVAR algorithm, starting day: $DAY"
 
-  if [ -e da_log.$DAY ]; then
+  if (-e da_log.$DAY) then
     /bin/rm -f da_log.$DAY
-  fi
+  endif
   mpirun -np $NCPUS $DA_ROMS $DA_STDINP > da_log.$DAY
 
 # Move estimated initial conditions, misfit, and log files to storage.
@@ -292,12 +292,12 @@ while [ $DAY -le $END_DAY ]; do
 
 # Create ROMS standard input script from template.
 
-  if [ -e $NL_STDINP ]; then
+  if (-e $NL_STDINP) then
     /bin/rm $NL_STDINP
-  fi
+  endif
   cp $NL_TEMPLATE $NL_STDINP
 
-  RSTname=${PREFIX}_rst_${DAY}.nc
+  set RSTname=${PREFIX}_rst_${DAY}.nc
 
   $SUBSTITUTE $NL_STDINP MyTITLE $TITLE
   $SUBSTITUTE $NL_STDINP varinfo.dat $VARINFO
@@ -318,9 +318,9 @@ while [ $DAY -le $END_DAY ]; do
 
   echo ">>> Running nonlinear model, starting day: $DAY"
 
-  if [ -e nl_log.${DAY} ]; then
+  if (-e nl_log.${DAY}) then
     /bin/rm -f nl_log.${DAY}
-  fi
+  endif
   mpirun -np $NCPUS $NL_ROMS $NL_STDINP > nl_log.${DAY}
 
 # Move current nonlinear history and log files to storage.
@@ -333,9 +333,9 @@ while [ $DAY -le $END_DAY ]; do
 # conditions file name.
 #---------------------------------------------------------------------
 
-  let "DAY+=DayStep"
+  @ DAY += $DayStep
 
-  INIname=${PREFIX}_ini_${DAY}.nc
+  set INIname=${PREFIX}_ini_${DAY}.nc
 
 #---------------------------------------------------------------------
 # Move next cycle first guess (background state) to storage. It is
@@ -349,5 +349,4 @@ while [ $DAY -le $END_DAY ]; do
   echo "  "
   echo ">>> Finished data assimilation cycle: $cycle"
 
-done
-
+end

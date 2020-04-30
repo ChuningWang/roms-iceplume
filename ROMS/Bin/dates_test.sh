@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/usr/bin/env bash
 #
 # svn $Id$
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -11,26 +11,26 @@
 #                                                                       :::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-set today = `date +"%d-%m-%Y %r"`
+today=`date +"%d-%m-%Y %r"`
 
-set dn1 = `dates datenum`
-set ds1 = `dates numdate $dn1`
-set yd1 = `dates yday $ds1`
+dn1=`dates datenum`
+ds1=`dates numdate $dn1`
+yd1=`dates yday $ds1`
 
-set dn2 = `dates datenum 1900-01-01`
-set ds2 = `dates numdate $dn2`
-set yd2 = `dates yday $ds2`
-set d21 = `dates daysdiff $ds2 $ds1`
+dn2=`dates datenum 1900-01-01`
+ds2=`dates numdate $dn2`
+yd2=`dates yday $ds2`
+d21=`dates daysdiff $ds2 $ds1`
 
-set dn2 = `dates datenum 19000101`
-set ds2 = `dates numdate $dn2`
-set yd2 = `dates yday $ds2`
-set d21 = `dates daysdiff $ds2 $ds1`
+dn2=`dates datenum 19000101`
+ds2=`dates numdate $dn2`
+yd2=`dates yday $ds2`
+d21=`dates daysdiff $ds2 $ds1`
 
-set dn3 = `dates datenum 1968-05-23`
-set ds3 = `dates numdate $dn3`
-set yd3 = `dates yday $ds3`
-set d31 = `dates daysdiff $ds3 $ds1`
+dn3=`dates datenum 1968-05-23`
+ds3=`dates numdate $dn3`
+yd3=`dates yday $ds3`
+d31=`dates daysdiff $ds3 $ds1`
 
 echo
 echo "Testing 'dates' Perl Script on $today"
