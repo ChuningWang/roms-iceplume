@@ -1382,6 +1382,7 @@
 # if defined AD_SENSITIVITY   || defined I4DVAR_ANA_SENSITIVITY || \
      defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR      || \
      defined SO_SEMI
+#  ifndef OBS_SPACE
 !
 !-----------------------------------------------------------------------
 !  Read in adjoint sensitivity functional.
@@ -1389,16 +1390,16 @@
 !
 !  Read in free-surface.
 !
-#  ifdef SENSITIVITY_4DVAR
+#   ifdef SENSITIVITY_4DVAR
       IF (LsenPSAS(ng)) THEN
-#  endif
+#   endif
         IF (SCALARS(ng)%Lstate(isFsur)) THEN
           CALL get_2dfldr (ng, iADM, idZads, ADS(ng)%ncid,              &
      &                     1, ADS(ng), update(1),                       &
      &                     LBi, UBi, LBj, UBj, 2, 1,                    &
-#  ifdef MASKING
+#   ifdef MASKING
      &                     GRID(ng) % rmask,                            &
-#  endif
+#   endif
      &                     CLIMA(ng) % zeta_adsG)
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
@@ -1410,9 +1411,9 @@
           CALL get_2dfldr (ng, iADM, idUbas, ADS(ng)%ncid,              &
      &                     1, ADS(ng), update(1),                       &
      &                     LBi, UBi, LBj, UBj, 2, 1,                    &
-#  ifdef MASKING
+#   ifdef MASKING
      &                     GRID(ng) % umask,                            &
-#  endif
+#   endif
      &                     CLIMA(ng) % ubar_adsG)
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
@@ -1422,15 +1423,15 @@
           CALL get_2dfldr (ng, iADM, idVbas, ADS(ng)%ncid,              &
      &                     1, ADS(ng), update(1),                       &
      &                     LBi, UBi, LBj, UBj, 2, 1,                    &
-#  ifdef MASKING
+#   ifdef MASKING
      &                     GRID(ng) % vmask,                            &
-#  endif
+#   endif
      &                     CLIMA(ng) % vbar_adsG)
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
         END IF
 
-#  ifdef SOLVE3D
+#   ifdef SOLVE3D
 !
 !  Read in 3D momentum.
 !
@@ -1438,9 +1439,9 @@
           CALL get_3dfldr (ng, iADM, idUads, ADS(ng)%ncid,              &
      &                     1, ADS(ng), update(1),                       &
      &                     LBi, UBi, LBj, UBj, 1, N(ng), 2, 1,          &
-#   ifdef MASKING
+#    ifdef MASKING
      &                     GRID(ng) % umask,                            &
-#   endif
+#    endif
      &                     CLIMA(ng) % u_adsG)
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
@@ -1450,9 +1451,9 @@
           CALL get_3dfldr (ng, iADM, idVads, ADS(ng)%ncid,              &
      &                     1, ADS(ng), update(1),                       &
      &                     LBi, UBi, LBj, UBj, 1, N(ng), 2, 1,          &
-#   ifdef MASKING
+#    ifdef MASKING
      &                     GRID(ng) % vmask,                            &
-#   endif
+#    endif
      &                     CLIMA(ng) % v_adsG)
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
@@ -1462,9 +1463,9 @@
           CALL get_3dfldr (ng, iADM, idWads, ADS(ng)%ncid,              &
      &                     1, ADS(ng), update(1),                       &
      &                     LBi, UBi, LBj, UBj, 0, N(ng), 2, 1,          &
-#     ifdef MASKING
+#    ifdef MASKING
      &                     GRID(ng) % rmask,                            &
-#     endif
+#    endif
      &                     CLIMA(ng) % wvel_adsG)
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
@@ -1477,17 +1478,18 @@
             CALL get_3dfldr (ng, iADM, idTads(i), ADS(ng)%ncid,         &
      &                       1, ADS(ng), update(1),                     &
      &                       LBi, UBi, LBj, UBj, 1, N(ng), 2, 1,        &
-#   ifdef MASKING
+#    ifdef MASKING
      &                       GRID(ng) % rmask,                          &
-#   endif
+#    endif
      &                       CLIMA(ng) % t_adsG(:,:,:,:,i))
             IF (FoundError(exit_flag, NoError, __LINE__,                &
      &                     __FILE__)) RETURN
           END IF
         END DO
-#  endif
-#  ifdef SENSITIVITY_4DVAR
+#   endif
+#   ifdef SENSITIVITY_4DVAR
       END IF
+#   endif
 #  endif
 # endif
 
