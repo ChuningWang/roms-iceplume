@@ -489,13 +489,13 @@
 #  endif
 # endif
 
-# if defined IS4DVAR || defined BACKGROUND
+# if defined I4DVAR || defined BACKGROUND
 !
 !-----------------------------------------------------------------------
 !  Write other 4D-Var data to DAV(ng)%name file.
 !-----------------------------------------------------------------------
 
-#  if defined IS4DVAR
+#  if defined I4DVAR
 !
 !  Write out tangent linear model misfit cost function. Notice that it
 !  is written into DAV(ng)%name file instead of ITL(ng)%name file.
@@ -521,7 +521,7 @@
      &               __FILE__)) RETURN
 #  endif
 
-#  if defined IS4DVAR
+#  if defined I4DVAR
 !
 !  Write out current optimal, normalized cost function minimum.  Notice
 !  that it is written into DAV(ng)%name file instead of ITL(ng)%name
@@ -544,7 +544,7 @@
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 
-# if defined IS4DVAR || defined BACKGROUND
+# if defined I4DVAR || defined BACKGROUND
       CALL netcdf_sync (ng, iTLM, DAV(ng)%name, DAV(ng)%ncid)
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN

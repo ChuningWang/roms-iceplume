@@ -56,7 +56,8 @@
 # include "tile.h"
 !
 # ifdef PROFILE
-      CALL wclock_on (ng, model, 45, __LINE__, __FILE__)
+      CALL wclock_on (ng, model, 83, __LINE__,                          &
+     &                __FILE__)
 # endif
 !
       CALL random_ic_tile (ng, tile,                                    &
@@ -95,7 +96,8 @@
 # endif
      &                     OCEAN(ng) % tl_zeta)
 # ifdef PROFILE
-      CALL wclock_off (ng, model, 45, __LINE__, __FILE__)
+      CALL wclock_off (ng, model, 83, __LINE__,                         &
+     &                 __FILE__)
 # endif
       RETURN
       END SUBROUTINE random_ic

@@ -1,6 +1,6 @@
 #include "cppdefs.h"
       MODULE inner2state_mod
-#if defined HESSIAN_SV || defined HESSIAN_SO || defined HESSIAN_FSV
+#if defined HESSIAN_FSV || defined HESSIAN_SO || defined HESSIAN_SV
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===
@@ -11,8 +11,8 @@
 !                                                                      !
 !  This routine computes the tangent linear model  initial conditions  !
 !  as the weighted sum of all Lanczos vectors computed from the first  !
-!  outer loop of the I4DVAR Lanczos algorithm. It converts from 4DVAR  !
-!  inner loop space span by assimilation to physical state space.      !
+!  outer loop of the I4D-Var Lanczos algorithm. It converts from inner !
+!  loop space span by assimilation to physical state space.            !
 !                                                                      !
 !=======================================================================
 !
@@ -2734,7 +2734,7 @@
      &                       zeta)
 !
 !  Read in the Lanczos vectors (q_i, where i=1,2,...k) computed from
-!  k inner-loops of the IS4DVAR algorithm first outer loop. Load
+!  k inner-loops of the I4D-Var algorithm first outer loop. Load
 !  Lanczos vectors into ADJOINT STATE ARRAYS at index Lwrk1.
 !
       DO inner=1,Ninner

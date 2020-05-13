@@ -263,12 +263,6 @@
 !  locations. Compute misfit (model-observations) cost function.
 !-----------------------------------------------------------------------
 !
-#   ifdef SP4DVAR
-!
-!  Do not assimilate obs on the last time step unless inter=Nsaddle.
-!
-      IF (iic(ng).ne.ntend(ng)+1.or.Lsadd(ng)) THEN
-#   endif
         IF (((time(ng)-0.5_r8*dt(ng)).le.ObsTime(ng)).and.              &
      &      (ObsTime(ng).lt.(time(ng)+0.5_r8*dt(ng)))) THEN
           ProcessObs(ng)=.TRUE.
@@ -278,16 +272,22 @@
           tile=-1
 #   endif
           CALL obs_read (ng, iTLM, .FALSE.)
+#   ifdef SP4DVAR
+!
+!  Do not assimilate obs on the last time step unless inter=Nsaddle.
+!
+          IF (iic(ng).ne.ntend(ng)+1.or.Lsadd(ng)) THEN
+            CALL obs_write (ng, tile, iTLM)
+          END IF
+#   else
           CALL obs_write (ng, tile, iTLM)
+#   endif
 #   ifndef WEAK_CONSTRAINT
           CALL obs_cost (ng, iTLM)
 #   endif
         ELSE
           ProcessObs(ng)=.FALSE.
         END IF
-#   ifdef SP4DVAR
-      END IF
-#   endif
 #  endif
 # endif
 # ifdef PROFILE

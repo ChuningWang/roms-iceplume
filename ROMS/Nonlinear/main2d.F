@@ -34,9 +34,11 @@
 # ifdef TLM_CHECK
       USE dotproduct_mod,       ONLY : nl_dotproduct
 # endif
-# if defined NLM_OUTER           || defined SP4DVAR                 || \
-     defined W4DPSAS             || defined W4DPSAS_FCT_SENSITIVITY || \
-     defined W4DPSAS_SENSITIVITY
+# if defined NLM_OUTER                || \
+     defined RBL4DVAR                 || \
+     defined RBL4DVAR_ANA_SENSITIVITY || \
+     defined RBL4DVAR_FCT_SENSITIVITY || \
+     defined SP4DVAR
       USE forcing_mod,          ONLY : forcing
 # endif
 # ifdef ADJUST_WSTRESS
@@ -142,8 +144,10 @@
               IF (step_counter(ng).eq.Rsteps) Time_Step=.FALSE.
             END DO
 
-# if defined NLM_OUTER               || defined W4DPSAS             || \
-     defined W4DPSAS_FCT_SENSITIVITY || defined W4DPSAS_SENSITIVITY
+# if defined NLM_OUTER                || \
+     defined RBL4DVAR                 || \
+     defined RBL4DVAR_ANA_SENSITIVITY || \
+     defined RBL4DVAR_FCT_SENSITIVITY
 !
 !-----------------------------------------------------------------------
 !  If appropriate, add convolved adjoint solution impulse forcing to

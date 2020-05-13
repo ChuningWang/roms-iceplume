@@ -113,7 +113,7 @@
               BLK(ng)%files(1)=TRIM(FWD(ng)%name)
             END IF
 
-#ifdef W4DPSAS_FCT_SENSITIVITY
+#ifdef RBL4DVAR_FCT_SENSITIVITY
 !
 !  Save FWD information into the HIS structure so it can be used to
 !  process the NLM background trajectory by the ADM and TLM kernels.

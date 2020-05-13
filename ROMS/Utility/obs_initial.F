@@ -248,7 +248,7 @@
 !
       ProcessObs(ng)=.FALSE.
 
-# ifdef IS4DVAR
+# ifdef I4DVAR
 !
 !  Initialize cost function misfit between model and observations.
 !  The IF statement is to avoid rewritting its value before it is

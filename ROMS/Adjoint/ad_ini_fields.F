@@ -1229,7 +1229,7 @@
      &                             ad_zeta(:,:,kstp))
       END IF
 
-# if !(defined AD_SENSITIVITY    || defined IS4DVAR_SENSITIVITY || \
+# if !(defined AD_SENSITIVITY    || defined I4DVAR_ANA_SENSITIVITY || \
        defined SENSITIVITY_4DVAR || defined SO_SEMI)
 !
       IF (.not.(ANY(ad_LBC(:,isFsur,ng)%radiation).or.                  &

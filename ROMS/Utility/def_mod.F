@@ -53,7 +53,7 @@
 # ifdef RPCG
       integer :: datumDimp, NouterDimp
 # endif
-# if defined IS4DVAR || defined WEAK_CONSTRAINT
+# if defined I4DVAR || defined WEAK_CONSTRAINT
       integer :: MinnerDim, MouterDim, NinnerDim, NouterDim, threeDim
 # endif
 # ifdef SP4DVAR
@@ -206,7 +206,7 @@
 # endif
 
 # ifdef FOUR_DVAR
-#  if defined IS4DVAR || defined WEAK_CONSTRAINT
+#  if defined I4DVAR || defined WEAK_CONSTRAINT
 #   ifdef SP4DVAR
         status=def_dim(ng, iNLM, DAV(ng)%ncid, ncname, 'Ninner1',       &
      &                 Ninner+1, NinnerDim1)
@@ -238,14 +238,14 @@
      &                 Nouter+1, MouterDim)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
-#   ifdef IS4DVAR
+#   ifdef I4DVAR
         status=def_dim(ng, iNLM, DAV(ng)%ncid, ncname, 'three',         &
      &                 3, threeDim)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 #   endif
 #  endif
-#  if defined IS4DVAR || defined BACKGROUND
+#  if defined I4DVAR || defined BACKGROUND
         status=def_dim(ng, iNLM, DAV(ng)%ncid, ncname, 'iteration',     &
      &                 nf90_unlimited, iterDim)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -262,7 +262,7 @@
 !  File type.
 !
           IF (exit_flag.eq.NoError) THEN
-            string='ROMS/TOMS 4DVAR output observation processing file'
+            string='ROMS/TOMS 4D-Var output observation processing file'
             status=nf90_put_att(DAV(ng)%ncid, nf90_global,              &
      &                          'type', TRIM(string))
             IF (FoundError(status, nf90_noerr, __LINE__,                &
@@ -278,26 +278,26 @@
           IF (exit_flag.eq.NoError) THEN
 # if defined ARRAY_MODES
             string=uppercase('array_modes')
-# elif defined IS4DVAR
-            string=uppercase('is4dvar')
-# elif defined IS4DVAR_SENSITIVITY
-            string=uppercase('is4dvar_sensitivity')
-# elif defined TL_W4DPSAS
-            string=uppercase('tl_w4dpsas')
-# elif defined TL_W4DVAR
-            string=uppercase('tl_w4dvar')
+# elif defined I4DVAR
+            string=uppercase('i4dvar')
+# elif defined I4DVAR_ANA_SENSITIVITY
+            string=uppercase('i4dvar_ana_sensitivity')
+# elif defined RBL4DVAR
+            string=uppercase('rbl4dvar')
+# elif defined RBL4DVAR_ANA_SENSITIVITY
+            string=uppercase('rbl4dvar_ana_sensitivity')
+# elif defined RBL4DVAR_FCT_SENSITIVITY
+            string=uppercase('rbl4dvar_fct_sensitivity')
+# elif defined R4DVAR
+            string=uppercase('r4dvar')
+# elif defined R4DVAR_ANA_SENSITIVITY
+            string=uppercase('r4dvar_ana_sensitivity')
+# elif defined TL_RBL4DVAR
+            string=uppercase('tl_rbl4dvar')
+# elif defined TL_R4DVAR
+            string=uppercase('tl_r4dvar')
 # elif defined VERIFICATION
             string=uppercase('verification')
-# elif defined W4DPSAS
-            string=uppercase('w4dpsas')
-# elif defined W4DPSAS_SENSITIVITY
-            string=uppercase('w4dpsas_sensitivity')
-# elif defined W4DPSAS_FCT_SENSITIVITY
-            string=uppercase('w4dpsas_fct_sensitivity')
-# elif defined W4DVAR
-            string=uppercase('w4dvar')
-# elif defined W4DVAR_SENSITIVITY
-            string=uppercase('w4dvar_sensitivity')
 # else
             string=uppercase('four_dvar')
 # endif
@@ -523,7 +523,7 @@
 !  Define variables and their attributes.
 !-----------------------------------------------------------------------
 
-# if defined IS4DVAR || defined WEAK_CONSTRAINT
+# if defined I4DVAR || defined WEAK_CONSTRAINT
 !
 !  Outer and inner loop counters.
 !
@@ -543,9 +543,11 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined IS4DVAR_SENSITIVITY     || defined W4DPSAS_SENSITIVITY || \
-     defined W4DPSAS_FCT_SENSITIVITY || defined W4DVAR_SENSITIVITY  || \
-     defined ARRAY_MODES
+# if defined ARRAY_MODES              || \
+     defined I4DVAR_ANA_SENSITIVITY   || \
+     defined RBL4DVAR_ANA_SENSITIVITY || \
+     defined RBL4DVAR_FCT_SENSITIVITY || \
+     defined R4DVAR_ANA_SENSITIVITY
 !
 !  Observations impact/sensitivity outer loop beeing processed.
 !
@@ -557,7 +559,7 @@
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 # endif
-# ifndef IS4DVAR_SENSITIVITY
+# ifndef I4DVAR_ANA_SENSITIVITY
 !
 !  Define model-observation comparison statistics.
 !
@@ -641,7 +643,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined IS4DVAR
+# if defined I4DVAR
 !
 !  Number of converged Ritz eigenvalues.
 !
@@ -682,7 +684,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined IS4DVAR
+# if defined I4DVAR
 !
 !  Converged Ritz eigenvalues.
 !
@@ -709,7 +711,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined IS4DVAR || defined WEAK_CONSTRAINT
+# if defined I4DVAR || defined WEAK_CONSTRAINT
 !
 !  Define conjugate gradient norm.
 !
@@ -725,7 +727,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined IS4DVAR || defined WEAK_CONSTRAINT
+# if defined I4DVAR || defined WEAK_CONSTRAINT
 !
 !  Define Lanczos algorithm coefficients.
 !
@@ -755,7 +757,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 #  endif
-#  ifdef IS4DVAR
+#  ifdef I4DVAR
 !
         Vinfo( 1)='cg_gamma'
         Vinfo( 2)='Lanczos algorithm gamma coefficient'
@@ -770,7 +772,7 @@
      &                 __FILE__)) RETURN
 #  endif
 # endif
-# if defined IS4DVAR
+# if defined I4DVAR
 !
 !  Initial gradient vector normalization factor.
 !
@@ -801,7 +803,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined IS4DVAR || defined WEAK_CONSTRAINT
+# if defined I4DVAR || defined WEAK_CONSTRAINT
 !
 !  Lanczos vector normalization factor.
 !
@@ -817,7 +819,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined IS4DVAR
+# if defined I4DVAR
 !
 !  Reduction in the gradient norm.
 !
@@ -860,7 +862,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined IS4DVAR
+# if defined I4DVAR
 !
 !  Lanczos recurrence tridiagonal matrix.
 !
@@ -888,7 +890,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined IS4DVAR || defined WEAK_CONSTRAINT
+# if defined I4DVAR || defined WEAK_CONSTRAINT
 !
 !  Eigenvalues of Lanczos recurrence relationship.
 !
@@ -918,7 +920,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined IS4DVAR
+# if defined I4DVAR
 !
 !  Eigenvectors of Lanczos recurrence relationship.
 !
@@ -951,9 +953,11 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined TL_W4DPSAS || defined W4DPSAS_FCT_SENSITIVITY || \
-     defined W4DPSAS    || defined W4DPSAS_SENSITIVITY     || \
-     defined SP4DVAR
+# if defined RBL4DVAR                 || \
+     defined RBL4DVAR_ANA_SENSITIVITY || \
+     defined RBL4DVAR_FCT_SENSITIVITY || \
+     defined SP4DVAR                  || \
+     defined TL_RBL4DVAR
 !
 !  Define NLM initial and final data penalty function.
 !
@@ -973,10 +977,10 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if (defined RECOMPUTE_4DVAR   && \
-     (defined ARRAY_MODES       || defined CLIPPING)) || \
-     defined TL_W4DVAR          || defined W4DVAR     || \
-     defined W4DVAR_SENSITIVITY
+# if (defined RECOMPUTE_4DVAR       && \
+     (defined ARRAY_MODES           || defined CLIPPING)) || \
+     defined R4DVAR_ANA_SENSITIVITY || defined R4DVAR     || \
+     defined TL_R4DVAR
 !
 !  Define RPM initial and final data penalty function.
 !
@@ -1462,7 +1466,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 
-# if defined FOUR_DVAR && !defined IS4DVAR_SENSITIVITY
+# if defined FOUR_DVAR && !defined I4DVAR_ANA_SENSITIVITY
 !
 !  Initial nonlinear model at observation locations.
 !
@@ -1538,8 +1542,8 @@
      &                 __FILE__)) RETURN
 #  endif
 # endif
-# if !defined IS4DVAR_SENSITIVITY && \
-     (defined IS4DVAR             || defined VERIFICATION || \
+# if !defined I4DVAR_ANA_SENSITIVITY && \
+     (defined I4DVAR                 || defined VERIFICATION || \
       defined WEAK_CONSTRAINT)
 !
 !  Nonlinear model at observation points.
@@ -1563,15 +1567,15 @@
      &                 __FILE__)) RETURN
 #  endif
 # endif
-# if defined IS4DVAR         || defined IS4DVAR_SENSITIVITY || \
+# if defined I4DVAR          || defined I4DVAR_ANA_SENSITIVITY || \
      defined WEAK_CONSTRAINT
 !
 !  Tangent linear or representer model at observation points.
 !
         haveTLmod(ng)=.FALSE.
         Vinfo( 1)=Vname(1,idTLmo)
-#  ifdef IS4DVAR_SENSITIVITY
-        Vinfo( 2)='4DVAR sensitivity analysis at observations location'
+#  ifdef I4DVAR_ANA_SENSITIVITY
+        Vinfo( 2)='4D-Var sensitivity analysis at observations location'
 #  else
         Vinfo( 2)=Vname(2,idTLmo)
 #  endif
@@ -1582,7 +1586,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined IS4DVAR || defined WEAK_CONSTRAINT
+# if defined I4DVAR || defined WEAK_CONSTRAINT
 !
 !  Initial model-observation misfit (innovation) vector.
 !
@@ -1606,7 +1610,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined IS4DVAR
+# if defined I4DVAR
 !
 !  Define model minus observations misfit NLM cost function.
 !
@@ -1639,7 +1643,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined IS4DVAR
+# if defined I4DVAR
 !
 !  Define optimality property that measures the consistency between
 !  background and observation errors hypotheses (Chi-square).
@@ -1830,8 +1834,8 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined TL_W4DVAR          || defined W4DVAR             || \
-     defined W4DVAR_SENSITIVITY
+# if defined R4DVAR    || defined R4DVAR_ANA_SENSITIVITY || \
+     defined TL_R4DVAR
 !
 !  Define initial values of RPmodVal.
 !
@@ -1845,8 +1849,10 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined IS4DVAR_SENSITIVITY     || defined W4DPSAS_SENSITIVITY || \
-     defined W4DPSAS_FCT_SENSITIVITY || W4DVAR_SENSITIVITY
+# if defined I4DVAR_ANA_SENSITIVITY   || \
+     defined RBL4DVAR_ANA_SENSITIVITY || \
+     defined RBL4DVAR_FCT_SENSITIVITY || \
+     defined R4DVAR_ANA_SENSITIVITY
 #  ifdef OBS_IMPACT
 !
 !  Define total observations impact.
@@ -1888,9 +1894,11 @@
      &                 __FILE__)) RETURN
 #  endif
 # endif
-# if defined OBS_IMPACT_SPLIT         && \
-     (defined IS4DVAR_SENSITIVITY     || defined W4DPSAS_SENSITIVITY ||\
-      defined W4DPSAS_FCT_SENSITIVITY || defined W4DVAR_SENSITIVITY)
+# if defined OBS_IMPACT_SPLIT          && \
+     (defined I4DVAR_ANA_SENSITIVITY   || \
+      defined RBL4DVAR_ANA_SENSITIVITY || \
+      defined RBL4DVAR_FCT_SENSITIVITY || \
+      defined R4DVAR_ANA_SENSITIVITY)
 !
 !  Define observation impact due to initial condition increments.
 !
@@ -2084,13 +2092,13 @@
             got_var(idNLmo)=.TRUE.
             haveNLmod(ng)=.TRUE.
             DAV(ng)%Vid(idNLmo)=var_id(i)
-# if defined IS4DVAR || defined WEAK_CONSTRAINT
+# if defined I4DVAR || defined WEAK_CONSTRAINT
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idTLmo))) THEN
             got_var(idTLmo)=.TRUE.
             haveTLmod(ng)=.TRUE.
             DAV(ng)%Vid(idTLmo)=var_id(i)
 # endif
-# if defined IS4DVAR || defined WEAK_CONSTRAINT
+# if defined I4DVAR || defined WEAK_CONSTRAINT
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idMOMi))) THEN
             got_var(idMOMi)=.TRUE.
             DAV(ng)%Vid(idMOMi)=var_id(i)
@@ -2184,7 +2192,7 @@
           exit_flag=2
           RETURN
         END IF
-# if defined IS4DVAR || defined WEAK_CONSTRAINT
+# if defined I4DVAR || defined WEAK_CONSTRAINT
         IF (.not.got_var(idTLmo)) THEN
           IF (Master) WRITE (stdout,90) TRIM(Vname(1,idTLmo)),          &
      &                                  TRIM(DAV(ng)%name)
@@ -2192,7 +2200,7 @@
           RETURN
         END IF
 # endif
-# if defined IS4DVAR || defined WEAK_CONSTRAINT
+# if defined I4DVAR || defined WEAK_CONSTRAINT
         IF (.not.got_var(idMOMi)) THEN
           IF (Master) WRITE (stdout,90) TRIM(Vname(1,idMOMi)),          &
      &                                  TRIM(DAV(ng)%name)

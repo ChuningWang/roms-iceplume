@@ -108,7 +108,7 @@
           ObsVetting(iobs)=IniVal
         END DO
 
-# ifndef IS4DVAR_SENSITIVITY
+# ifndef I4DVAR_ANA_SENSITIVITY
 !
 !  Some entries are not computed in the extraction routine.  Set values
 !  to zero to avoid problems when writing non initialized values.
@@ -167,7 +167,7 @@
 !  Free-surface observations.
 !-----------------------------------------------------------------------
 !
-# ifndef IS4DVAR_SENSITIVITY
+# ifndef I4DVAR_ANA_SENSITIVITY
         IF (wrtNLmod(ng).and.                                           &
      &      (FOURDVAR(ng)%ObsCount(isFsur).gt.0)) THEN
           CALL extract_obs2d (ng, 0, Lm(ng)+1, 0, Mm(ng)+1,             &
@@ -226,7 +226,7 @@
 !  Vertically integrated u-velocity observations.
 !-----------------------------------------------------------------------
 !
-# ifndef IS4DVAR_SENSITIVITY
+# ifndef I4DVAR_ANA_SENSITIVITY
         IF (wrtNLmod(ng).and.                                           &
      &      (FOURDVAR(ng)%ObsCount(isUbar).gt.0)) THEN
           CALL extract_obs2d (ng, 1, Lm(ng)+1, 0, Mm(ng)+1,             &
@@ -285,7 +285,7 @@
 !  Vertically integrated v-velocity observations.
 !-----------------------------------------------------------------------
 !
-# ifndef IS4DVAR_SENSITIVITY
+# ifndef I4DVAR_ANA_SENSITIVITY
         IF (wrtNLmod(ng).and.                                           &
      &      (FOURDVAR(ng)%ObsCount(isVbar).gt.0)) THEN
           CALL extract_obs2d (ng, 0, Lm(ng)+1, 1, Mm(ng)+1,             &
@@ -346,7 +346,7 @@
 !  3D u-velocity observations.
 !-----------------------------------------------------------------------
 !
-#  ifndef IS4DVAR_SENSITIVITY
+#  ifndef I4DVAR_ANA_SENSITIVITY
         IF (wrtNLmod(ng).and.                                           &
      &      (FOURDVAR(ng)%ObsCount(isUvel).gt.0)) THEN
           DO k=1,N(ng)
@@ -424,7 +424,7 @@
 !  3D v-velocity observations.
 !-----------------------------------------------------------------------
 !
-#  ifndef IS4DVAR_SENSITIVITY
+#  ifndef I4DVAR_ANA_SENSITIVITY
         IF (wrtNLmod(ng).and.                                           &
      &      (FOURDVAR(ng)%ObsCount(isVvel).gt.0)) THEN
           DO k=1,N(ng)
@@ -521,7 +521,7 @@
 #  endif
 !-----------------------------------------------------------------------
 !
-#  ifndef IS4DVAR_SENSITIVITY
+#  ifndef I4DVAR_ANA_SENSITIVITY
         IF (wrtNLmod(ng).and.                                           &
      &      (FOURDVAR(ng)%ObsCount(isRadial).gt.0)) THEN
           DO iobs=Mstr,Mend
@@ -783,7 +783,7 @@
 !-----------------------------------------------------------------------
 !
         DO itrc=1,NT(ng)
-#  ifndef IS4DVAR_SENSITIVITY
+#  ifndef I4DVAR_ANA_SENSITIVITY
           IF (wrtNLmod(ng).and.                                         &
      &        (FOURDVAR(ng)%ObsCount(isTvar(itrc)).gt.0)) THEN
             CALL extract_obs3d (ng, 0, Lm(ng)+1, 0, Mm(ng)+1,           &
@@ -857,7 +857,7 @@
           END DO
         END IF
 
-# if defined BGQC && !defined IS4DVAR_SENSITIVITY
+# if defined BGQC && !defined I4DVAR_ANA_SENSITIVITY
 !
 !-----------------------------------------------------------------------
 !  Perform the background quality control: check and reject observations
@@ -868,11 +868,11 @@
         IF (wrtObsScale(ng).and.wrtNLmod(ng)) THEN
           DO iobs=Mstr,Mend
             IF (ObsScale(iobs).ne.IniVal) THEN
-#  if defined IS4DVAR
+#  if defined I4DVAR
               df1=(ObsVal(iobs)-NLmodVal(iobs))/BgErr(iobs)
               df2=(1.0_r8/ObsErr(iobs))/(BgErr(iobs)*BgErr(iobs))
 #  elif defined WEAK_CONSTRAINT
-#    ifdef W4DVAR
+#    ifdef R4DVAR
               df1=(ObsVal(iobs)-TLmodVal(iobs))/BgErr(iobs)
               df2=ObsErr(iobs)/(BgErr(iobs)*BgErr(iobs))
 #    else
@@ -951,7 +951,7 @@
 # ifdef TLM_OBS
         IF (wrtTLmod(ng).or.wrtRPmod(ng)) THEN
           DO iobs=Mstr,Mend
-#  ifdef IS4DVAR_SENSITIVITY
+#  ifdef I4DVAR_ANA_SENSITIVITY
             TLmodVal(iobs)=ObsScale(iobs)*TLmodVal(iobs)*ObsErr(iobs)
 #  else
             TLmodVal(iobs)=ObsScale(iobs)*TLmodVal(iobs)
@@ -965,7 +965,7 @@
 !  Collect extracted data.
 !-----------------------------------------------------------------------
 !
-#  ifndef IS4DVAR_SENSITIVITY
+#  ifndef I4DVAR_ANA_SENSITIVITY
 
         IF (wrtNLmod(ng)) THEN
           CALL mp_collect (ng, model, Ncollect, IniVal,                 &
@@ -1010,7 +1010,7 @@
 #  endif
 # endif
 
-# if defined FOUR_DVAR && !defined IS4DVAR_SENSITIVITY
+# if defined FOUR_DVAR && !defined I4DVAR_ANA_SENSITIVITY
 !
 !-----------------------------------------------------------------------
 !  Compute and write initial and final model-observation misfit
@@ -1020,11 +1020,11 @@
 !
         IF (wrtMisfit(ng)) THEN
           DO iobs=Mstr,Mend
-#  if defined IS4DVAR
+#  if defined I4DVAR
             misfit(iobs)=ObsScale(iobs)*SQRT(ObsErr(iobs))*             &
      &                   (NLmodVal(iobs)-ObsVal(iobs))
 #  elif defined WEAK_CONSTRAINT
-#   ifdef W4DVAR
+#   ifdef R4DVAR
             misfit(iobs)=ObsScale(iobs)/SQRT(ObsErr(iobs))*             &
      &                   (TLmodVal(iobs)-ObsVal(iobs))
 #   else
@@ -1073,7 +1073,7 @@
 #  endif
 # endif
 
-# if defined FOUR_DVAR && !defined IS4DVAR_SENSITIVITY
+# if defined FOUR_DVAR && !defined I4DVAR_ANA_SENSITIVITY
 !
 !-----------------------------------------------------------------------
 !  Write out variables needed to compute Desroziers et al. (2005)
@@ -1140,7 +1140,7 @@
 !-----------------------------------------------------------------------
 !  Write out data into output 4DVAR NetCDF file.
 !-----------------------------------------------------------------------
-# if defined FOUR_DVAR && !defined IS4DVAR_SENSITIVITY
+# if defined FOUR_DVAR && !defined I4DVAR_ANA_SENSITIVITY
 !
 !  Current outer and inner loop.
 !
@@ -1171,7 +1171,7 @@
      &                   __FILE__)) RETURN
         END IF
 
-# ifndef IS4DVAR_SENSITIVITY
+# ifndef I4DVAR_ANA_SENSITIVITY
 !
 !  Nonlinear model or first guess (background) state at observation
 !  locations.
@@ -1214,7 +1214,7 @@
      &                   __FILE__)) RETURN
           haveTLmod(ng)=.TRUE.
         END IF
-#  ifdef IS4DVAR_SENSITIVITY
+#  ifdef I4DVAR_ANA_SENSITIVITY
 #   ifdef OBS_IMPACT
 !
 !  Write the total observation impact.
@@ -1269,8 +1269,8 @@
 #   endif
 #  endif
 # endif
-# if defined TL_W4DVAR          || defined W4DVAR             || \
-     defined W4DVAR_SENSITIVITY
+# if defined R4DVAR    || defined R4DVAR_ANA_SENSITIVITY || \
+     defined TL_R4DVAR
 !
 !  Write initial representer model increments at observation locations.
 !
@@ -1445,7 +1445,7 @@
         ELSE IF (wrtRPmod(ng)) THEN
           string='Wrote RPM state at observation locations,         '
 #  else
-#   ifdef IS4DVAR_SENSITIVITY
+#   ifdef I4DVAR_ANA_SENSITIVITY
         ELSE IF (wrtTLmod(ng)) THEN
           string='Wrote 4DVAR observation sensitivity,              '
 #   else

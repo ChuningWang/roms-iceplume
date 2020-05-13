@@ -1,10 +1,15 @@
 #include "cppdefs.h"
       MODULE ini_adjust_mod
 
-#if defined TLM_CHECK  || defined OPT_PERTURBATION || \
-    defined FORCING_SV || defined STOCHASTIC_OPT || \
-    defined HESSIAN_SV || defined HESSIAN_SO || defined HESSIAN_FSV || \
-    (defined ADJOINT   && defined TANGENT)
+#if defined FORCING_SV       || \
+    defined HESSIAN_FSV      || \
+    defined HESSIAN_SO       || \
+    defined HESSIAN_SV       || \
+    defined OPT_PERTURBATION || \
+    defined STOCHASTIC_OPT   || \
+    defined TLM_CHECK        || \
+    (defined ADJOINT         && \
+     defined TANGENT)
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===
@@ -20,10 +25,13 @@
       implicit none
 
       PRIVATE
-# if defined ADJOINT && defined TANGENT
-#  if defined IS4DVAR || defined TL_W4DPSAS          || \
-      defined W4DPSAS || defined W4DPSAS_SENSITIVITY || \
-      defined SP4DVAR
+# if defined ADJOINT                   && \
+     defined TANGENT
+#  if defined I4DVAR                   || \
+      defined RBL4DVAR                 || \
+      defined RBL4DVAR_ANA_SENSITIVITY || \
+      defined SP4DVAR                  || \
+      defined TL_RBL4DVAR
       PUBLIC :: ini_adjust
 #  endif
 # endif
@@ -34,29 +42,34 @@
 # ifdef TLM_CHECK
       PUBLIC :: ini_perturb
 # endif
-# if defined TL_W4DVAR          || defined W4DVAR      || \
-     defined W4DVAR_SENSITIVITY || defined ARRAY_MODES || \
-     defined CLIPPING
+# if defined ARRAY_MODES            || \
+     defined CLIPPING               || \
+     defined R4DVAR                 || \
+     defined R4DVAR_ANA_SENSITIVITY || \
+     defined TL_R4DVAR
       PUBLIC :: rp_ini_adjust
 # endif
 # ifdef TLM_CHECK
       PUBLIC :: tl_ini_perturb
 # endif
-# if defined OPT_PERTURBATION || defined FORCING_SV || \
-     defined STOCHASTIC_OPT   || defined HESSIAN_SV || \
-     defined HESSIAN_SO       || defined HESSIAN_FSV
+# if defined FORCING_SV       || \
+     defined HESSIAN_FSV      || \
+     defined HESSIAN_SO       || \
+     defined HESSIAN_SV       || \
+     defined OPT_PERTURBATION || \
+     defined STOCHASTIC_OPT
       PUBLIC :: ad_ini_perturb
 # endif
 
       CONTAINS
 
 # if defined ADJOINT && defined TANGENT
-#  if defined IS4DVAR || defined SP4DVAR
+#  if defined I4DVAR || defined SP4DVAR
       SUBROUTINE ini_adjust (ng, tile, Linp, Lout)
 !
 !=======================================================================
 !                                                                      !
-!  This routine adds 4DVAR inner loop tangent linear increments to     !
+!  This routine adds 4D-Var inner loop tangent linear increments to    !
 !  nonlinear state initial conditions.  The boundary condition and     !
 !  barotropic/baroclinic coupling, if any, are processed latter in     !
 !  routine "ini_fields" before time-stepping.                          !
@@ -279,8 +292,9 @@
       END SUBROUTINE ini_adjust_tile
 #  endif
 
-#  if defined TL_W4DPSAS          || defined W4DPSAS || \
-      defined W4DPSAS_SENSITIVITY
+#  if defined RBL4DVAR    || defined RBL4DVAR_ANA_SENSITIVITY || \
+      defined TL_RBL4DVAR
+
       SUBROUTINE ini_adjust (ng, tile, Linp, Lout)
 !
 !=======================================================================
@@ -508,9 +522,12 @@
       END SUBROUTINE ini_adjust_tile
 #  endif
 
-#  if defined TL_W4DVAR          || defined W4DVAR      || \
-      defined W4DVAR_SENSITIVITY || defined ARRAY_MODES || \
-      defined CLIPPING
+#  if defined ARRAY_MODES            || \
+      defined CLIPPING               || \
+      defined R4DVAR                 || \
+      defined R4DVAR_ANA_SENSITIVITY || \
+      defined TL_R4DVAR
+
       SUBROUTINE rp_ini_adjust (ng, tile, Linp, Lout)
 !
 !=======================================================================

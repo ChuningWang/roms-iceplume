@@ -347,7 +347,7 @@
 !  in addition to initialization time.
 !-----------------------------------------------------------------------
 
-#  if defined ADJUST_BOUNDARY && !defined W4DPSAS_FCT_SENSITIVITY
+#  if defined ADJUST_BOUNDARY && !defined RBL4DVAR_FCT_SENSITIVITY
 !
 !  Define free-surface open boundaries.
 !

@@ -194,7 +194,7 @@
           ObsVetting(iobs)=IniVal
         END DO
 
-# if defined OBS_SPACE && defined W4DPSAS_FCT_SENSITIVITY
+# if defined OBS_SPACE && defined RBL4DVAR_FCT_SENSITIVITY
 !
 !  Define ADmodVal to be the impact forcing in observation space.
 !

@@ -310,8 +310,8 @@
 !
 !  Read in model values at observation locations.
 !
-# if defined TL_W4DVAR          || defined W4DVAR || \
-     defined W4DVAR_SENSITIVITY
+# if defined R4DVAR    || defined R4DVAR_ANA_SENSITIVITY || \
+     defined TL_R4DVAR
       CALL netcdf_get_fvar (ng, iNLM, DAV(ng)%name, Vname(1,idTLmo),    &
      &                      mod_value,                                  &
      &                      ncid = DAV(ng)%ncid,                        &

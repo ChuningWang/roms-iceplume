@@ -82,33 +82,33 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+9)=' ADJOINT,'
 #endif
-#if defined ADJUST_BOUNDARY     && \
-   (defined CORRELATION         || defined IS4DVAR           || \
-    defined IS4DVAR_SENSITIVITY || defined SENSITIVITY_4DVAR || \
-    defined SP4DVAR             || defined W4DPSAS           || \
-    defined W4DVAR)
+#if defined ADJUST_BOUNDARY        && \
+   (defined CORRELATION            || defined I4DVAR            || \
+    defined I4DVAR_ANA_SENSITIVITY || defined RBL4DVAR          || \
+    defined R4DVAR                 || defined SENSITIVITY_4DVAR || \
+    defined SP4DVAR)
 !
       IF (Master) WRITE (stdout,20) 'ADJUST_BOUNDARY',                  &
      &   'Including boundary conditions in 4D-Var state estimation'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+17)=' ADJUST_BOUNDARY,'
 #endif
-#if defined ADJUST_STFLUX       && \
-   (defined CORRELATION         || defined IS4DVAR           || \
-    defined IS4DVAR_SENSITIVITY || defined SENSITIVITY_4DVAR || \
-    defined SP4DVAR             || defined W4DPSAS           || \
-    defined W4DVAR)
+#if defined ADJUST_STFLUX          && \
+   (defined CORRELATION            || defined I4DVAR            || \
+    defined I4DVAR_ANA_SENSITIVITY || defined RBL4DVAR          || \
+    defined R4DVAR                 || defined SENSITIVITY_4DVAR || \
+    defined SP4DVAR)
 !
       IF (Master) WRITE (stdout,20) 'ADJUST_STFLUX',                    &
      &   'Including surface tracer flux in 4D-Var state estimation'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+15)=' ADJUST_STFLUX,'
 #endif
-#if defined ADJUST_WSTRESS      && \
-   (defined CORRELATION         || defined IS4DVAR           || \
-    defined IS4DVAR_SENSITIVITY || defined SENSITIVITY_4DVAR || \
-    defined SP4DVAR             || defined W4DPSAS           || \
-    defined W4DVAR)
+#if defined ADJUST_WSTRESS         && \
+   (defined CORRELATION            || defined I4DVAR            || \
+    defined I4DVAR_ANA_SENSITIVITY || defined RBL4DVAR          || \
+    defined R4DVAR                 || defined SENSITIVITY_4DVAR || \
+    defined SP4DVAR)
 !
       IF (Master) WRITE (stdout,20) 'ADJUST_WSTRESS',                   &
      &   'Including surface wind stress in 4D-Var state estimation'
@@ -340,8 +340,8 @@
       Coptions(is:is+17)=' ANA_RESPIRATION,'
 #endif
 #if defined ANA_SCOPE        && \
-   (defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
-    defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR   || \
+   (defined AD_SENSITIVITY   || defined I4DVAR_ANA_SENSITIVITY || \
+    defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR      || \
     defined SO_SEMI)
 !
       IF (Master) WRITE (stdout,20) 'ANA_SCOPE',                        &
@@ -625,7 +625,7 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+20)=' BOUNDARY_ALLGATHER,'
 # else
-      IF (Master) WRITE (stdout,20) '!BOUNDARY_ALLGATHER',               &
+      IF (Master) WRITE (stdout,20) '!BOUNDARY_ALLGATHER',              &
      &   'Using mpi_allreduce in mp_boundary routine'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+11)=' !BOUNDARY_ALLGATHER,'
@@ -755,7 +755,7 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+15)=' DATA_COUPLING,'
 #endif
-#if defined DATALESS_LOOPS && defined W4DVAR
+#if defined DATALESS_LOOPS && defined R4DVAR
 !
       IF (Master) WRITE (stdout,20) 'DATALESS_LOOPS',                   &
      &   'Testing convergence of RPM Picard iterations'
@@ -1157,9 +1157,12 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+10)=' ICESHELF,'
 #endif
-#if defined IMPACT_INNER        && defined OBS_IMPACT              && \
-   (defined IS4DVAR_SENSITIVITY || defined W4DPSAS_FCT_SENSITIVITY || \
-    defined W4DPSAS_SENSITIVITY || defined W4DVAR_SENSITIVITY)
+#if defined IMPACT_INNER             && \
+    defined OBS_IMPACT               && \
+   (defined I4DVAR_ANA_SENSITIVITY   || \
+    defined RBL4DVAR_ANA_SENSITIVITY || \
+    defined RBL4DVAR_FCT_SENSITIVITY || \
+    defined R4DVAR_ANA_SENSITIVITY)
 !
       IF (Master) WRITE (stdout,20) 'IMPACT_INNER',                     &
      &   'Writing observations impacts for each inner loop'
@@ -1223,20 +1226,20 @@
       Coptions(is:is+15)=' INNER_PRODUCT,'
       idriver=idriver+1
 #endif
-#ifdef IS4DVAR
+#ifdef I4DVAR
 !
-      IF (Master) WRITE (stdout,20) 'IS4DVAR',                          &
+      IF (Master) WRITE (stdout,20) 'I4DVAR',                           &
      &   'Incremental, strong constraint 4D-Var data assimilation'
       is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+9)=' IS4DVAR,'
+      Coptions(is:is+8)=' I4DVAR,'
       idriver=idriver+1
 #endif
-#ifdef IS4DVAR_SENSITIVITY
+#ifdef I4DVAR_ANA_SENSITIVITY
 !
-      IF (Master) WRITE (stdout,20) 'IS4DVAR_SENSITIVITY',              &
+      IF (Master) WRITE (stdout,20) 'I4DVAR_ANA_SENSITIVITY',           &
      &   'I4D-Var Observations Sensitivity Analysis'
       is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+21)=' IS4DVAR_SENSITIVITY,'
+      Coptions(is:is+24)=' I4DVAR_ANA_SENSITIVITY,'
       idriver=idriver+1
 #endif
 #if defined INLINE_2DIO && defined DISTRIBUTE
@@ -1633,7 +1636,7 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+18)=' OBS_IMPACT_SPLIT,'
 #endif
-#if defined OBS_SPACE && defined W4DPSAS_FCT_SENSITIVITY
+#if defined OBS_SPACE && defined RBL4DVAR_FCT_SENSITIVITY
 !
       IF (Master) WRITE (stdout,20) 'OBS_SPACE',                        &
      &   'Forecast metric in observation-space instead of state-space'
@@ -1896,6 +1899,30 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+14)=' RAMP_TIDES,'
 #endif
+#ifdef RBL4DVAR
+!
+      IF (Master) WRITE (stdout,20) 'RBL4DVAR',                         &
+     &   'Strong/Weak constraint RBL4D-VAR data assimilation'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+10)=' RBL4DVAR,'
+      idriver=idriver+1
+#endif
+#ifdef RBL4DVAR_ANA_SENSITIVITY
+!
+      IF (Master) WRITE (stdout,20) 'RBL4DVAR_ANA_SENSITIVITY',         &
+     &   'RBL4D-VAR analysis observation sensitivity'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+26)=' RBL4DVAR_ANA_SENSITIVITY,'
+      idriver=idriver+1
+#endif
+#ifdef RBL4DVAR_FCT_SENSITIVITY
+!
+      IF (Master) WRITE (stdout,20) 'RBL4DVAR_FCT_SENSITIVITY',         &
+     &   'RBL4D-VAR forecast observation sensitivity'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+26)=' RBL4DVAR_FCT_SENSITIVITY,'
+      idriver=idriver+1
+#endif
 #if defined READ_WATER && defined MASKING
 !
       IF (Master) WRITE (stdout,20) 'READ_WATER',                       &
@@ -2004,10 +2031,11 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+10)=' RHO_SURF,'
 #endif
+
 #if defined RPCG && defined WEAK_CONSTRAINT
 !
       IF (Master) WRITE (stdout,20) 'RPCG',                             &
-     &   'Restricted B-preconditioned Lanczos minimization'
+     &   'Restricted B-preconditioned Lanczos minimization solver'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+6)=' RPCG,'
 #endif
@@ -2045,6 +2073,22 @@
      &   'Double precision fields in restart NetCDF file'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' !RST_SINGLE,'
+#endif
+#ifdef R4DVAR
+!
+      IF (Master) WRITE (stdout,20) 'R4DVAR',                           &
+     &   'Strong/Weak constraint, R4D-Var data assimilation'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+8)=' R4DVAR,'
+      idriver=idriver+1
+#endif
+#ifdef R4DVAR_ANA_SENSITIVITY
+!
+      IF (Master) WRITE (stdout,20) 'R4DVAR_ANA_SENSITIVITY',           &
+     &   'R4D-Var analysis  observation sensitivity'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+24)=' R4DVAR_ANA_SENSITIVITY,'
+      idriver=idriver+1
 #endif
 #ifdef SALINITY
 !
@@ -2678,46 +2722,6 @@
      &   'Horizontal, time-dependent 3D viscosity coefficient'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' VISC_3DCOEF,'
-#endif
-#ifdef W4DPSAS
-!
-      IF (Master) WRITE (stdout,20) 'W4DPSAS',                          &
-     &   'Weak constraint 4D-PSAS data assimilation'
-      is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+9)=' W4DPSAS,'
-      idriver=idriver+1
-#endif
-#ifdef W4DPSAS_FCT_SENSITIVITY
-!
-      IF (Master) WRITE (stdout,20) 'W4DPSAS_FCT_SENSITIVITY',          &
-     &   'Weak constraint 4D-PSAS observation forecast sensitivity'
-      is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+25)=' W4DPSAS_FCT_SENSITIVITY,'
-      idriver=idriver+1
-#endif
-#ifdef W4DPSAS_SENSITIVITY
-!
-      IF (Master) WRITE (stdout,20) 'W4DPSAS_SENSITIVITY',              &
-     &   'Weak constraint 4D-PSAS observation sensitivity'
-      is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+21)=' W4DPSAS_SENSITIVITY,'
-      idriver=idriver+1
-#endif
-#ifdef W4DVAR
-!
-      IF (Master) WRITE (stdout,20) 'W4DVAR',                           &
-     &   'Weak constraint, Representers 4D-Var data assimilation'
-      is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+8)=' W4DVAR,'
-      idriver=idriver+1
-#endif
-#ifdef W4DVAR_SENSITIVITY
-!
-      IF (Master) WRITE (stdout,20) 'W4DVAR_SENSITIVITY',               &
-     &   'Weak constraint 4D-Var observation sensitivity'
-      is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+20)=' W4DVAR_SENSITIVITY,'
-      idriver=idriver+1
 #endif
 #ifdef WAV_COUPLING
 !

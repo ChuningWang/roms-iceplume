@@ -143,7 +143,6 @@
 !  computed only once since the "first_tile" and "last_tile" values
 !  are private for each parallel thread/node.
 !
-!$OMP PARALLEL
 #if defined _OPENMP
       MyThread=my_threadnum()
 #elif defined DISTRIBUTE
@@ -156,7 +155,6 @@
         first_tile(ng)=MyThread*chunk_size
         last_tile (ng)=first_tile(ng)+chunk_size-1
       END DO
-!$OMP END PARALLEL
 !
 !  Initialize internal wall clocks. Notice that the timings does not
 !  includes processing standard input because several parameters are
@@ -168,18 +166,14 @@
         END IF
 !
         DO ng=1,Ngrids
-!$OMP PARALLEL
           DO thread=THREAD_RANGE
             CALL wclock_on (ng, iNLM, 0, __LINE__, __FILE__)
           END DO
-!$OMP END PARALLEL
         END DO
 !
 !  Allocate and initialize modules variables.
 !
-!$OMP PARALLEL
         CALL mod_arrays (allocate_vars)
-!$OMP END PARALLEL
 !
 !  Allocate and initialize observation arrays.
 !
@@ -355,10 +349,8 @@
         wrtRPmod(ng)=.FALSE.
         wrtTLmod(ng)=.FALSE.
       END DO
-
-!$OMP PARALLEL
+!
       CALL initial
-!$OMP END PARALLEL
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 !
@@ -427,12 +419,10 @@
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
 #endif
-
-!$OMP PARALLEL
+!
           DO tile=first_tile(ng),last_tile(ng),+1
             CALL normalization (ng, tile, 2)
           END DO
-!$OMP END PARALLEL
           LdefNRM(1:4,ng)=.FALSE.
           LwrtNRM(1:4,ng)=.FALSE.
         ELSE
@@ -502,14 +492,12 @@
           WRITE (stdout,20) 'NL', ng, ntstart(ng), ntend(ng)
         END IF
       END DO
-
-!$OMP PARALLEL
+!
 #ifdef SOLVE3D
       CALL main3d (RunInterval)
 #else
       CALL main2d (RunInterval)
 #endif
-!$OMP END PARALLEL
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 
@@ -600,9 +588,7 @@
 !
         DO ng=1,Ngrids
           IRP(ng)%Rindex=Rec1
-!$OMP PARALLEL
           CALL rp_initial (ng)
-!$OMP END PARALLEL
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
         END DO
@@ -615,14 +601,12 @@
             WRITE (stdout,20) 'RP', ng, ntstart(ng), ntend(ng)
           END IF
         END DO
-
-!$OMP PARALLEL
+!
 # ifdef SOLVE3D
         CALL rp_main3d (RunInterval)
 # else
         CALL rp_main2d (RunInterval)
 # endif
-!$OMP END PARALLEL
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 !
@@ -674,14 +658,12 @@
 !  tangent linear model.
 !
         DO ng=1,Ngrids
-!$OMP PARALLEL
           DO tile=first_tile(ng),last_tile(ng),+1
             CALL initialize_forces (ng, tile, iTLM)
 # ifdef ADJUST_BOUNDARY
             CALL initialize_boundary (ng, tile, iTLM)
 # endif
           END DO
-!$OMP END PARALLEL
         END DO
 
 # if defined BALANCE_OPERATOR && defined ZETA_ELLIPTIC
@@ -695,12 +677,10 @@
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
 !
-!$OMP PARALLEL
             DO tile=first_tile(ng),last_tile(ng),+1
               CALL balance_ref (ng, tile, Lini)
               CALL biconj (ng, tile, iNLM, Lini)
             END DO
-!$OMP END PARALLEL
             wrtZetaRef(ng)=.TRUE.
           END DO
         END IF
@@ -740,9 +720,7 @@
 !  Initialize the adjoint model from rest.
 !
             DO ng=1,Ngrids
-!$OMP PARALLEL
               CALL ad_initial (ng)
-!$OMP END PARALLEL
               IF (FoundError(exit_flag, NoError, __LINE__,              &
      &                       __FILE__)) RETURN
               wrtMisfit(ng)=.FALSE.
@@ -776,14 +754,12 @@
                 WRITE (stdout,20) 'AD', ng, ntstart(ng), ntend(ng)
               END IF
             END DO
-
-!$OMP PARALLEL
+!
 # ifdef SOLVE3D
             CALL ad_main3d (RunInterval)
 # else
             CALL ad_main2d (RunInterval)
 # endif
-!$OMP END PARALLEL
             IF (FoundError(exit_flag, NoError, __LINE__,                &
      &                     __FILE__)) RETURN
 !
@@ -862,9 +838,7 @@
 !
             DO ng=1,Ngrids
               ITL(ng)%Rindex=Rec1
-!$OMP PARALLEL
               CALL tl_initial (ng)
-!$OMP END PARALLEL
               IF (FoundError(exit_flag, NoError, __LINE__,              &
      &                       __FILE__)) RETURN
             END DO
@@ -898,14 +872,12 @@
                 WRITE (stdout,20) 'TL', ng, ntstart(ng), ntend(ng)
               END IF
             END DO
-
-!$OMP PARALLEL
+!
 # ifdef SOLVE3D
             CALL tl_main3d (RunInterval)
 # else
             CALL tl_main2d (RunInterval)
 # endif
-!$OMP END PARALLEL
             IF (FoundError(exit_flag, NoError, __LINE__,                &
      &                     __FILE__)) RETURN
 
@@ -951,9 +923,7 @@
 !  Initialize the adjoint model always from rest.
 !
         DO ng=1,Ngrids
-!$OMP PARALLEL
           CALL ad_initial (ng)
-!$OMP END PARALLEL
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
         END DO
@@ -987,14 +957,12 @@
             WRITE (stdout,20) 'AD', ng, ntstart(ng), ntend(ng)
           END IF
         END DO
-
-!$OMP PARALLEL
+!
 # ifdef SOLVE3D
         CALL ad_main3d (RunInterval)
 # else
         CALL ad_main2d (RunInterval)
 # endif
-!$OMP END PARALLEL
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 !
@@ -1083,9 +1051,7 @@
 #else
           IRP(ng)%Rindex=Rec2
 #endif
-!$OMP PARALLEL
           CALL rp_initial (ng)
-!$OMP END PARALLEL
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
         END DO
@@ -1107,14 +1073,12 @@
             WRITE (stdout,20) 'RP', ng, ntstart(ng), ntend(ng)
           END IF
         END DO
-
-!$OMP PARALLEL
+!
 #ifdef SOLVE3D
         CALL rp_main3d (RunInterval)
 #else
         CALL rp_main2d (RunInterval)
 #endif
-!$OMP END PARALLEL
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 !
@@ -1207,7 +1171,7 @@
      &                        total = (/Nobs(ng)/))
       END DO
 !
-!  Now run the tangent linear of W4DVAR.
+!  Now run the tangent linear of R4D-Var.
 !
 !  Reset value of "Nrun" and clear "TLmodVal".
 !
@@ -1233,11 +1197,9 @@
 !  tangent linear model.
 !
         DO ng=1,Ngrids
-!$OMP PARALLEL
           DO tile=first_tile(ng),last_tile(ng),+1
             CALL initialize_forces (ng, tile, iTLM)
           END DO
-!$OMP END PARALLEL
         END DO
 !
         INNER_LOOP2 : DO my_inner=0,Ninner
@@ -1279,9 +1241,7 @@
 !  Initialize the adjoint model from rest.
 !
             DO ng=1,Ngrids
-!$OMP PARALLEL
               CALL ad_initial (ng)
-!$OMP END PARALLEL
               IF (FoundError(exit_flag, NoError, __LINE__,              &
      &                       __FILE__)) RETURN
               wrtMisfit(ng)=.FALSE.
@@ -1312,14 +1272,12 @@
                 WRITE (stdout,20) 'AD', ng, ntstart(ng), ntend(ng)
               END IF
             END DO
-
-!$OMP PARALLEL
+!
 #ifdef SOLVE3D
             CALL ad_main3d (RunInterval)
 #else
             CALL ad_main2d (RunInterval)
 #endif
-!$OMP END PARALLEL
             IF (FoundError(exit_flag, NoError, __LINE__,                &
      &                     __FILE__)) RETURN
 !
@@ -1398,9 +1356,7 @@
 !
             DO ng=1,Ngrids
               ITL(ng)%Rindex=Rec1
-!$OMP PARALLEL
               CALL tl_initial (ng)
-!$OMP END PARALLEL
               IF (FoundError(exit_flag, NoError, __LINE__,              &
      &                       __FILE__)) RETURN
             END DO
@@ -1434,15 +1390,12 @@
                 WRITE (stdout,20) 'TL', ng, ntstart(ng), ntend(ng)
               END IF
             END DO
-
-!$OMP PARALLEL
+!
 #ifdef SOLVE3D
             CALL tl_main3d (RunInterval)
 #else
             CALL tl_main2d (RunInterval)
 #endif
-!$OMP END PARALLEL
-
             DO ng=1,Ngrids
               wrtNLmod(ng)=.FALSE.
               wrtTLmod(ng)=.FALSE.
@@ -1477,9 +1430,7 @@
 !  Initialize the adjoint model always from rest.
 !
         DO ng=1,Ngrids
-!$OMP PARALLEL
           CALL ad_initial (ng)
-!$OMP END PARALLEL
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
         END DO
@@ -1510,14 +1461,12 @@
             WRITE (stdout,20) 'AD', ng, ntstart(ng), ntend(ng)
           END IF
         END DO
-
-!$OMP PARALLEL
+!
 #ifdef SOLVE3D
         CALL ad_main3d (RunInterval)
 #else
         CALL ad_main2d (RunInterval)
 #endif
-!$OMP END PARALLEL
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 !
@@ -1605,9 +1554,7 @@
 !
         DO ng=1,Ngrids
           ITL(ng)%Rindex=Rec1
-!$OMP PARALLEL
           CALL tl_initial (ng)
-!$OMP END PARALLEL
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
         END DO
@@ -1632,14 +1579,12 @@
             WRITE (stdout,20) 'TL', ng, ntstart(ng), ntend(ng)
           END IF
         END DO
-
-!$OMP PARALLEL
+!
 #ifdef SOLVE3D
         CALL tl_main3d (RunInterval)
 #else
         CALL tl_main2d (RunInterval)
 #endif
-!$OMP END PARALLEL
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 
@@ -1734,18 +1679,14 @@
       END IF
 !
       DO ng=1,Ngrids
-!$OMP PARALLEL
         DO thread=THREAD_RANGE
           CALL wclock_off (ng, iNLM, 0, __LINE__, __FILE__)
         END DO
-!$OMP END PARALLEL
       END DO
 !
 !  Report dynamic memory and automatic memory requirements.
 !
-!$OMP PARALLEL
       CALL memory
-!$OMP END PARALLEL
 !
 !  Close IO files.
 !

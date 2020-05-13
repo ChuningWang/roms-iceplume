@@ -2,7 +2,7 @@
 
       MODULE cgradient_mod
 
-#ifdef IS4DVAR
+#ifdef I4DVAR
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===
@@ -161,7 +161,8 @@
 # include "tile.h"
 !
 # ifdef PROFILE
-      CALL wclock_on (ng, model, 43, __LINE__, __FILE__)
+      CALL wclock_on (ng, model, 85, __LINE__,                          &
+     &                __FILE__)
 # endif
       CALL cgradient_tile (ng, tile, model,                             &
      &                     LBi, UBi, LBj, UBj, LBij, UBij,              &
@@ -278,7 +279,8 @@
 # endif
      &                     OCEAN(ng) % ad_zeta)
 # ifdef PROFILE
-      CALL wclock_off (ng, model, 43, __LINE__, __FILE__)
+      CALL wclock_off (ng, model, 85, __LINE__,                         &
+     &                 __FILE__)
 # endif
       RETURN
       END SUBROUTINE cgradient

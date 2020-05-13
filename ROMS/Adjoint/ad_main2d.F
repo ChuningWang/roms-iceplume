@@ -31,7 +31,7 @@
       USE mod_storage
 # endif
 !
-# if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
+# if defined AD_SENSITIVITY   || defined I4DVAR_ANA_SENSITIVITY || \
      defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR
       USE adsen_force_mod,         ONLY : adsen_force
 # endif
@@ -160,7 +160,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 
-# if (defined FOUR_DVAR    && !defined IS4DVAR_SENSITIVITY) && \
+# if (defined FOUR_DVAR    && !defined I4DVAR_ANA_SENSITIVITY) && \
       defined OBSERVATIONS
 !
 !-----------------------------------------------------------------------
@@ -169,12 +169,6 @@
 !-----------------------------------------------------------------------
 !
         DO ng=1,Ngrids
-#  ifdef SP4DVAR
-!
-!  Skip assimilation of obs on first timestep unless inter=Nsaddle.
-!
-          IF ((iic(ng).ne.ntstart(ng)).or.Lsadd(ng)) THEN
-#  endif
 #  ifdef SENSITIVITY_4DVAR
           IF (.not.LsenPSAS(ng)) THEN
 #  endif
@@ -192,6 +186,12 @@
 !$OMP END MASTER
 !$OMP BARRIER
 !
+#  ifdef SP4DVAR
+!
+!  Skip assimilation of obs on first timestep unless inter=Nsaddle.
+!
+          IF ((iic(ng).ne.ntstart(ng)).or.Lsadd(ng)) THEN
+#  endif
             DO tile=first_tile(ng),last_tile(ng),+1
 #  ifdef WEAK_CONSTRAINT
               CALL ad_htobs (ng, tile, iADM)
@@ -545,7 +545,7 @@
         END DO
 # endif
 
-# if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
+# if defined AD_SENSITIVITY   || defined I4DVAR_ANA_SENSITIVITY || \
      defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR
 !
 !-----------------------------------------------------------------------

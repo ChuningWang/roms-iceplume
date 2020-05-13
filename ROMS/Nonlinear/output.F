@@ -535,8 +535,9 @@
         END IF
       END IF
 
-# if (defined FOUR_DVAR || defined VERIFICATION) && \
-     !defined IS4DVAR_SENSITIVITY
+# if (defined FOUR_DVAR              || \
+      defined VERIFICATION)          && \
+     !defined I4DVAR_ANA_SENSITIVITY
 #  ifdef OBSERVATIONS
 !
 !-----------------------------------------------------------------------
@@ -549,7 +550,7 @@
         ProcessObs=.TRUE.
         CALL obs_read (ng, iNLM, .FALSE.)
         CALL obs_write (ng, tile, iNLM)
-#   if !(defined VERIFICATION || defined W4DVAR)
+#   if !(defined R4DVAR || defined VERIFICATION)
         CALL obs_cost (ng, iNLM)
 #   endif
       ELSE

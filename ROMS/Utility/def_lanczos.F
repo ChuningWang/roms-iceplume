@@ -1,5 +1,5 @@
 #include "cppdefs.h"
-#if defined IS4DVAR
+#if defined I4DVAR
       SUBROUTINE def_lanczos (ng)
 !
 !svn $Id$

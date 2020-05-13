@@ -230,7 +230,7 @@
 !
 !  Turn on time wall clock.
 !
-      CALL wclock_on (ng, model, 42, __LINE__,                          &
+      CALL wclock_on (ng, model, 80, __LINE__,                          &
      &                __FILE__)
 #endif
 !
@@ -800,7 +800,7 @@
 !
 !  Turn off time wall clock.
 !
-      CALL wclock_off (ng, model, 42, __LINE__,                         &
+      CALL wclock_off (ng, model, 80, __LINE__,                         &
      &                 __FILE__)
 #endif
 !

@@ -1,7 +1,7 @@
 #include "cppdefs.h"
       MODULE lanc_resid_mod
 
-#if defined IS4DVAR
+#if defined I4DVAR
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===

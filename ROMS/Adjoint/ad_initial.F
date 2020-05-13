@@ -43,8 +43,8 @@
 # ifdef DISTRIBUTE
       USE distribute_mod,    ONLY : mp_bcasti
 # endif
-# if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
-     defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR   || \
+# if defined AD_SENSITIVITY   || defined I4DVAR_ANA_SENSITIVITY || \
+     defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR      || \
      defined SO_SEMI
       USE adsen_initial_mod, ONLY : adsen_initial
 # endif
@@ -97,8 +97,8 @@
 # if defined PERTURBATION
         WRITE (stdout,10) Nrun
  10     FORMAT (/,' <<<< Ensemble/Perturbation Run: ',i5.5,' >>>>',/)
-# elif defined IS4DVAR || defined SENSITIVITY_4DVAR || \
-       defined W4DPSAS || defined W4DVAR
+# elif defined I4DVAR   || defined SENSITIVITY_4DVAR || \
+       defined RBL4DVAR || defined R4DVAR
         WRITE (stdout,10) outer, inner
  10     FORMAT (/,' <<<< 4D Variational Data Assimilation, ',           &
      &          'Outer = ',i3.3, ', Inner = ',i3.3,' >>>>',/)
@@ -195,8 +195,8 @@
 !$OMP BARRIER
 # endif
 
-# if defined FOUR_DVAR            && \
-    !(defined IS4DVAR_SENSITIVITY || defined OPT_OBSERVATIONS)
+# if defined FOUR_DVAR               && \
+    !(defined I4DVAR_ANA_SENSITIVITY || defined OPT_OBSERVATIONS)
 !
 !-----------------------------------------------------------------------
 !  If variational data assimilation, reset several IO switches and
@@ -249,8 +249,8 @@
 #  ifdef MASKING
           CALL ana_mask (ng, tile, iADM)
 #  endif
-#  if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
-      defined OPT_OBSERVATIONS || defined SO_SEMI             || \
+#  if defined AD_SENSITIVITY    || defined I4DVAR_ANA_SENSITIVITY || \
+      defined OPT_OBSERVATIONS  || defined SO_SEMI                || \
       defined SENSITIVITY_4DVAR
           CALL ana_scope (ng, tile, iADM)
 #  endif
@@ -375,7 +375,7 @@
 !  executed for each ensemble/perturbation/iteration pass.
 !=======================================================================
 
-# if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
+# if defined AD_SENSITIVITY   || defined I4DVAR_ANA_SENSITIVITY || \
      defined OPT_OBSERVATIONS || defined SO_SEMI
 !
 !-----------------------------------------------------------------------
@@ -397,7 +397,7 @@
       END DO
 !$OMF BARRIER
 
-# elif defined FOUR_DVAR && !defined IS4DVAR_SENSITIVITY
+# elif defined FOUR_DVAR && !defined I4DVAR_ANA_SENSITIVITY
 !
 !-----------------------------------------------------------------------
 !  Clear all adjoint variables.  In variational data assimilation the
@@ -553,7 +553,7 @@
 !-----------------------------------------------------------------------
 !
 !$OMP MASTER
-# ifdef W4DPSAS_FCT_SENSITIVITY
+# ifdef RBL4DVAR_FCT_SENSITIVITY
       IF (.not.LsenPSAS(ng).and.LsenFCT(ng)) THEN
 #  ifdef OBS_SPACE
         IF (Lobspace(ng)) THEN
@@ -563,7 +563,7 @@
 # ifdef OBS_SPACE
         END IF
 # endif
-# ifdef W4DPSAS_FCT_SENSITIVITY
+# ifdef RBL4DVAR_FCT_SENSITIVITY
       END IF
 # endif
 !$OMP END MASTER
@@ -686,7 +686,7 @@
 # endif
 
 # if defined PROPAGATOR || \
-    (defined MASKING    && (defined READ_WATER || defined WRITE_WATER ))
+    (defined MASKING    && (defined READ_WATER || defined WRITE_WATER) )
 !
 !-----------------------------------------------------------------------
 !  Set variables associated with the processing water points and/or
@@ -699,8 +699,8 @@
 !$OMP BARRIER
 # endif
 
-# if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
-     defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR   || \
+# if defined AD_SENSITIVITY   || defined I4DVAR_ANA_SENSITIVITY || \
+     defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR      || \
      defined SO_SEMI
 !
 !-----------------------------------------------------------------------

@@ -1,5 +1,5 @@
 #include "cppdefs.h"
-#if defined IS4DVAR               || \
+#if defined I4DVAR                || \
     (defined WEAK_CONSTRAINT      && \
      (defined POSTERIOR_EOFS      || defined POSTERIOR_ERROR_I ||\
       defined POSTERIOR_ERROR_F)) || defined LCZ_FINAL

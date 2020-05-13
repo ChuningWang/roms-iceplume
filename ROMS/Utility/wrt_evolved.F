@@ -1,6 +1,6 @@
 #include "cppdefs.h"
 
-#if (defined IS4DVAR && defined EVOLVED_LCZ) || defined LCZ_FINAL
+#if (defined I4DVAR && defined EVOLVED_LCZ) || defined LCZ_FINAL
       SUBROUTINE wrt_evolved (ng, kout, nout)
 !
 !svn $Id$

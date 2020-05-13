@@ -1116,8 +1116,8 @@
           END DO
         END DO
 # else
-#  if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
-      defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR   || \
+#  if defined AD_SENSITIVITY   || defined I4DVAR_ANA_SENSITIVITY || \
+      defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR      || \
       defined SO_SEMI
         fac=1.0_r8
 #  else

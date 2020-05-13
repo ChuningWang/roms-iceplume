@@ -98,9 +98,9 @@
 #if defined PERTURBATION
         WRITE (stdout,10) Nrun
  10     FORMAT (/,' <<<< Ensemble/Perturbation Run: ',i5.5,' >>>>',/)
-#elif defined IS4DVAR    || defined SENSITIVITY_4DVAR || \
-      defined TL_W4DPSAS || defined TL_W4DVAR         || \
-      defined W4DPSAS    || defined W4DVAR
+#elif defined I4DVAR      || defined RBL4DVAR          || \
+      defined R4DVAR      || defined SENSITIVITY_4DVAR || \
+      defined TL_RBL4DVAR || defined TL_R4DVAR
         WRITE (stdout,10) outer, inner
  10     FORMAT (/,' <<<< 4D Variational Data Assimilation, ',           &
      &          'Outer = ',i3.3, ', Inner = ',i3.3,' >>>>',/)
@@ -236,7 +236,7 @@
         HIS(ng)%Nrec(Fcount)=0
       END DO
 
-# ifdef IS4DVAR
+# ifdef I4DVAR
 !
 !  Activate switches to writting data into average, history and
 !  restart files.
@@ -512,7 +512,7 @@
       END DO
 #endif
 
-#if defined INI_FILE && !defined W4DPSAS_FCT_SENSITIVITY
+#if defined INI_FILE && !defined RBL4DVAR_FCT_SENSITIVITY
 !
 !  Read in initial conditions from initial NetCDF file.
 !
@@ -579,7 +579,7 @@
       END DO
 #endif
 
-#if defined OBSERVATIONS && !defined W4DPSAS_FCT_SENSITIVITY
+#if defined OBSERVATIONS && !defined RBL4DVAR_FCT_SENSITIVITY
 !
 !-----------------------------------------------------------------------
 !  Open observations NetCDF file and initialize various variables
@@ -599,10 +599,13 @@
 !$OMP BARRIER
 #endif
 
-#if (defined TL_W4DPSAS          || defined W4DPSAS                  ||\
-     defined W4DPSAS_SENSITIVITY || defined W4DPSAS_FCT_SENSITIVITY) &&\
-    (defined ADJUST_BOUNDARY     || defined ADJUST_WSTRESS           ||\
-     defined ADJUST_STFLUX)
+#if (defined ADJUST_BOUNDARY          || \
+     defined ADJUST_STFLUX            || \
+     defined ADJUST_WSTRESS)          && \
+    (defined RBL4DVAR                 || \
+     defined RBL4DVAR_ANA_SENSITIVITY || \
+     defined RBL4DVAR_FCT_SENSITIVITY || \
+     defined TL_RBL4DVAR)
 !
 !-----------------------------------------------------------------------
 !  Read in the surface forcing and or open boundary conditions
@@ -876,9 +879,11 @@
       END DO
 #endif
 
-#if defined NLM_OUTER               || defined TL_W4DPSAS          ||\
-    defined W4DPSAS                 || defined W4DPSAS_SENSITIVITY ||\
-    defined W4DPSAS_FCT_SENSITIVITY
+#if defined NLM_OUTER                || \
+    defined RBL4DVAR                 || \
+    defined RBL4DVAR_ANA_SENSITIVITY || \
+    defined RBL4DVAR_FCT_SENSITIVITY || \
+    defined TL_RBL4DVAR
 !
 !-----------------------------------------------------------------------
 !  Read in convolved adjoint impulse forcing (first record) and its

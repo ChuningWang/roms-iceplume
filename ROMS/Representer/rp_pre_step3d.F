@@ -1162,8 +1162,8 @@
               tl_FC(i,N(ng))=0.0_r8
             END DO
 !
-          ELSE IF ((tl_Vadvection(itrc,ng)%MPDATA).or                   &
-     &             (tl_Vadvection(itrc,ng)%HSINT)) THEN
+          ELSE IF ((tl_Vadvection(itrc,ng)%MPDATA).or.                  &
+     &             (tl_Vadvection(itrc,ng)%HSIMT)) THEN
 !
 !  First_order, upstream differences vertical advective flux.
 !

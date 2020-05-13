@@ -1376,7 +1376,8 @@
 #   endif
 #  endif
 
-#  if defined TL_W4DVAR || defined W4DVAR || defined W4DVAR_SENSITIVITY
+#  if defined R4DVAR    || defined R4DVAR_ANA_SENSITIVITY || \
+      defined TL_R4DVAR
 !
 !-----------------------------------------------------------------------
 !  Read frequent impulse forcing for weak constraint.
