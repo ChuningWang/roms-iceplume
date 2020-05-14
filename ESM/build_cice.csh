@@ -26,7 +26,7 @@
 #                                                                       :::
 # Usage:                                                                :::
 #                                                                       :::
-#    ./build_cice.sh [options]                                          :::
+#    ./build_cice.csh [options]                                         :::
 #                                                                       :::
 # Options:                                                              :::
 #                                                                       :::
@@ -35,13 +35,13 @@
 #                                                                       :::
 #    -p macro    Prints any Makefile macro value. For example,          :::
 #                                                                       :::
-#                  build_cice.sh -p CPPDEFS                             :::
+#                  build_cice.csh -p CPPDEFS                            :::
 #                                                                       :::
 #    -noclean    Do not clean already compiled objects                  :::
 #                                                                       :::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-set which_MPI = openmpi                      #  default, overwritten below
+setenv which_MPI  openmpi                     #  default, overwritten below
 
 set parallel = 0
 set clean = 1
@@ -83,7 +83,7 @@ while ( ($#argv) > 0 )
       echo "              omit argument for all avaliable CPUs"
       echo ""
       echo "-p macro    Prints any Makefile macro value"
-      echo "              For example:  build_cice.sh -p CPPDEFS"
+      echo "              For example:  build_cice.csh -p CPPDEFS"
       echo ""
       echo "-noclean    Do not clean already compiled objects"
       echo ""
@@ -345,7 +345,7 @@ end
 #setenv USE_MY_LIBS yes          # use my customized library paths
 
 if ($USE_MY_LIBS == 'yes') then
-  source ${COMPILERS}/my_build_paths.sh
+  source ${COMPILERS}/my_build_paths.csh
 endif
 
 #--------------------------------------------------------------------------
@@ -394,7 +394,7 @@ else
  echo "Minimum file unit number,               NUMIN   = $NUMIN"
  echo "Maximum file unit number,               NUMAX   = $NUMAX"
  echo ""
- echo "MY_BUILD = $PWD/build_cice.sh"
+ echo "MY_BUILD = $PWD/build_cice.csh"
  echo "MAKEFILE = $CICE_MAKEFILE"
  echo "FORT     = $FORT"
  echo "MDEPEND  = $SFMAKEDEPEND"
