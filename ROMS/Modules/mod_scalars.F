@@ -318,11 +318,16 @@
         integer :: Ninner = 1                   ! number of inner loops
         integer :: Nouter = 1                   ! number of outer loops
         integer :: Nrun = 1                     ! Current counter
-        integer :: inner = 0                    ! inner loop counter
-        integer :: outer = 0                    ! outer loop counter
 #ifdef SENSITIVITY_4DVAR
         integer :: NrunSAVE = 0                 ! Loop counter
 #endif
+        integer :: OuterLoop = 0                ! split outer loop
+        integer :: inner = 0                    ! inner loop counter
+        integer :: outer = 0                    ! outer loop counter
+!
+! Split 4D-Var phase.
+!
+        character (len=20) :: Phase4DVAR
 !
 ! Number of sadde point 4D-Var intervals.
 !

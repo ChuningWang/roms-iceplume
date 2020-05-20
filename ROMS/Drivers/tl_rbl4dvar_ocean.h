@@ -8,9 +8,12 @@
 !=======================================================================
 !                                                                      !
 !  ROMS/TOMS Strong/Weak Constraint 4-Dimensional Variational Data     !
-!        Assimilation and its Tangent Linear Driver: Physical-space    !
-!        Statistical Analysis System (4D-PSAS).                        !
-!        Dual formulation in observarion space.                        !
+!        Assimilation and its Tangent Linear Driver: Restricted        !
+!    B-preconditioned Lanczos (RBL4D-Var).                             !
+!                                                                      !
+!  This driver is used for the dual formulation (observation space),   !
+!  strong or weak constraint 4D-Var where errors may be considered     !
+!  in both model and observations.                                     !
 !                                                                      !
 !  This driver is used for strong/weak constraint 4D-Var where errors  !
 !  may be considered in both model and observations.                   !
@@ -306,7 +309,7 @@
       integer, dimension(Ngrids) :: indxSave
       integer, dimension(Ngrids) :: Nrec
 
-      character (len=10) :: driver
+      character (len=11) :: driver
       character (len=20) :: string
 !
 !=======================================================================
@@ -336,10 +339,10 @@
       inner=0
       ERstr=1
       ERend=Nouter
-      driver='tl_w4dpsas'
+      driver='tl_rbl4dvar'
 !
 !-----------------------------------------------------------------------
-!  Configure weak constraint 4DVAR algorithm: PSAS Approach.
+!  Configure weak constraint RBL4D-Var algorithm.
 !-----------------------------------------------------------------------
 !
 !  Initialize the switch to gather weak constraint forcing.
@@ -1160,7 +1163,7 @@
 !
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!  Tangent linear of 4D-PSAS
+!  Tangent linear of RBL4D-Var
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !
@@ -1212,7 +1215,7 @@
 
           IF (Master) THEN
             WRITE (stdout,60) 'Tangent linear of',                      &
-     &                        uppercase('w4dpsas'), outer, inner
+     &                        uppercase('rbl4dvar'), outer, inner
           END IF
 !
 ! Initialize tangent linear conjugate gradient algorithm depending on
@@ -1689,7 +1692,7 @@
 !
       IF (Master) THEN
         WRITE (stdout,20)
- 20     FORMAT (/,'Elapsed CPU time (seconds):',/)
+ 20     FORMAT (/,'Elapsed wall CPU time for each process (seconds):',/)
       END IF
 !
       DO ng=1,Ngrids

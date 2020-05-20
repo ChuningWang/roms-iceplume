@@ -44,7 +44,8 @@
       integer :: i, gtype, status, varid
       integer :: ibuffer(2)
 
-      real(r8) :: Fmin, Fmax, scale
+      real(r8) :: Fmin, Fmax
+      real(dp) :: scale
 
 # include "set_bounds.h"
 !
@@ -72,7 +73,7 @@
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 !
-      scale=1.0_r8
+      scale=1.0_dp
 !
 !  Process free-surface weak-constraint impulse forcing.
 !

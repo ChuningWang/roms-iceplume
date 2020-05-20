@@ -83,8 +83,8 @@
       integer, intent(in) :: ng, model, ncid, ncvarid, tindex, gtype
       integer, intent(in) :: LBi, UBi, LBj, UBj, LBk, UBk, LBt, UBt
 
-      real(r8), intent(in) :: Ascl
-
+      real(dp), intent(in) :: Ascl
+!
 # ifdef ASSUMED_SHAPE
 #  ifdef MASKING
       real(r8), intent(in) :: Amask(LBi:,LBj:)
@@ -430,8 +430,8 @@
       integer, intent(in) :: ng, model, ncid, ncvarid, tindex, gtype
       integer, intent(in) :: LBi, UBi, LBj, UBj, LBk, UBk, LBt, UBt
 
-      real(r8), intent(in) :: Ascl
-
+      real(dp), intent(in) :: Ascl
+!
 # ifdef ASSUMED_SHAPE
 #  ifdef MASKING
       real(r8), intent(in) :: Amask(LBi:,LBj:)

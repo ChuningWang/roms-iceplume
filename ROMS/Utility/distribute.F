@@ -3943,7 +3943,7 @@
       integer, intent(in) :: LBi, UBi, LBj, UBj
       integer, intent(out) :: Npts
 
-      real(r8), intent(in) :: Ascl
+      real(dp), intent(in) :: Ascl
 
 # ifdef MASKING
       real(r8), intent(in) :: Amask(LBi:UBi,LBj:UBj)
@@ -4279,7 +4279,7 @@
       integer, intent(in) :: LBi, UBi, LBj, UBj, LBk, UBk
       integer, intent(out) :: Npts
 
-      real(r8), intent(in) :: Ascl
+      real(dp), intent(in) :: Ascl
 
 # ifdef MASKING
       real(r8), intent(in) :: Amask(LBi:UBi,LBj:UBj)

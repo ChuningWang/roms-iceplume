@@ -463,6 +463,7 @@
       logical :: bounded
       logical :: Lconvolve(4)
 # endif
+!
       integer :: Imin, Imax, Jmin, Jmax
       integer :: i, ic, ifile, is, j, jc, rec
       integer :: NSUB
@@ -472,10 +473,11 @@
 # ifdef ADJUST_BOUNDARY
       integer :: Bmin, Bmax, IJlen, IJKlen
       integer :: ib, ibry, ifield, kb
-
+!
       real(r8), parameter :: Aspv = 0.0_r8
 # endif
-      real(r8) :: cff, compute, my_time
+      real(dp) :: my_time
+      real(r8) :: cff, compute
       real(r8) :: my_dot, Gdotp
 !
       real(r8), dimension(LBi:UBi,LBj:UBj) :: A2d
@@ -3212,6 +3214,7 @@
 # ifdef ADJUST_BOUNDARY
       logical :: Lconvolve(4)
 # endif
+!
       integer :: i, ifile, is, iter, j, rec
 # ifdef SOLVE3D
       integer :: UBt, itrc, k
@@ -3220,16 +3223,17 @@
       integer :: IJlen, IJKlen, ib, ibry, ic, ifield
 # endif
       integer :: start(4), total(4)
-
+!
+      real(dp) :: my_time
       real(r8) :: Aavg, Amax, Amin, Asqr, FacAvg, FacSqr
-      real(r8) :: cff, my_time, val
+      real(r8) :: cff, val
 
 # ifdef ADJUST_BOUNDARY
       real(r8) :: Bavg, Bmin, Bmax, Bsqr
 
       real(r8), parameter :: Aspv = 0.0_r8
 # endif
-
+!
       real(r8), dimension(LBi:UBi,LBj:UBj) :: A2d
       real(r8), dimension(LBi:UBi,LBj:UBj) :: A2davg
       real(r8), dimension(LBi:UBi,LBj:UBj) :: A2dsqr
@@ -5275,8 +5279,8 @@
 !  Local variable declarations.
 !
       integer :: gfactor, gtype, status
-
-      real(r8) :: scale
+!
+      real(dp) :: scale
 
 # include "set_bounds.h"
 !
@@ -5301,7 +5305,7 @@
 !  Write out 2D normalization field.
 !
       gtype=gfactor*Iinfo(1,ifield,ng)
-      scale=1.0_r8
+      scale=1.0_dp
       status=nf_fwrite2d(ng, model, ncid, ncvarid, tindex, gtype,       &
      &                   LBi, UBi, LBj, UBj, scale,                     &
 # ifdef MASKING
@@ -5379,8 +5383,8 @@
 !  Local variable declarations.
 !
       integer :: gfactor, gtype, status
-
-      real(r8) :: scale
+!
+      real(dp) :: scale
 
 # include "set_bounds.h"
 !
@@ -5405,7 +5409,7 @@
 !  Write out 3D normalization field.
 !
       gtype=gfactor*Iinfo(1,ifield,ng)
-      scale=1.0_r8
+      scale=1.0_dp
       status=nf_fwrite3d(ng, model, ncid, ncvarid, tindex, gtype,       &
      &                   LBi, UBi, LBj, UBj, LBk, UBk, scale,           &
 # ifdef MASKING

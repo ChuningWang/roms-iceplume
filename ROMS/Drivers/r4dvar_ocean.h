@@ -159,7 +159,8 @@
 !
         DO ng=1,Ngrids
           DO thread=THREAD_RANGE
-            CALL wclock_on (ng, iNLM, 0, __LINE__, __FILE__)
+            CALL wclock_on (ng, iNLM, 0, __LINE__,                      &
+     &                      __FILE__)
           END DO
         END DO
 !
@@ -239,7 +240,7 @@
       integer :: my_outer, ng
 !
 !=======================================================================
-!  Run W4D-PSAS Data Assimilation algorithm.
+!  Run R4D-Var Data Assimilation algorithm.
 !=======================================================================
 !
 !  Initialize several global parameters.
@@ -379,20 +380,21 @@
       END IF
 !
 !-----------------------------------------------------------------------
-!  Stop model and time profiling clocks, report memory requirements, and
-!  close output NetCDF files.
+!  Stop model and time profiling clocks, report memory requirements,
+!  and close output NetCDF files.
 !-----------------------------------------------------------------------
 !
 !  Stop time clocks.
 !
       IF (Master) THEN
         WRITE (stdout,20)
- 20     FORMAT (/,'Elapsed CPU time (seconds):',/)
+ 20     FORMAT (/,'Elapsed wall CPU time for each process (seconds):',/)
       END IF
 !
       DO ng=1,Ngrids
         DO thread=THREAD_RANGE
-          CALL wclock_off (ng, iNLM, 0, __LINE__, __FILE__)
+          CALL wclock_off (ng, iNLM, 0, __LINE__,                       &
+     &                     __FILE__)
         END DO
       END DO
 !

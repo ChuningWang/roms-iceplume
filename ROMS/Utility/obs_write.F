@@ -1336,7 +1336,7 @@
         IF (wrtZetaRef(ng).and.balance(isFsur)) THEN
           status=nf_fwrite2d(ng, model, DAV(ng)%ncid,                   &
      &                       DAV(ng)%Vid(idFsur), 0, r2dvar,            &
-     &                       LBi, UBi, LBj, UBj, 1.0_r8,                &
+     &                       LBi, UBi, LBj, UBj, 1.0_dp,                &
 #  ifdef MASKING
      &                       GRID(ng) % rmask,                          &
 #  endif

@@ -76,12 +76,12 @@
 !  Imported variable declarations.
 !
       logical, intent(in), optional :: SetFillVal
-
+!
       integer, intent(in) :: ng, model, ncid, ncvarid, tindex, gtype
       integer, intent(in) :: LBi, UBi, LBj, UBj, LBk, UBk
-
-      real(r8), intent(in) :: Ascl
-
+!
+      real(dp), intent(in) :: Ascl
+!
 # ifdef ASSUMED_SHAPE
 #  ifdef MASKING
       real(r8), intent(in) :: Amask(LBi:,LBj:)
@@ -400,12 +400,12 @@
 !  Imported variable declarations.
 !
       logical, intent(in), optional :: SetFillVal
-
+!
       integer, intent(in) :: ng, model, ncid, ncvarid, tindex, gtype
       integer, intent(in) :: LBi, UBi, LBj, UBj, LBk, UBk
-
-      real(r8), intent(in) :: Ascl
-
+!
+      real(dp), intent(in) :: Ascl
+!
 # ifdef ASSUMED_SHAPE
 #  ifdef MASKING
       real(r8), intent(in) :: Amask(LBi:,LBj:)

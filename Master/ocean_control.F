@@ -76,6 +76,23 @@
 !! sp4dvar_ocean.h              Saddle Point 4D-Var data assimilation  !
 !!                                driver (SP4D-Var)                    !
 !!                                                                     !
+!! split_i4dvar_ocean.h         Multiple executables Strong constraint,!
+!!                                incremental 4D-Var data assimilation !
+!!                                driver (I4D-Var)                     !
+!!                                                                     !
+!! split_rbl4dvar_ocean.h       Multiple executables Strong/Weak       !
+!!                                constraint 4D-Var data assimilation  !
+!!                                driver: Restricted, B-preconditioned !
+!!                                Lanczos method (RBL4D-Var)           !
+!!                                                                     !
+!! split_r4dvar_ocean.h         Multiple executables Strong/Weak       !
+!!                                constraint 4D-Var data assimilation, !
+!!                                indirect representer method (R4D-Var)!
+!!                                                                     !
+!! split_sp4dvar_ocean.h        Multiple executables Saddle Point      !
+!!                                4D-Var data assimilation  driver     !
+!!                                (SP4D-Var)                           !
+!!                                                                     !
 !! symmetry.h                   Representer matrix, symmetry driver    !
 !!                                                                     !
 !! tlcheck_ocean.h              Tangent linear model linearization     !
@@ -130,21 +147,29 @@
 
 #elif defined ARRAY_MODES || defined CLIPPING
 # include "array_modes.h"
-#elif defined I4DVAR
+#elif defined I4DVAR && !defined SPLIT_I4DVAR
 #  include "i4dvar_ocean.h"
 #elif defined I4DVAR_ANA_SENSITIVITY
 # include "obs_sen_i4dvar_analysis.h"
-#elif defined RBL4DVAR
+#elif defined RBL4DVAR && !defined SPLIT_RBL4DVAR
 # include "rbl4dvar_ocean.h"
 #elif defined RBL4DVAR_ANA_SENSITIVITY
 # include "obs_sen_rbl4dvar_analysis.h"
 #elif defined RBL4DVAR_FCT_SENSITIVITY
 # include "obs_sen_rbl4dvar_forecast.h"
-#elif defined R4DVAR
+#elif defined R4DVAR && !defined SPLIT_R4DVAR
 # include "r4dvar_ocean.h"
 #elif defined R4DVAR_ANA_SENSITIVITY
 # include "obs_sen_r4dvar_analysis.h"
-#elif defined SP4DVAR
+#elif defined SPLIT_I4DVAR
+# include "split_i4dvar_ocean.h"
+#elif defined SPLIT_RBL4DVAR
+# include "split_rbl4dvar_ocean.h"
+#elif defined SPLIT_R4DVAR
+# include "split_r4dvar_ocean.h"
+#elif defined SPLIT_SP4DVAR
+# include "split_sp4dvar_ocean.h"
+#elif defined SP4DVAR && !defined SPLIT_SP4DVAR
 # include "sp4dvar_ocean.h"
 #elif defined TL_RBL4DVAR
 # include "tl_rbl4dvar_ocean.h"

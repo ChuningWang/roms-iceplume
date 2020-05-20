@@ -78,7 +78,7 @@
 # endif
 #endif
       USE strings_mod,       ONLY : FoundError
-      USE w4dpsas_mod,       ONLY : prior_error
+      USE rbl4dvar_mod,      ONLY : prior_error
 !
 !  Imported variable declarations.
 !
@@ -164,7 +164,8 @@
 !
         DO ng=1,Ngrids
           DO thread=THREAD_RANGE
-            CALL wclock_on (ng, iNLM, 0, __LINE__, __FILE__)
+            CALL wclock_on (ng, iNLM, 0, __LINE__,                      &
+     &                      __FILE__)
           END DO
         END DO
 !
@@ -228,12 +229,12 @@
       USE mod_scalars
       USE mod_stepping
 !
-      USE strings_mod, ONLY : FoundError
-      USE w4dpsas_mod, ONLY : background, increment, analysis
+      USE strings_mod,  ONLY : FoundError
+      USE rbl4dvar_mod, ONLY : background, increment, analysis
 
 #if defined POSTERIOR_ERROR_I || defined POSTERIOR_ERROR_F || \
     defined POSTERIOR_EOFS
-      USE w4dpsas_mod, ONLY : posterior_error
+      USE rbl4dvar_mod, ONLY : posterior_error
 #endif
 !
 !  Imported variable declarations
@@ -247,7 +248,7 @@
       SourceFile=__FILE__ // ", ROMS_run"
 !
 !=======================================================================
-!  Run W4D-PSAS Data Assimilation algorithm.
+!  Run RBL4D-Var Data Assimilation algorithm.
 !=======================================================================
 !
 !  Initialize several global parameters.
@@ -387,20 +388,21 @@
       END IF
 !
 !-----------------------------------------------------------------------
-!  Stop model and time profiling clocks, report memory requirements, and
-!  close output NetCDF files.
+!  Stop model and time profiling clocks, report memory requirements,
+!  and close output NetCDF files.
 !-----------------------------------------------------------------------
 !
 !  Stop time clocks.
 !
       IF (Master) THEN
         WRITE (stdout,20)
- 20     FORMAT (/,'Elapsed CPU time (seconds):',/)
+ 20     FORMAT (/,'Elapsed wall CPU time for each process (seconds):',/)
       END IF
 !
       DO ng=1,Ngrids
         DO thread=THREAD_RANGE
-          CALL wclock_off (ng, iNLM, 0, __LINE__, __FILE__)
+          CALL wclock_off (ng, iNLM, 0, __LINE__,                       &
+     &                     __FILE__)
         END DO
       END DO
 !

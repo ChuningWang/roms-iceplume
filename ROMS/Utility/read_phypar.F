@@ -3718,7 +3718,7 @@
 !  If variational data assimilation, disallow creation of multiple
 !  output adjoint history files and the tangent linear history file
 !  in I4D-Var.  Multiple TLM history are allow in R4d-Var and
-!  irrelevant in 4D-PSAS since TLM history is turned off.  The
+!  irrelevant in RBL4D-Var since TLM history is turned off.  The
 !  adjoint history files are special at the unlimited dimension
 !  is not associated with time records.
 !

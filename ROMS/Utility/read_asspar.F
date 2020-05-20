@@ -156,6 +156,16 @@
             CASE ('Nimpact')
               Npts=load_i(Nval, Rval, 1, Ivalue)
               Nimpact=Ivalue(1)
+#  ifdef SLIP_4DVAR
+            CASE ('OuterLoop')
+              Npts=load_i(Nval, Rval, 1, Ivalue)
+              OuterLoop=Ivalue(1)
+            CASE ('Phase4DVAR')
+              DO i=1,LEN(Phase4DVAR)
+                Phase4DVAR(i:i)=blank
+              END DO
+              Phase4DVAR=TRIM(ADJUSTL(Cval(Nval)))
+#  endif
             CASE ('NextraObs')
               Npts=load_i(Nval, Rval, 1, Ivalue)
               NextraObs=Ivalue(1)
@@ -630,7 +640,7 @@
               label='ERR - 4D-Var posterior error covariance'
               Npts=load_s1d(Nval, Cval, Cdim, line, label, igrid,       &
      &                      Ngrids, Nfiles, ERR)
-#ifdef SP4DVAR
+#  ifdef SP4DVAR
             CASE ('SPTname')
               label='SPT - TLM Arnoldi vectors'
               Npts=load_s1d(Nval, Cval, Cdim, line, label, igrid,       &
@@ -647,8 +657,8 @@
               label='SCA - ADM Arnoldi vectors'
               Npts=load_s1d(Nval, Cval, Cdim, line, label, igrid,       &
      &                      Ngrids, Nfiles, SCA)
-#endif
-#if defined RBL4DVAR_FCT_SENSITIVITY && defined OBS_SPACE
+#  endif
+#  if defined RBL4DVAR_FCT_SENSITIVITY && defined OBS_SPACE
             CASE ('OIFnameA')
               label='OIFA - observartion impacts forecast, analysis'
               Npts=load_s1d(Nval, Cval, Cdim, line, label, igrid,       &
@@ -657,7 +667,7 @@
               label='OIFB - observartion impacts forecast, background'
               Npts=load_s1d(Nval, Cval, Cdim, line, label, igrid,       &
      &                      Ngrids, Nfiles, OIFB)
-#endif
+#  endif
           END SELECT
         END IF
       END DO
@@ -848,11 +858,11 @@
 #   if defined RBL4DVAR_ANA_SENSITIVITY || \
        defined RBL4DVAR_FCT_SENSITIVITY || \
        defined R4DVAR_ANA_SENSITIVITY
-          WRITE (out,80) Nimpact, 'Nimpact',                             &
+          WRITE (out,80) Nimpact, 'Nimpact',                            &
      &            'Observations impact/sensitivity outer loop to use.'
           IF (Nimpact.gt.Nouter) THEN
             IF (Master) THEN
-              WRITE (out,240) 'Nimpact', Nimpact,                        &
+              WRITE (out,240) 'Nimpact', Nimpact,                       &
      &              'must be less or equal than Nouter'
             END IF
             exit_flag=5
@@ -860,16 +870,30 @@
           END IF
 #   endif
 #   if defined ARRAY_MODES
-          WRITE (out,80) Nimpact, 'Nimpact',                             &
+          WRITE (out,80) Nimpact, 'Nimpact',                            &
      &            'Array mode outer loop.'
           IF (Nimpact.gt.Nouter) THEN
             IF (Master) THEN
-              WRITE (out,240) 'Nimpact', Nimpact,                        &
+              WRITE (out,240) 'Nimpact', Nimpact,                       &
      &              'must be less or equal than Nouter'
             END IF
             exit_flag=5
             RETURN
           END IF
+#   endif
+#   if defined SPLIT_4DVAR
+          WRITE (out,80) OuterLoop, 'OuterLoop',                        &
+     &            'Current outer loop counter.'
+          IF (OuterLoop.gt.Nouter) THEN
+            IF (Master) THEN
+              WRITE (out,240) 'OuterLoop', OuterLoop,                   &
+     &              'must be less or equal than Nouter'
+            END IF
+            exit_flag=5
+            RETURN
+          END IF
+          WRITE (out,80) TRIM(Phase4DVAR), 'Phase4DVAR',                &
+     &            'Current 4D-Var phase (first 10 characters).'
 #   endif
 #   ifndef TLM_CHECK
 #    ifndef I4DVAR_ANA_SENSITIVITY
@@ -1221,11 +1245,11 @@
 #   endif
 #  endif
           IF (NextraObs.gt.0) THEN
-            WRITE (out,80) NextraObs, 'NextraObs',                       &
+            WRITE (out,80) NextraObs, 'NextraObs',                      &
      &            'Number of extra-observations classes to process.'
             DO i=1,NextraObs
-              WRITE (out,85) ExtraIndex(i), 'ExtraIndex', i,             &
-     &            'Extra-observation type index for: '//                 &
+              WRITE (out,85) ExtraIndex(i), 'ExtraIndex', i,            &
+     &            'Extra-observation type index for: '//                &
      &            TRIM(ExtraName(i))
             END DO
           END IF
@@ -1455,8 +1479,8 @@
   70  FORMAT (10x,l1,2x,a,t30,a)
   80  FORMAT (1x,i10,2x,a,t30,a)
   85  FORMAT (1x,i10,2x,a,'(',i2.2,')',t30,a)
-
   90  FORMAT (1x,i10,2x,a,t30,a,/,t32,a)
+  95  FORMAT (1x,a10,2x,a,t30,a)
  100  FORMAT (1p,e11.4,2x,a,t30,a)
  110  FORMAT (10x,l1,2x,a,t30,a,i2.2,':',1x,a)
  120  FORMAT (f11.3,2x,a,t30,a)

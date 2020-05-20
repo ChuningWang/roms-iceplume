@@ -609,8 +609,8 @@
 !
 !-----------------------------------------------------------------------
 !  Read in the surface forcing and or open boundary conditions
-!  increments for PSAS from record IniRec of the NLM initial NetCDF
-!  file.
+!  increments for RBL4D-Var from record IniRec of the NLM initial
+!  NetCDF file.
 !-----------------------------------------------------------------------
 !
       IF (Nrun.gt.1) THEN

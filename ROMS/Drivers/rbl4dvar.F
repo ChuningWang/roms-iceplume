@@ -1,5 +1,5 @@
 #include "cppdefs.h"
-      MODULE w4dpsas_mod
+      MODULE rbl4dvar_mod
 #ifdef RBL4DVAR
 !
 !svn $Id$
@@ -9,7 +9,7 @@
 !    See License_ROMS.txt                                              !
 !=======================================================================
 !                                                                      !
-!  This module splits the W4D-PSAS data assimilation algorithm into    !
+!  This module splits the RBL4D-Var data assimilation algorithm into   !
 !  its logical components routines:                                    !
 !                                                                      !
 !    background        Xb, nonlinear trajectory used to linearize the  !
@@ -1910,7 +1910,7 @@
       integer :: my_inner, my_outer, ng, tile
       integer :: Fcount, Rec
 !
-      character (len=7) :: driver = 'w4dpsas'
+      character (len=8) :: driver = 'rbl4dvar'
 !
       SourceFile=__FILE__
 
@@ -2150,4 +2150,4 @@
 # endif
 
 #endif
-      END MODULE w4dpsas_mod
+      END MODULE rbl4dvar_mod

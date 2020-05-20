@@ -9,7 +9,7 @@
 !    See License_ROMS.txt                                              !
 !=======================================================================
 !                                                                      !
-!  This module splits the W4D-PSAS data assimilation algorithm into    !
+!  This module splits the R4D-Var data assimilation algorithm into     !
 !  its logical components routines:                                    !
 !                                                                      !
 !    background        Xb, nonlinear trajectory used to linearize the  !

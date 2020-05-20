@@ -74,11 +74,12 @@
 !
       integer, intent(in) :: ng, model, ncid, ncvarid, tindex, gtype
       integer, intent(in) :: LBij, UBij, LBk, UBk, Nrec
-      real(r8), intent(in) :: Ascl
-
+!
+      real(dp), intent(in) :: Ascl
+!
       character (len=*), intent(in) :: ncname
       character (len=*), intent(in) :: ncvname
-
+!
 #ifdef ASSUMED_SHAPE
       real(r8), intent(in) :: A(LBij:,LBk:,:,:)
 #else
@@ -90,7 +91,7 @@
 !  Local variable declarations.
 !
       logical, dimension(4) :: bounded
-
+!
       integer :: bc, i, ib, ic, ir, j, k, kc, rc, tile
       integer :: IorJ, IJKlen, Imin, Imax, Jmin, Jmax, Klen, Npts
       integer :: Istr, Iend, Jstr, Jend
@@ -98,7 +99,7 @@
       integer, dimension(5) :: start, total
 
       integer :: status
-
+!
       real(r8), parameter :: Aspv = 0.0_r8
 
       real(r8), dimension((UBij-LBij+1)*(UBk-LBk+1)*4*Nrec) :: Awrk

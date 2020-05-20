@@ -78,10 +78,10 @@
 !  Imported variable declarations.
 !
       logical, intent(in) :: Cgrid
-
+!
       integer, intent(in) :: ng, model, ifield, gtype, Npos
       integer, intent(in) :: LBi, UBi, LBj, UBj
-      real(r8), intent(in) :: Ascl
+      real(dp), intent(in) :: Ascl
 
 #ifdef ASSUMED_SHAPE
       real(r8), intent(in) :: A(LBi:,LBj:)
@@ -348,10 +348,10 @@
 !  Imported variable declarations.
 !
       logical, intent(in) :: Cgrid
-
+!
       integer, intent(in) :: ng, model, ifield, gtype, Npos
       integer, intent(in) :: LBi, UBi, LBj, UBj, LBk, UBk
-      real(r8), intent(in) :: Ascl
+      real(dp), intent(in) :: Ascl
 !
 # ifdef ASSUMED_SHAPE
       real(r8), intent(in) :: A(LBi:,LBj:,LBk:)

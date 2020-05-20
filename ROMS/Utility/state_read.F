@@ -213,7 +213,8 @@
 
       integer, dimension(4) :: Vsize
 
-      real(r8) :: Fmin, Fmax, scale, stime
+      real(r8) :: Fmin, Fmax
+      real(dp) :: stime, scale
 
       character (len=15) :: Tstring
       character (len=22) :: t_code
@@ -260,7 +261,8 @@
 !
 !  Read in time.
 !
-      CALL netcdf_get_fvar (ng, model, ncname, Vname(1,idtime), stime,  &
+      CALL netcdf_get_time (ng, model, ncname, Vname(1,idtime),         &
+     &                      Rclock%DateNumber, stime,                   &
      &                      ncid, (/rec/), (/1/))
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN

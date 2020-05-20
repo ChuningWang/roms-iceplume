@@ -69,7 +69,8 @@
 # ifdef SOLVE3D
       integer :: i, itrc, j, k, tile
 # endif
-      real(r8) :: scale
+!
+      real(dp) :: scale
       real(r8) :: Tval(1)
 !
       LBi=LBOUND(GRID(ng)%h,DIM=1)
@@ -133,7 +134,7 @@
 !  own fixed time-dimension (of size Nfrec) to allow 4DVAR adjustments
 !  at other times in addition to initialization time.
 !
-      scale=1.0                             ! m2/s2
+      scale=1.0_dp                          ! m2/s2
       gtype=gfactor*u3dvar
       status=nf_fwrite3d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idUsms),   &
      &                   TLM(ng)%Rindex, gtype,                         &
@@ -154,7 +155,7 @@
 !
 !  Write out surface V-momentum stress.
 !
-      scale=1.0                             ! m2/s2
+      scale=1.0_dp                          ! m2/s2
       gtype=gfactor*v3dvar
       status=nf_fwrite3d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idVsms),   &
      &                   TLM(ng)%Rindex, gtype,                         &
@@ -181,7 +182,7 @@
 !
       DO itrc=1,NT(ng)
         IF (Lstflux(itrc,ng)) THEN
-          scale=1.0_r8                      ! kinematic flux units
+          scale=1.0_dp                      ! kinematic flux units
           gtype=gfactor*r3dvar
           status=nf_fwrite3d(ng, iTLM, TLM(ng)%ncid,                    &
      &                       TLM(ng)%Vid(idTsur(itrc)),                 &
@@ -209,7 +210,7 @@
 !  Write out surface U-momentum stress.
 !
       IF (Hout(idUsms,ng)) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*u2dvar
         status=nf_fwrite2d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idUsms), &
      &                     TLM(ng)%Rindex, gtype,                       &
@@ -232,7 +233,7 @@
 !  Write out surface V-momentum stress.
 !
       IF (Hout(idVsms,ng)) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*v2dvar
         status=nf_fwrite2d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idVsms), &
      &                     TLM(ng)%Rindex, gtype,                       &
@@ -257,7 +258,7 @@
 !
       DO itrc=1,NT(ng)
         IF (Hout(idTsur(itrc),ng)) THEN
-          scale=1.0_r8
+          scale=1.0_dp
           gtype=gfactor*r2dvar
           status=nf_fwrite2d(ng, iTLM, TLM(ng)%ncid,                    &
      &                       TLM(ng)%Vid(idTsur(itrc)),                 &
@@ -285,7 +286,7 @@
 !  Write out free-surface (m)
 !
       IF (Hout(idFsur,ng)) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*r2dvar
         status=nf_fwrite2d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idFsur), &
      &                     TLM(ng)%Rindex, gtype,                       &
@@ -337,7 +338,7 @@
 !  Write out free-surface open boundaries.
 !
       IF (ANY(Lobc(:,isFsur,ng))) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         status=nf_fwrite2d_bry (ng, iTLM, TLM(ng)%name, TLM(ng)%ncid,   &
      &                          Vname(1,idSbry(isFsur)),                &
      &                          TLM(ng)%Vid(idSbry(isFsur)),            &
@@ -361,7 +362,7 @@
 !  Write out 2D U-momentum component (m/s).
 !
       IF (Hout(idUbar,ng)) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*u2dvar
         status=nf_fwrite2d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idUbar), &
      &                     TLM(ng)%Rindex, gtype,                       &
@@ -462,7 +463,7 @@
 !  Write out 2D U-momentum component open boundaries.
 !
       IF (ANY(Lobc(:,isUbar,ng))) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         status=nf_fwrite2d_bry (ng, iTLM, TLM(ng)%name, TLM(ng)%ncid,   &
      &                          Vname(1,idSbry(isUbar)),                &
      &                          TLM(ng)%Vid(idSbry(isUbar)),            &
@@ -486,7 +487,7 @@
 !  Write out 2D V-momentum component (m/s).
 !
       IF (Hout(idVbar,ng)) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*v2dvar
         status=nf_fwrite2d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idVbar), &
      &                     TLM(ng)%Rindex, gtype,                       &
@@ -587,7 +588,7 @@
 !  Write out 2D V-momentum component open boundaries.
 !
       IF (ANY(Lobc(:,isVbar,ng))) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         status=nf_fwrite2d_bry (ng, iTLM, TLM(ng)%name, TLM(ng)%ncid,   &
      &                          Vname(1,idSbry(isVbar)),                &
      &                          TLM(ng)%Vid(idSbry(isVbar)),            &
@@ -612,7 +613,7 @@
 !  Write out 3D U-momentum component (m/s).
 !
       IF (Hout(idUvel,ng)) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*u3dvar
         status=nf_fwrite3d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idUvel), &
      &                     TLM(ng)%Rindex, gtype,                       &
@@ -659,7 +660,7 @@
 !  Write out 3D U-momentum component open boundaries.
 !
       IF (ANY(Lobc(:,isUvel,ng))) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         status=nf_fwrite3d_bry (ng, iTLM, TLM(ng)%name, TLM(ng)%ncid,   &
      &                          Vname(1,idSbry(isUvel)),                &
      &                          TLM(ng)%Vid(idSbry(isUvel)),            &
@@ -683,7 +684,7 @@
 !  Write out 3D V-momentum component (m/s).
 !
       IF (Hout(idVvel,ng)) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*v3dvar
         status=nf_fwrite3d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idVvel), &
      &                     TLM(ng)%Rindex, gtype,                       &
@@ -730,7 +731,7 @@
 !  Write out 3D V-momentum component open boundaries.
 !
       IF (ANY(Lobc(:,isVvel,ng))) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         status=nf_fwrite3d_bry (ng, iTLM, TLM(ng)%name, TLM(ng)%ncid,   &
      &                          Vname(1,idSbry(isVvel)),                &
      &                          TLM(ng)%Vid(idSbry(isVvel)),            &
@@ -755,7 +756,7 @@
 !
       DO itrc=1,NT(ng)
         IF (Hout(idTvar(itrc),ng)) THEN
-          scale=1.0_r8
+          scale=1.0_dp
           gtype=gfactor*r3dvar
           status=nf_fwrite3d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Tid(itrc), &
      &                       TLM(ng)%Rindex, gtype,                     &
@@ -787,7 +788,7 @@
 !
       DO itrc=1,NT(ng)
         IF (ANY(Lobc(:,isTvar(itrc),ng))) THEN
-          scale=1.0_r8
+          scale=1.0_dp
           status=nf_fwrite3d_bry (ng, iTLM, TLM(ng)%name, TLM(ng)%ncid, &
      &                            Vname(1,idSbry(isTvar(itrc))),        &
      &                            TLM(ng)%Vid(idSbry(isTvar(itrc))),    &
@@ -813,7 +814,7 @@
 !  Write out density anomaly.
 !
       IF (Hout(idDano,ng)) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*r3dvar
         status=nf_fwrite3d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idDano), &
      &                     TLM(ng)%Rindex, gtype,                       &
@@ -840,7 +841,7 @@
 !  Write out vertical viscosity coefficient.
 !
       IF (Hout(idVvis,ng)) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*w3dvar
         status=nf_fwrite3d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idVvis), &
      &                     TLM(ng)%Rindex, gtype,                       &
@@ -868,7 +869,7 @@
 !  Write out vertical diffusion coefficient for potential temperature.
 !
       IF (Hout(idTdif,ng)) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*w3dvar
         status=nf_fwrite3d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idTdif), &
      &                     TLM(ng)%Rindex, gtype,                       &
@@ -897,7 +898,7 @@
 !  Write out vertical diffusion coefficient for salinity.
 !
       IF (Hout(idSdif,ng)) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*w3dvar
         status=nf_fwrite3d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idSdif), &
      &                     TLM(ng)%Rindex, gtype,                       &
@@ -927,7 +928,7 @@
 !  Write out turbulent kinetic energy.
 !
       IF (Hout(idMtke,ng)) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*w3dvar
         status=nf_fwrite3d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idMtke), &
      &                     TLM(ng)%Rindex, gtype,                       &
@@ -947,7 +948,7 @@
           RETURN
         END IF
 
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*w3dvar
         status=nf_fwrite3d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idVmKK), &
      &                     TLM(ng)%Rindex, gtype,                       &
@@ -970,7 +971,7 @@
 !  Write out turbulent length scale field.
 !
       IF (Hout(idMtls,ng)) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*w3dvar
         status=nf_fwrite3d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idMtls), &
      &                     TLM(ng)%Rindex, gtype,                       &
@@ -990,7 +991,7 @@
           RETURN
         END IF
 
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*w3dvar
         status=nf_fwrite3d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idVmLS), &
      &                     TLM(ng)%Rindex, gtype,                       &
@@ -1009,7 +1010,7 @@
           RETURN
         END IF
 #    ifdef GSL_MIXING
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*w3dvar
         status=nf_fwrite3d(ng, iTLM, TLM(ng)%ncid, TLM(ng)%Vid(idVmKP), &
      &                     TLM(ng)%Rindex, gtype,                       &

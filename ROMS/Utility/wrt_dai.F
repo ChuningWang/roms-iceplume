@@ -42,7 +42,8 @@
       integer :: i, j, k, itrc
       integer :: LBi, UBi, LBj, UBj
       integer :: Fcount, gfactor, gtype, status, varid
-      real(r8) :: scale
+!
+      real(dp) :: scale
 
 # include "set_bounds.h"
 !
@@ -79,7 +80,7 @@
 !
 !  Write out time independent (unperturb) depths of RHO-points.
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*r3dvar
       status=nf_fwrite3d(ng, iNLM, DAI(ng)%ncid, DAI(ng)%Vid(idpthR),   &
      &                   0, gtype,                                      &
@@ -101,7 +102,7 @@
 !
 !  Write out time independent (unperturb) depths of U-points.
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*u3dvar
       DO k=1,N(ng)
         DO j=Jstr-1,Jend+1
@@ -131,7 +132,7 @@
 !
 !  Write out time independent (unperturb) depths of V-points.
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*v3dvar
       DO k=1,N(ng)
         DO j=JstrV-1,Jend+1
@@ -161,7 +162,7 @@
 !
 !  Write out time independent (unperturb) depths of W-points.
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*w3dvar
       status=nf_fwrite3d(ng, iNLM, DAI(ng)%ncid, DAI(ng)%Vid(idpthW),   &
      &                   0, gtype,                                      &
@@ -194,7 +195,7 @@
 !
 !  Write out free-surface (m).
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*r2dvar
       status=nf_fwrite2d(ng, iNLM, DAI(ng)%ncid, DAI(ng)%Vid(idFsur),   &
      &                   DAI(ng)%Rindex, gtype,                         &
@@ -220,7 +221,7 @@
 !
 !  Write out 2D momentum component (m/s) in the XI-direction.
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*u2dvar
       status=nf_fwrite2d(ng, iNLM, DAI(ng)%ncid, DAI(ng)%Vid(idUbar),   &
      &                   DAI(ng)%Rindex, gtype,                         &
@@ -241,7 +242,7 @@
 !
 !  Write out 2D momentum component (m/s) in the ETA-direction.
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*v2dvar
       status=nf_fwrite2d(ng, iNLM, DAI(ng)%ncid, DAI(ng)%Vid(idVbar),   &
      &                   DAI(ng)%Rindex, gtype,                         &
@@ -264,7 +265,7 @@
 !
 !  Write out 3D momentum component (m/s) in the XI-direction.
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*u3dvar
       status=nf_fwrite3d(ng, iNLM, DAI(ng)%ncid, DAI(ng)%Vid(idUvel),   &
      &                   DAI(ng)%Rindex, gtype,                         &
@@ -285,7 +286,7 @@
 !
 !  Write out momentum component (m/s) in the ETA-direction.
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*v3dvar
       status=nf_fwrite3d(ng, iNLM, DAI(ng)%ncid, DAI(ng)%Vid(idVvel),   &
      &                   DAI(ng)%Rindex, gtype,                         &
@@ -307,7 +308,7 @@
 !  Write out tracer type variables.
 !
       DO itrc=1,NT(ng)
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*r3dvar
         status=nf_fwrite3d(ng, iNLM, DAI(ng)%ncid, DAI(ng)%Tid(itrc),   &
      &                     DAI(ng)%Rindex, gtype,                       &
@@ -329,7 +330,7 @@
 !
 !  Write out vertical viscosity coefficient.
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*w3dvar
       status=nf_fwrite3d(ng, iNLM, DAI(ng)%ncid, DAI(ng)%Vid(idVvis),   &
      &                   DAI(ng)%Rindex, gtype,                         &
@@ -351,7 +352,7 @@
 !
 !  Write out vertical diffusion coefficient for potential temperature.
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*w3dvar
       status=nf_fwrite3d(ng, iNLM, DAI(ng)%ncid, DAI(ng)%Vid(idTdif),   &
      &                   DAI(ng)%Rindex, gtype,                         &
@@ -374,7 +375,7 @@
 !
 !  Write out vertical diffusion coefficient for salinity.
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*w3dvar
       status=nf_fwrite3d(ng, iNLM, DAI(ng)%ncid, DAI(ng)%Vid(idSdif),   &
      &                   DAI(ng)%Rindex, gtype,                         &
