@@ -120,7 +120,7 @@
 !  statistics at observation locations:                                !
 !                                                                      !
 !  BgErr         4D-Var Background error standard deviation.           !
-!  increment     4D-Var increment, analysis minus background.          !
+!  NLincrement   4D-Var NLM increment, analysis minus background.      !
 !  innovation    4D-Var innovation, observations minus background.     !
 !  residual      4D-Var residual, observation minus analysis.          !
 !                                                                      !
@@ -554,9 +554,9 @@
 !
         real(r8), allocatable :: BgErr(:)
 !
-!  4D-Var increment vector, analysis minus background {Mobs].
+!  4D-Var NLM increment vector, analysis minus background {Mobs].
 !
-        real(r8), allocatable :: increment(:)
+        real(r8), allocatable :: NLincrement(:)
 !
 !  4D-Var innovation vector, observations minus background [Mobs].
 !
@@ -1262,8 +1262,8 @@
         deallocate (BgErr)
       END IF
 
-      IF (allocated(increment)) THEN
-        deallocate (increment)
+      IF (allocated(NLincrement)) THEN
+        deallocate (NLincrement)
       END IF
 
       IF (allocated(innovation)) THEN
@@ -2074,11 +2074,11 @@
       END IF
       BgErr = IniVal
 
-      IF (.not.allocated(increment)) THEN
-        allocate ( increment(Mobs) )
+      IF (.not.allocated(NLincrement)) THEN
+        allocate ( NLincrement(Mobs) )
         Dmem(1)=Dmem(1)+REAL(Mobs,r8)
       END IF
-      increment = IniVal
+      NLincrement = IniVal
 
       IF (.not.allocated(innovation)) THEN
         allocate ( innovation(Mobs) )

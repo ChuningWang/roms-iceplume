@@ -1095,12 +1095,12 @@
           END IF
 !
 !  4D-Var innovation vector: observation minus background. Save initial
-!  background in the innovation vector.
+!  background in the NLincrement vector.
 !
           IF (Nrun.eq.1) THEN
             DO iobs=Mstr,Mend
               innovation(iobs)=ObsVal(iobs)-NLmodVal(iobs)
-              increment(iobs)=NLmodVal(iobs)
+              NLincrement(iobs)=NLmodVal(iobs)
             END DO
             CALL netcdf_put_fvar (ng, model, DAV(ng)%name,              &
      &                            Vname(1,idInno), innovation(Mstr:),   &
@@ -1116,11 +1116,11 @@
 !
           IF (outer.eq.Nouter) THEN
             DO iobs=Mstr,Mend
-              increment(iobs)=NLmodVal(iobs)-increment(iobs)
+              NLincrement(iobs)=NLmodVal(iobs)-NLincrement(iobs)
               residual(iobs)=ObsVal(iobs)-NLmodVal(iobs)
             END DO
             CALL netcdf_put_fvar (ng, model, DAV(ng)%name,              &
-     &                            Vname(1,idIncr), increment(Mstr:),    &
+     &                            Vname(1,idIncr), NLincrement(Mstr:),  &
      &                            (/NstrObs(ng)/), (/Nobs(ng)/),        &
      &                            ncid = DAV(ng)%ncid,                  &
      &                            varid = DAV(ng)%Vid(idIncr))
@@ -1302,7 +1302,7 @@
 !  Write Z-location of observation in grid coordinates, if applicable.
 !  This values are needed elsewhere when using the interpolation
 !  weight matrix.  Recall that the depth of observations can be in
-!  meters or grid coordinates.  Recall that since the model levels
+!  meters or grid coordinates.  Notice that since the model levels
 !  evolve in time, the fractional level coordinate is unknow during
 !  the processing of the observations.
 !

@@ -49,7 +49,6 @@
 !
       implicit none
 !
-      PRIVATE
       PUBLIC  :: background
       PUBLIC  :: increment
       PUBLIC  :: analysis
