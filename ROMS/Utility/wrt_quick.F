@@ -2355,20 +2355,20 @@
 #endif
 !
   10  FORMAT (/,' WRT_QUICK - error while writing variable: ',a,/,13x,  &
-     &        'into quicksave NetCDF file for time record: ',i4)
+     &        'into quicksave NetCDF file for time record: ',i0)
 #ifdef SOLVE3D
   20  FORMAT (6x,'WRT_QUICK   - wrote quicksave', t39,                  &
 # ifdef NESTING
-     &        'fields (Index=',i1,',',i1,') in record = ',i7.7,t92,i2.2)
+     &        'fields (Index=',i1,',',i1,') in record = ',i0,t92,i2.2)
 # else
-     &        'fields (Index=',i1,',',i1,') in record = ',i7.7)
+     &        'fields (Index=',i1,',',i1,') in record = ',i0)
 # endif
 #else
   20  FORMAT (6x,'WRT_QUICK   - wrote quicksave', t39,                  &
 # ifdef NESTING
-     &        'fields (Index=',i1,')   in record = ',i7.7,t92,i2.2)
+     &        'fields (Index=',i1,')   in record = ',i0,t92,i2.2)
 # else
-     &        'fields (Index=',i1,')   in record = ',i7.7)
+     &        'fields (Index=',i1,')   in record = ',i0)
 # endif
 #endif
 

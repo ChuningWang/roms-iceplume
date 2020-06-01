@@ -522,20 +522,20 @@
 # endif
 !
   10  FORMAT (/,' WRT_ERROR - error while writing variable: ',a,/,      &
-     &        15x,'into 4DVar error NetCDF file for time record: ',i4)
+     &        15x,'into 4DVar error NetCDF file for time record: ',i0)
 # ifdef SOLVE3D
   20  FORMAT (3x,'WRT_ERROR    - wrote error    fields (Index=', i1,    &
 #  ifdef NESTING
-     &        ',',i1,') into time record = ',i7.7,2x,i2.2)
+     &        ',',i1,') into time record = ',i0,2x,i2.2)
 #  else
-     &        ',',i1,') into time record = ',i7.7)
+     &        ',',i1,') into time record = ',i0)
 #  endif
 # else
   20  FORMAT (3x,'WRT_ERROR    - wrote error    fields (Index=', i1,    &
 #  ifdef NESTING
-     &        ') into time record = ',i7.7,2x,i2.2)
+     &        ') into time record = ',i0,2x,i2.2)
 #  else
-     &        ') into time record = ',i7.7)
+     &        ') into time record = ',i0)
 #  endif
 # endif
       RETURN

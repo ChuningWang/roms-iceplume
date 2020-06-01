@@ -5335,7 +5335,7 @@
   10  FORMAT (/,' WRT_NORM2D - error while writing variable: ',a,/,11x, &
      &        'into normalization NetCDF file for time record: ',i4)
   20  FORMAT (7x,'wrote  ',a, t21,'normalization factors into record ', &
-     &        i7.7)
+     &        i0)
 
       END SUBROUTINE wrt_norm2d
 
@@ -5439,7 +5439,7 @@
   10  FORMAT (/,' WRT_NORM3D - error while writing variable: ',a,/,11x, &
      &        'into normalization NetCDF file for time record: ',i4)
   20  FORMAT (7x,'wrote  ',a, t21,'normalization factors into record ', &
-     &        i7.7)
+     &        i0)
       RETURN
 
       END SUBROUTINE wrt_norm3d

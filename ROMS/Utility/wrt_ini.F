@@ -796,21 +796,22 @@
 
       IF (Master) THEN
 #  ifdef NESTING
-        WRITE (stdout,20) Nrun, Tindex, OutRec, ng
+        WRITE (stdout,20) outer, inner, Tindex, OutRec, ng
 #  else
-        WRITE (stdout,20) Nrun, Tindex, OutRec
+        WRITE (stdout,20) outer, inner, Tindex, OutRec
 #  endif
       END IF
 !
   10  FORMAT (/,' WRT_FRC - error while writing variable: ',a,/,11x,    &
      &        'into initial NetCDF file for time record: ',i4)
-  20  FORMAT (6x,'WRT_FRC   - wrote initial  fields (Iter=',i4.4,       &
+  20  FORMAT (6x,'WRT_FRC   - wrote forcing  fields (Outer=',i2.2,      &
 #  ifdef NESTING
-     &           ', Index=',i1,', Rec=',i4.4,', Grid ',i2.2,')')
+     &        ', Inner=',i3.3,', Index=',i0,', Rec=',i0,', Grid ',      &
+     &        i0,')')
 #  else
-     &           ', Index=',i1,', Rec=',i4.4,')')
+     &        ', Inner=',i3.3,', Index=',i0,', Rec=',i0,')')
 #  endif
-
+!
       RETURN
       END SUBROUTINE wrt_frc
 !
@@ -1134,23 +1135,25 @@
       CALL netcdf_sync (ng, iNLM, INI(ng)%name, INI(ng)%ncid)
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
-
+!
       IF (Master) THEN
 # ifdef NESTING
-        WRITE (stdout,20) Nrun, Tindex, OutRec, ng
+        WRITE (stdout,20) outer, inner, Tindex, OutRec, ng
 # else
-        WRITE (stdout,20) Nrun, Tindex, OutRec
+        WRITE (stdout,20) outer, inner, Tindex, OutRec
 # endif
       END IF
 !
   10  FORMAT (/,' WRT_FRC_AD - error while writing variable: ',a,/,11x, &
      &        'into initial NetCDF file for time record: ',i4)
-  20  FORMAT (6x,'WRT_FRC_AD   - wrote initial  fields (Iter=',i4.4,    &
-# ifdef NESTING
-     &           ', Index=',i1,', Rec=',i4.4,', Grid ',i2.2,')')
-# else
-     &           ', Index=',i1,', Rec=',i4.4,')')
-# endif
+  20  FORMAT (6x,'WRT_FRC_AD   - wrote forcing  fields (Outer=',i2.2,   &
+#  ifdef NESTING
+     &        ', Inner=',i3.3,', Index=',i0,', Rec=',i0,', Grid ',      &
+     &        i0,')')
+#  else
+     &        ', Inner=',i3.3,', Index=',i0,', Rec=',i0,')')
+#  endif
+!
       RETURN
       END SUBROUTINE wrt_frc_AD
 # endif

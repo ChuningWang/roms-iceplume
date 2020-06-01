@@ -374,12 +374,12 @@
 # endif
 !
   10  FORMAT (/,' WRT_DIAGS - error while writing variable: ',a,/,13x,  &
-     &        'into diagnostics NetCDF file for time record: ',i4)
+     &        'into diagnostics NetCDF file for time record: ',i0)
   20  FORMAT (6x,'WRT_DIAGS   - wrote diagnostics fields',t58,          &
 # ifdef NESTING
-     &        'in record = ',i7.7,t92,i2.2)
+     &        'in record = ',i0,t92,i2.2)
 # else
-     &        'in record = ',i7.7)
+     &        'in record = ',i0)
 # endif
 #else
       SUBROUTINE wrt_diags

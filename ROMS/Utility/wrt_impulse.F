@@ -501,7 +501,7 @@
      &        /,12x,'in input NetCDF file: ',a)
   50  FORMAT (/,' WRT_IMPULSE - unable to close input NetCDF file: ',a)
   60  FORMAT (4x,'WRT_IMPULSE - wrote convolved adjoint impulses, ',    &
-     &           'records: 001 to ',i3.3,/,18x,'file: ',a)
+     &           'records: 1 to ',i0,/,18x,'file: ',a)
 
       RETURN
       END SUBROUTINE wrt_impulse

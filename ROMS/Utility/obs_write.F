@@ -1465,7 +1465,7 @@
   10  FORMAT (10x,a,t25,4(1x,i10))
   20  FORMAT (/,10x,'Total',t47,2(1x,i10),                              &
      &        /,10x,'Obs Tally',t47,2(1x,i10),/)
-  30  FORMAT (1x,a,' datum = ',i7.7,' - ',i7.7,/)
+  30  FORMAT (1x,a,' datum = ',i0,' - ',i0,/)
 
       RETURN
       END SUBROUTINE obs_write

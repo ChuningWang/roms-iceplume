@@ -390,9 +390,9 @@
  10   FORMAT (/,' ROMS/TOMS - Output NetCDF summary for Grid ',         &
      &        i2.2,':')
  20   FORMAT (13x,'number of time records written in ',                 &
-     &        a,' file = ',i8.8)
+     &        a,' file = ',i0)
  30   FORMAT (/,a,/)
- 40   FORMAT (/,a,i3,/)
+ 40   FORMAT (/,a,i0,/)
  50   FORMAT (/,' MAIN: Abnormal termination: BLOWUP.',/,               &
      &          ' REASON: ',a)
  60   FORMAT (/,' ROMS/TOMS: DONE... ',a)

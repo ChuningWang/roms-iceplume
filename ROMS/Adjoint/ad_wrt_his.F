@@ -1075,13 +1075,13 @@
 # endif
 !
   10  FORMAT (/,' AD_WRT_HIS - error while writing variable: ',a,/,14x, &
-     &        'into adjoint NetCDF file for time record: ',i4)
+     &        'into adjoint NetCDF file for time record: ',i0)
 # ifdef SOLVE3D
   20  FORMAT (3x,'AD_WRT_HIS   - wrote adjoint  fields (Index=', i1,    &
-     &        ',',i1,') into time record = ',i7.7)
+     &        ',',i1,') into time record = ',i0)
 # else
   20  FORMAT (3x,'AD_WRT_HIS   - wrote adjoint  fields (Index=', i1,    &
-     &        ') into time record = ',i7.7)
+     &        ') into time record = ',i0)
 # endif
       RETURN
       END SUBROUTINE ad_wrt_his

@@ -162,9 +162,7 @@
 #ifdef DISTRIBUTE
 !
       USE distribute_mod, ONLY : mp_barrier, mp_reduce
-# ifdef ROMS_STDOUT
       USE distribute_mod, ONLY : mp_collect
-# endif
       USE strings_mod,    ONLY : uppercase
 #endif
 !

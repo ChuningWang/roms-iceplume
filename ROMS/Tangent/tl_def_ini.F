@@ -40,6 +40,7 @@
 
       integer :: i, j, ifield, itrc, nvd3, nvd4
       integer :: recdim, status, varid
+      integer :: Fcount
 # ifdef ADJUST_BOUNDARY
       integer :: IorJdim, brecdim
 # endif
@@ -997,6 +998,8 @@
 !  Set unlimited time record dimension to the appropriate value.
 !
         ITL(ng)%Rindex=rec_size
+        Fcount=ITL(ng)%Fcount
+        ITL(ng)%Nrec(Fcount)=rec_size
       END IF QUERY
 !
   10  FORMAT (3x,'TL_DEF_INI   - creating initial file: ',a)
