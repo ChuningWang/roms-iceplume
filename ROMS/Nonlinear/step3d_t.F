@@ -1178,9 +1178,6 @@
      &                                   cff*SOURCES(ng)%Qsrc(is,k)*    &
      &                                   cff3
 # ifdef ICEPLUME
-!
-! Add ICEPLUME type tracers.
-!
                     cff3=PLUME(ng)%det   (is,k     )*                   &
 #  ifdef ICEPLUME_DET_NEUTRAL
      &                   PLUME(ng)%detTrc(is,k,itrc)+                   &
@@ -1390,9 +1387,6 @@
      &                                     cff*SOURCES(ng)%Qsrc(is,k)*  &
      &                                     cff3
 # ifdef ICEPLUME
-!
-! Add ICEPLUME type tracers.
-!
                   cff3=PLUME(ng)%det   (is,k     )*                     &
 #  ifdef ICEPLUME_DET_NEUTRAL
      &                 PLUME(ng)%detTrc(is,k,itrc)+                     &

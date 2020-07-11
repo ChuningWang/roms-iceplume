@@ -239,6 +239,7 @@ ad_VolCons(north) ==  F                            ! northern boundary
        ERend =  1
       Nouter =  1
       Ninner =  1
+     Nsaddle =  1
   Nintervals =  1
 
 ! Number of eigenvalues (NEV) and eigenvectors (NCV) to compute for the
@@ -450,8 +451,8 @@ LtracerSponge == F F                            ! temperature, salinity, inert
 ! point Sources/Sinks (like river runoff transport) and mass point
 ! Sources/Sinks (like volume vertical influx), [1:Ngrids].
 
-      LuvSrc == T                          ! horizontal momentum transport
-       LwSrc == F                          ! volume vertical influx
+      LuvSrc == F                          ! horizontal momentum transport
+       LwSrc == T                          ! volume vertical influx
 
 ! Logical switches (TRUE/FALSE) to activate tracers point Sources/Sinks
 ! (like river runoff) and to specify which tracer variables to consider:
@@ -925,13 +926,28 @@ Dout(iTvdif) == T T     ! temp_vdiff, ...    vertical diffusion
 
      NGCNAME =  roms_ngc.nc
 
-! Input lateral boundary conditions and climatology file names.  The
-! USER has the option to split input data time records into several
-! NetCDF files (see prologue instructions above). If so, use a single
-! line per entry with a vertical bar (|) symbol after each entry,
-! except the last one.
+! Input lateral boundary conditions file names. The USER has the option
+! to separate the required lateral boundary variables into individual
+! NetCDF files (NBCFILES > 1), as in the input surface forcing.  Also,
+! the USER may split input data time records into several NetCDF files
+! (monthly, seasonal, or annual). See prologue instructions above. Use
+! a single line per entry with a continuation (\) or a vertical bar (|)
+! symbol after each entry, except the last one.
 
-     BRYNAME == roms_bdry.nc
+    NBCFILES == 1                          ! number of boundary files
+
+     BRYNAME == roms_bry.nc
+
+! Input climatology file names. The USER has the option to separate the
+! climatology variables into individual NetCDF files (NCLMFILES > 1),
+! as in the input surface forcing.  Also, the USER may split input data
+! time records into several NetCDF files (monthly, seasonal, or annual).
+! See prologue instructions above. Use a single line per entry with a
+! continuation (\) or a vertical bar (|) symbol after each entry, except
+! the last one.
+
+   NCLMFILES == 1                          ! number of climatology files
+
      CLMNAME == roms_clm.nc
 
 ! Input climatology nudging coefficients file name.

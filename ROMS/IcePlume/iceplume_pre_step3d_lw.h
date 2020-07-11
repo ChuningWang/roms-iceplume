@@ -1,6 +1,6 @@
 !
 !  Apply mass point sources (volume vertical influx), if any, including
-!  ICEPLUME type tracers.
+!  iceplume type tracers.
 !  (Notice the j-loop is pipelined above).
 !
           IF (LwSrc(ng)) THEN

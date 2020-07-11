@@ -1,6 +1,6 @@
 !
 !  Apply mass point sources (volume vertical influx), if any, including
-!  ICEPLUME type tracers.
+!  iceplume type tracers.
 !
           IF (LwSrc(ng)) THEN
             DO is=1,Nsrc(ng)

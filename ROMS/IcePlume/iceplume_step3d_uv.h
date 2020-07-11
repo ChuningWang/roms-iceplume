@@ -1,7 +1,7 @@
 !
 !-----------------------------------------------------------------------
 !  Apply momentum transport point sources (like river runoff), if any,
-!  including ICEPLUME type tracers.
+!  including iceplume type tracers.
 !-----------------------------------------------------------------------
 !
       IF (LuvSrc(ng)) THEN

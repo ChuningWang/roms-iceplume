@@ -1,6 +1,6 @@
 !
 !  Apply tracers point sources to the horizontal advection terms,
-!  if any, including ICEPLUME type tracers.
+!  if any, including iceplume type tracers.
 !
           IF (LuvSrc(ng)) THEN
             DO is=1,Nsrc(ng)
