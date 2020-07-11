@@ -1154,47 +1154,49 @@
             END DO
           END IF VADV_FLUX
 !
-!  If MPDATA and cell-centered point source (LwSrc), augment the
-!  intermediate tracer, Ta, with the tracer divergence. For other
-!  advection schemes LwSrc is applied after the vertical advection
-!  is completed (J. Wilkin).
+!  Apply mass point sources (volume vertical influx), if any.
 !
           IF (LwSrc(ng)) THEN
-            IF (Hadvection(itrc,ng)%MPDATA) THEN
-              DO is=1,Nsrc(ng)
-                Isrc=SOURCES(ng)%Isrc(is)
-                Jsrc=SOURCES(ng)%Jsrc(is)
-                IF (((Istr.le.Isrc).and.(Isrc.le.Iend+1)).and.          &
-     &               ((Jstr.le.Jsrc).and.(Jsrc.le.Jend+1)).and.         &
-     &               (j.eq.Jsrc)) THEN
+            DO is=1,Nsrc(ng)
+              Isrc=SOURCES(ng)%Isrc(is)
+              Jsrc=SOURCES(ng)%Jsrc(is)
+              IF (LtracerSrc(itrc,ng)) THEN
+                IF ((Vadvection(itrc,ng)%MPDATA).or.                    &
+     &              (Vadvection(itrc,ng)%HSIMT)) THEN
+                  LapplySrc=(IstrUm2.le.Isrc).and.                      &
+     &                      (Isrc.le.Iendp2i).and.(j.eq.Jsrc)
+                ELSE
+                  LapplySrc=(IstrR.le.Isrc).and.                        &
+     &                      (Isrc.le.IendR).and.(j.eq.Jsrc)
+                END IF
+                IF (LapplySrc) THEN
+                  cff=0.0_r8
                   DO k=1,N(ng)
-                    cff=dt(ng)*pm(i,j)*pn(i,j)
-                    IF (LtracerSrc(itrc,ng)) THEN
-                      cff3=SOURCES(ng)%Tsrc(is,k,itrc)
-                    ELSE
-                      cff3=t(Isrc,Jsrc,k,3,itrc)
-                    END IF
-                    Ta(Isrc,Jsrc,k,itrc)=Ta(Isrc,Jsrc,k,itrc)+          &
-     &                                   cff*SOURCES(ng)%Qsrc(is,k)*    &
-     &                                   cff3
+                    cff=cff+SOURCES(ng)%Qsrc(is,k)*                     &
+     &                      SOURCES(ng)%Tsrc(is,k,itrc)
 # ifdef ICEPLUME
-                    cff3=PLUME(ng)%det   (is,k     )*                   &
+                    cff=cff+PLUME(ng)%det   (is,k     )*                &
 #  ifdef ICEPLUME_DET_NEUTRAL
-     &                   PLUME(ng)%detTrc(is,k,itrc)+                   &
+     &                      PLUME(ng)%detTrc(is,k,itrc)+                &
 #  else
-     &                   PLUME(ng)%trc   (is,  itrc)+                   &
+     &                      PLUME(ng)%trc   (is,  itrc)+                &
 #  endif
-     &                   PLUME(ng)%ent   (is,k     )*                   &
-     &                   PLUME(ng)%trcAm (is,k,itrc)+                   &
-     &                   PLUME(ng)%mB    (is,k     )*                   &
-     &                   PLUME(ng)%trcB  (is,  itrc)
-                    Ta(Isrc,Jsrc,k,itrc)=Ta(Isrc,Jsrc,k,itrc)+          &
-     &                                   cff*cff3
+     &                      PLUME(ng)%ent   (is,k     )*                &
+     &                      PLUME(ng)%trcAm (is,k,itrc)+                &
+     &                      PLUME(ng)%mB    (is,k     )*                &
+     &                      PLUME(ng)%trcB  (is,  itrc)
 # endif
+# ifdef SPLINES_VDIFF
+                    IF (.not.((Hadvection(itrc,ng)%MPDATA).and.         &
+     &                 (Vadvection(itrc,ng)%MPDATA))) THEN
+                      cff=cff*oHz(Isrc,Jsrc,k)
+                    END IF
+# endif
+                    FC(Isrc,k)=FC(Isrc,k)-cff
                   END DO
                 END IF
-              END DO
-            END IF
+              END IF
+            END DO
           END IF
 !
 !  If MPDATA, time-step vertical advection for intermediate diffusive
@@ -1354,58 +1356,6 @@
           END DO
         END IF MPDATA
       END DO T_LOOP3
-!
-!-----------------------------------------------------------------------
-!  Add tracer divergence due to cell-centered (LwSrc) point sources.
-!-----------------------------------------------------------------------
-!
-!  When LTracerSrc is .true. the inflowing concentration is Tsrc.
-!  When LtracerSrc is .false. we add tracer mass to compensate for the
-!  added volume to keep the receiving cell concentration unchanged.
-!  J. Levin (Jupiter Intelligence Inc.) and J. Wilkin
-!
-      IF (LwSrc(ng)) THEN
-        IF (.not.((Hadvection(itrc,ng)%MPDATA).and.                     &
-     &            (Vadvection(itrc,ng)%MPDATA))) THEN
-          DO itrc=1,NT(ng)
-            DO is=1,Nsrc(ng)
-              Isrc=SOURCES(ng)%Isrc(is)
-              Jsrc=SOURCES(ng)%Jsrc(is)
-              IF (((Istr.le.Isrc).and.(Isrc.le.Iend+1)).and.            &
-     &            ((Jstr.le.Jsrc).and.(Jsrc.le.Jend+1))) THEN
-                DO k=1,N(ng)
-                  cff=dt(ng)*pm(i,j)*pn(i,j)
-# ifdef SPLINES_VDIFF
-                  cff=cff*oHz(Isrc,Jsrc,k)
-# endif
-                  IF (LtracerSrc(itrc,ng)) THEN
-                    cff3=SOURCES(ng)%Tsrc(is,k,itrc)
-                  ELSE
-                    cff3=t(Isrc,Jsrc,k,3,itrc)
-                  END IF
-                  t(Isrc,Jsrc,k,nnew,itrc)=t(Isrc,Jsrc,k,nnew,itrc)+    &
-     &                                     cff*SOURCES(ng)%Qsrc(is,k)*  &
-     &                                     cff3
-# ifdef ICEPLUME
-                  cff3=PLUME(ng)%det   (is,k     )*                     &
-#  ifdef ICEPLUME_DET_NEUTRAL
-     &                 PLUME(ng)%detTrc(is,k,itrc)+                     &
-#  else
-     &                 PLUME(ng)%trc   (is,  itrc)+                     &
-#  endif
-     &                 PLUME(ng)%ent   (is,k     )*                     &
-     &                 PLUME(ng)%trcAm (is,k,itrc)+                     &
-     &                 PLUME(ng)%mB    (is,k     )*                     &
-     &                 PLUME(ng)%trcB  (is,  itrc)
-                  t(Isrc,Jsrc,k,nnew,itrc)=t(Isrc,Jsrc,k,nnew,itrc)+    &
-     &                                     cff*cff3
-# endif
-                END DO
-              END IF
-            END DO
-          END DO
-        END IF
-      END IF
 !
 !-----------------------------------------------------------------------
 !  Time-step vertical diffusion term.
