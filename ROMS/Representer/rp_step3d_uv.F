@@ -120,7 +120,7 @@
 # ifdef PROFILE
       CALL wclock_off (ng, iRPM, 34, __LINE__, __FILE__)
 # endif
-
+!
       RETURN
       END SUBROUTINE rp_step3d_uv
 !
@@ -174,8 +174,8 @@
 # ifdef DISTRIBUTE
       USE mp_exchange_mod, ONLY : mp_exchange2d, mp_exchange3d
 # endif
-      USE rp_u3dbc_mod, ONLY : rp_u3dbc_tile
-      USE rp_v3dbc_mod, ONLY : rp_v3dbc_tile
+      USE rp_u3dbc_mod,    ONLY : rp_u3dbc_tile
+      USE rp_v3dbc_mod,    ONLY : rp_v3dbc_tile
 !
 !  Imported variable declarations.
 !
@@ -319,10 +319,10 @@
 !  Local variable declarations.
 !
       integer :: i, idiag, is, j, k
-
+!
       real(r8) :: cff, cff1, cff2
       real(r8) :: tl_cff, tl_cff1, tl_cff2
-
+!
       real(r8), dimension(IminS:ImaxS) :: CF1
       real(r8), dimension(IminS:ImaxS) :: FC1
 # ifdef NEARSHORE_MELLOR
@@ -1536,7 +1536,11 @@
 # endif
 !>              u(i,j,k,nnew)=SOURCES(ng)%Qsrc(is,k)*cff1
 !>
-                tl_u(i,j,k,nnew)=SOURCES(ng)%Qsrc(is,k)*tl_cff1
+                tl_u(i,j,k,nnew)=SOURCES(ng)%tl_Qsrc(is,k)*cff1+        &
+     &                           SOURCES(ng)%Qsrc(is,k)*tl_cff1-        &
+# ifdef TL_IOMS
+     &                           SOURCES(ng)%Qsrc(is,k)*cff1
+# endif
               END DO
             ELSE
               DO k=1,N(ng)
@@ -1551,7 +1555,11 @@
 # endif
 !>              v(i,j,k,nnew)=SOURCES(ng)%Qsrc(is,k)*cff1
 !>
-                tl_v(i,j,k,nnew)=SOURCES(ng)%Qsrc(is,k)*tl_cff1
+                tl_v(i,j,k,nnew)=SOURCES(ng)%tl_Qsrc(is,k)*cff1+        &
+     &                           SOURCES(ng)%Qsrc(is,k)*tl_cff1-        &
+# ifdef TL_IOMS
+     &                           SOURCES(ng)%Qsrc(is,k)*cff1
+# endif
               END DO
             END IF
           END IF
@@ -2358,7 +2366,7 @@
      &                    tl_ubar(:,:,1), tl_vbar(:,:,1),               &
      &                    tl_ubar(:,:,2), tl_vbar(:,:,2))
 # endif
-
+!
       RETURN
       END SUBROUTINE rp_step3d_uv_tile
 #endif

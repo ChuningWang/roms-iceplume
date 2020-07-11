@@ -1,5 +1,6 @@
 #include "cppdefs.h"
       MODULE ad_step3d_uv_mod
+
 #if defined ADJOINT && defined SOLVE3D
 !
 !svn $Id$
@@ -21,10 +22,10 @@
 !=======================================================================
 !
       implicit none
-
+!
       PRIVATE
       PUBLIC  :: ad_step3d_uv
-
+!
       CONTAINS
 !
 !***********************************************************************
@@ -122,6 +123,7 @@
 # ifdef PROFILE
       CALL wclock_off (ng, iADM, 34, __LINE__, __FILE__)
 # endif
+!
       RETURN
       END SUBROUTINE ad_step3d_uv
 !
@@ -176,8 +178,8 @@
 # ifdef DISTRIBUTE
       USE mp_exchange_mod, ONLY : ad_mp_exchange2d, ad_mp_exchange3d
 # endif
-      USE ad_u3dbc_mod, ONLY : ad_u3dbc_tile
-      USE ad_v3dbc_mod, ONLY : ad_v3dbc_tile
+      USE ad_u3dbc_mod,    ONLY : ad_u3dbc_tile
+      USE ad_v3dbc_mod,    ONLY : ad_v3dbc_tile
 !
 !  Imported variable declarations.
 !
@@ -325,11 +327,11 @@
 !  Local variable declarations.
 !
       integer :: i, idiag, is, j, k
-
+!
       real(r8) :: cff, cff1, cff2
       real(r8) :: ad_cff, ad_cff1, ad_cff2
       real(r8) :: adfac, adfac1, adfac2
-
+!
       real(r8), dimension(IminS:ImaxS) :: CF1
       real(r8), dimension(IminS:ImaxS) :: FC1
 # ifdef NEARSHORE_MELLOR
@@ -1380,9 +1382,13 @@
                 cff1=1.0_r8/(on_u(i,j)*                                 &
      &                       0.5_r8*(z_w(i-1,j,k)-z_w(i-1,j,k-1)+       &
      &                               z_w(i  ,j,k)-z_w(i  ,j,k-1)))
-!>              tl_u(i,j,k,nnew)=SOURCES(ng)%Qsrc(is,k)*tl_cff1
+!>              tl_u(i,j,k,nnew)=SOURCES(ng)%tl_Qsrc(is,k)*cff1+        &
+!>   &                           SOURCES(ng)%Qsrc(is,k)*tl_cff1
 !>
-                ad_cff1=ad_cff1+SOURCES(ng)%Qsrc(is,k)*ad_u(i,j,k,nnew)
+                SOURCES(ng)%ad_Qsrc(is,k)=SOURCES(ng)%ad_Qsrc(is,k)+    &
+     &                                    cff1*ad_u(i,j,k,nnew)
+                ad_cff1=ad_cff1+                                        &
+     &                  SOURCES(ng)%Qsrc(is,k)*ad_u(i,j,k,nnew)
                 ad_u(i,j,k,nnew)=0.0_r8
 !>              tl_cff1=-cff1*cff1*on_u(i,j)*                           &
 !>   &                  0.5_r8*(tl_z_w(i-1,j,k)-tl_z_w(i-1,j,k-1)+      &
@@ -1400,9 +1406,13 @@
                 cff1=1.0_r8/(om_v(i,j)*                                 &
      &                       0.5_r8*(z_w(i,j-1,k)-z_w(i,j-1,k-1)+       &
      &                               z_w(i,j  ,k)-z_w(i,j  ,k-1)))
-!>              tl_v(i,j,k,nnew)=SOURCES(ng)%Qsrc(is,k)*tl_cff1
+!>              tl_v(i,j,k,nnew)=SOURCES(ng)%tl_Qsrc(is,k)*cff1+        &
+!>   &                           SOURCES(ng)%Qsrc(is,k)*tl_cff1
 !>
-                ad_cff1=ad_cff1+SOURCES(ng)%Qsrc(is,k)*ad_v(i,j,k,nnew)
+                SOURCES(ng)%ad_Qsrc(is,k)=SOURCES(ng)%ad_Qsrc(is,k)+    &
+     &                                    cff1*ad_v(i,j,k,nnew)
+                ad_cff1=ad_cff1+                                        &
+     &                  SOURCES(ng)%Qsrc(is,k)*ad_v(i,j,k,nnew)
                 ad_v(i,j,k,nnew)=0.0_r8
 !>              tl_cff1=-cff1*cff1*om_v(i,j)*                           &
 !>   &                  0.5_r8*(tl_z_w(i,j-1,k)-tl_z_w(i,j-1,k-1)+      &
@@ -2826,6 +2836,7 @@
           ad_AK(i,0)=0.0_r8
         END DO
       END DO J_LOOP2
+!
       RETURN
       END SUBROUTINE ad_step3d_uv_tile
 #endif

@@ -196,7 +196,7 @@ ad_Vadvection == C4       \                     ! temperature
 
 ad_LBC(isFsur) ==   Cha     Cha     Clo     Cha         ! free-surface
 ad_LBC(isUbar) ==   Fla     Fla     Clo     Fla         ! 2D U-momentum
-ad_LBC(isVbar) ==   Fla     Fla     Clo     Fla         ! 2D U-momentum
+ad_LBC(isVbar) ==   Fla     Fla     Clo     Fla         ! 2D V-momentum
 ad_LBC(isUvel) ==   Cla     Cla     Clo     Cla         ! 3D U-momentum
 ad_LBC(isVvel) ==   Cla     Cla     Clo     Cla         ! 3D V-momentum
 ad_LBC(isMtke) ==   Gra     Gra     Clo     Gra         ! mixing TKE
@@ -256,7 +256,7 @@ ad_VolCons(north) ==  F                            ! northern boundary
         NFLT == 1
        NINFO == 1
 
-! Output history, quicksave, quicksaveand , quicksaveand , quicksaveand , average, and diagnostic files parameters.
+! Output history, quicksave, average, and diagnostic files parameters.
 
      LDEFOUT == T
         NHIS == 30
@@ -736,7 +736,7 @@ Qout(idMtls) == F       ! gls                turbulent length scale
 ! switches can be activated using compact parameter specification.
 
  Qout(inert) == F       ! dye_01, ...        inert passive tracers
- Qout(Snert) == F       ! dye_01_sur, ..     surface inert passive tracers
+ Qout(Snert) == F       ! dye_01_sur, ...    surface inert passive tracers
 
 ! Logical switches (TRUE/FALSE) to activate writing of time-averaged
 ! fields into AVERAGE output file.

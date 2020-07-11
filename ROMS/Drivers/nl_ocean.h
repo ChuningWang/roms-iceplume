@@ -367,7 +367,7 @@
       IF (exit_flag.eq.1) THEN
         DO ng=1,Ngrids
           IF (LwrtRST(ng)) THEN
-            IF (Master) WRITE (stdout,10), TRIM(blowup_string)
+            IF (Master) WRITE (stdout,10) TRIM(blowup_string)
  10         FORMAT (/,' Blowing-up: Saving latest model state into ',   &
      &                ' RESTART file',/,'     REASON: ',a,/)
             Fcount=RST(ng)%load
