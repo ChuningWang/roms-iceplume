@@ -112,7 +112,7 @@
 
       real(r8) :: Aval(6)
 
-      character (len=11 ) :: frcatt
+      character (len=11 ) :: bryatt, clmatt, frcatt
       character (len=50 ) :: tiling
       character (len=80 ) :: type
       character (len=120) :: Vinfo(Natt)
@@ -274,15 +274,15 @@
         ELSE IF (ncid.eq.HAR(ng)%ncid) THEN
           type='ROMS/TOMS Least-squared Detiding Harmonics file'
         ELSE IF (ncid.eq.HSS(ng)%ncid) THEN
-          type='ROMS/TOMS 4DVAR Hessian eigenvectors file'
+          type='ROMS/TOMS 4D-Var Hessian eigenvectors file'
         ELSE IF (ncid.eq.HIS(ng)%ncid) THEN
           type='ROMS/TOMS history file'
         ELSE IF (ncid.eq.ITL(ng)%ncid) THEN
           type='ROMS/TOMS tangent linear model initial file'
         ELSE IF (ncid.eq.LCZ(ng)%ncid) THEN
-          type='ROMS/TOMS 4DVAR Lanczos vectors file'
+          type='ROMS/TOMS 4D-Var Lanczos vectors file'
         ELSE IF (ncid.eq.LZE(ng)%ncid) THEN
-          type='ROMS/TOMS 4DVAR Evolved Lanczos vectors file'
+          type='ROMS/TOMS 4D-Var Evolved Lanczos vectors file'
         ELSE IF (ncid.eq.NRM(1,ng)%ncid) THEN
           type='ROMS/TOMS initial conditions error covariance norm file'
         ELSE IF (ncid.eq.NRM(2,ng)%ncid) THEN
@@ -295,6 +295,16 @@
           type='ROMS/TOMS quicksave file'
         ELSE IF (ncid.eq.RST(ng)%ncid) THEN
           type='ROMS/TOMS restart file'
+# ifdef SP4DVAR
+        ELSE IF (ncid.eq.SCA(ng)%ncid) THEN
+          type='ROMS/TOMS AD scratch file'
+        ELSE IF (ncid.eq.SCT(ng)%ncid) THEN
+          type='ROMS/TOMS TL scratch file'
+        ELSE IF (ncid.eq.SPA(ng)%ncid) THEN
+          type='ROMS/TOMS AD Arnoldi file'
+        ELSE IF (ncid.eq.SPT(ng)%ncid) THEN
+          type='ROMS/TOMS TL Arnoldi file'
+# endif
         ELSE IF (ncid.eq.STA(ng)%ncid) THEN
           type='ROMS/TOMS station file'
         ELSE IF (ncid.eq.TLF(ng)%ncid) THEN
@@ -541,9 +551,9 @@
 # endif
 
 # if defined ADJOINT && \
-    !(defined AD_SENSITIVITY      || defined FOUR_DVAR        || \
-      defined IS4DVAR_SENSITIVITY || defined OPT_OBSERVATIONS || \
-      defined SENSITIVITY_4DVAR   || defined SO_SEMI          || \
+    !(defined AD_SENSITIVITY         || defined FOUR_DVAR        || \
+      defined I4DVAR_ANA_SENSITIVITY || defined OPT_OBSERVATIONS || \
+      defined SENSITIVITY_4DVAR      || defined SO_SEMI          || \
       defined STOCHASTIC_OPT )
         IF (exit_flag.eq.NoError) THEN
           status=nf90_put_att(ncid, nf90_global, 'iad_file',            &
@@ -558,7 +568,7 @@
 # endif
 #endif
 
-#if defined IS4DVAR         || defined OPT_OBSERVATIONS || \
+#if defined I4DVAR          || defined OPT_OBSERVATIONS || \
     defined WEAK_CONSTRAINT
         IF (exit_flag.eq.NoError) THEN
           status=nf90_put_att(ncid, nf90_global, 'nrm_file',            &
@@ -598,7 +608,7 @@
         END IF
 #endif
 
-#ifdef W4DPSAS_FCT_SENSITIVITY
+#ifdef RBL4DVAR_FCT_SENSITIVITY
         IF (exit_flag.eq.NoError) THEN
           status=nf90_put_att(ncid, nf90_global, 'fcta_file',           &
      &                        TRIM(FCTA(ng)%name))
@@ -688,7 +698,7 @@
           DO i=1,nFfiles(ng)
             CALL join_string (FRC(i,ng)%files, FRC(i,ng)%Nfiles,        &
      &                        string, lstr)
-            WRITE (frcatt,30) i
+            WRITE (frcatt,30) 'frc_file_', i
             status=nf90_put_att(ncid, nf90_global, frcatt,              &
      &                          string(1:lstr))
             IF (FoundError(status, nf90_noerr, __LINE__,                &
@@ -703,35 +713,41 @@
 #endif
 
         IF (ObcData(ng)) THEN
-          IF (exit_flag.eq.NoError) THEN
-            CALL join_string (BRY(ng)%files, BRY(ng)%Nfiles,            &
-     &                        string, lstr)
-            status=nf90_put_att(ncid, nf90_global, 'bry_file',          &
-     &                          string(1:lstr))
-            IF (FoundError(status, nf90_noerr, __LINE__,                &
+          DO i=1,nBCfiles(ng)
+            IF (exit_flag.eq.NoError) THEN
+              CALL join_string (BRY(i,ng)%files, BRY(i,ng)%Nfiles,      &
+     &                          string, lstr)
+              WRITE (bryatt,30) 'clm_file_', i
+              status=nf90_put_att(ncid, nf90_global, bryatt,            &
+     &                            string(1:lstr))
+              IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                     __FILE__)) THEN
-              IF (Master) WRITE (stdout,20) 'bry_file', TRIM(ncname)
-              exit_flag=3
-              ioerror=status
+                IF (Master) WRITE (stdout,20) TRIM(bryatt), TRIM(ncname)
+                exit_flag=3
+                ioerror=status
+              END IF
             END IF
-          END IF
+          END DO
         END IF
 
 #if !(defined ANA_SSH     || defined ANA_M2CLIMA || \
       defined ANA_M3CLIMA || defined ANA_TCLIMA)
         IF (Lclimatology(ng)) THEN
-          IF (exit_flag.eq.NoError) THEN
-            CALL join_string (CLM(ng)%files, CLM(ng)%Nfiles,            &
-     &                        string,lstr)
-            status=nf90_put_att(ncid, nf90_global, 'clm_file',          &
-     &                          string(1:lstr))
-            IF (FoundError(status, nf90_noerr, __LINE__,                &
+          DO i=1,nCLMfiles(ng)
+            IF (exit_flag.eq.NoError) THEN
+              CALL join_string (CLM(i,ng)%files, CLM(i,ng)%Nfiles,      &
+     &                          string, lstr)
+              WRITE (clmatt,30) 'clm_file_', i
+              status=nf90_put_att(ncid, nf90_global, clmatt,            &
+     &                            string(1:lstr))
+              IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                     __FILE__)) THEN
-              IF (Master) WRITE (stdout,20) 'clm_file', TRIM(ncname)
-              exit_flag=3
-              ioerror=status
+                IF (Master) WRITE (stdout,20) TRIM(clmatt), TRIM(ncname)
+                exit_flag=3
+                ioerror=status
+              END IF
             END IF
-          END IF
+          END DO
         END IF
 #endif
 
@@ -763,8 +779,8 @@
         END IF
 #endif
 
-#if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
-    defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR   || \
+#if defined AD_SENSITIVITY   || defined I4DVAR_ANA_SENSITIVITY || \
+    defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR      || \
     defined SO_SEMI
         IF (exit_flag.eq.NoError) THEN
           status=nf90_put_att(ncid, nf90_global, 'ads_file',            &
@@ -1206,7 +1222,7 @@
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 
-#ifdef W4DPSAS_FCT_SENSITIVITY
+#ifdef RBL4DVAR_FCT_SENSITIVITY
       Vinfo( 1)='ntimes_ana'
       Vinfo( 2)='number of time-steps for observation impacts, '//      &
      &          'analysis interval'
@@ -1352,7 +1368,7 @@
 #ifdef ADJUST_BOUNDARY
       Vinfo( 1)='nOBC'
       Vinfo( 2)=                                                        &
-     &  'number of time-steps between 4DVAR open boundary adjustment'
+     &  'number of time-steps between 4D-Var open boundary adjustment'
       status=def_var(ng, model, ncid, varid, nf90_int,                  &
      &               1, (/0/), Aval, Vinfo, ncname,                     &
      &               SetParAccess = .FALSE.)
@@ -1363,7 +1379,7 @@
 #if defined ADJUST_STFLUX || defined ADJUST_WSTRESS
       Vinfo( 1)='nSFF'
       Vinfo( 2)=                                                        &
-     &  'number of time-steps between 4DVAR surface forcing adjustment'
+     &  'number of time-steps between 4D-Var surface forcing adjustment'
       status=def_var(ng, model, ncid, varid, nf90_int,                  &
      &               1, (/0/), Aval, Vinfo, ncname,                     &
      &               SetParAccess = .FALSE.)
@@ -2298,7 +2314,7 @@
 #endif
 #ifdef FOUR_DVAR
 !
-!  4DVAR assimilation parameters.
+!  4D-Var assimilation parameters.
 !
 # ifdef ADJUST_STFLUX
       Vinfo( 1)='Lstflux'
@@ -2322,7 +2338,7 @@
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 # endif
-# ifndef IS4DVAR_SENSITIVITY
+# ifndef I4DVAR_ANA_SENSITIVITY
       Vinfo( 1)='LhessianEV'
       Vinfo( 2)='switch to compute Hessian eigenvectors'
       Vinfo( 9)='.FALSE.'
@@ -2386,9 +2402,11 @@
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 # endif
-# if defined IS4DVAR_SENSITIVITY     || defined W4DPSAS_SENSITIVITY || \
-     defined W4DPSAS_FCT_SENSITIVITY || defined W4DVAR_SENSITIVITY  || \
-     defined ARRAY_MODES
+# if defined ARRAY_MODES              || \
+     defined I4DVAR_ANA_SENSITIVITY   || \
+     defined RBL4DVAR_ANA_SENSITIVITY || \
+     defined RBL4DVAR_FCT_SENSITIVITY || \
+     defined R4DVAR_ANA_SENSITIVITY
       Vinfo( 1)='Nimpact'
       Vinfo( 2)='Observations impact/sensitivity outer loop to use'
       status=def_var(ng, model, ncid, varid, nf90_int,                  &
@@ -2397,7 +2415,7 @@
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 # endif
-# ifndef IS4DVAR_SENSITIVITY
+# ifndef I4DVAR_ANA_SENSITIVITY
       Vinfo( 1)='GradErr'
       Vinfo( 2)='Upper bound on relative error of the gradient'
       status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
@@ -2680,8 +2698,8 @@
 # endif
 #endif
 
-#if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
-    defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR   || \
+#if defined AD_SENSITIVITY   || defined I4DVAR_ANA_SENSITIVITY || \
+    defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR      || \
     defined SO_SEMI
 !
 !  Adjoint sensitivity parameters.
@@ -3612,8 +3630,8 @@
      &                   __FILE__)) RETURN
         END IF
 #endif
-#if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
-    defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR   || \
+#if defined AD_SENSITIVITY   || defined I4DVAR_ANA_SENSITIVITY || \
+    defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR      || \
     defined SO_SEMI
 !
 !  Adjoint sensitivity spatial scope mask at RHO-, U-, and V-points.
@@ -3701,7 +3719,7 @@
   10  FORMAT (i3.3,'x',i3.3)
   20  FORMAT (/,' DEF_INFO - error while creating global attribute: ',  &
      &        a,/,12x,a)
-  30  FORMAT ('frc_file_',i2.2)
+  30  FORMAT (a,i2.2)
 
       RETURN
       END SUBROUTINE def_info

@@ -1,8 +1,8 @@
 #include "cppdefs.h"
-#if defined IS4DVAR               || \
+#if defined I4DVAR                || \
     (defined WEAK_CONSTRAINT      && \
      (defined POSTERIOR_EOFS      || defined POSTERIOR_ERROR_I || \
-      defined POSTERIOR_ERROR_F)) ||  defined LCZ_FINAL
+      defined POSTERIOR_ERROR_F)) || defined LCZ_FINAL
       SUBROUTINE def_hessian (ng)
 !
 !svn $Id$
@@ -13,7 +13,7 @@
 !=======================================================================
 !                                                                      !
 !  This routine creates the Hessian eigenvectors NetCDF file used for  !
-!  the pre-conditioning of the 4DVar conjugate gradient algorithm. It  !
+!  the pre-conditioning of the 4D-Var conjugate gradient algorithm. It !
 !  defines its dimensions, attributes, and variables.                  !
 !                                                                      !
 !=======================================================================

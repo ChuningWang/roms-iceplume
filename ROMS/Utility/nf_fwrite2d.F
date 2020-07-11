@@ -27,11 +27,13 @@
 !     Ascl         Factor to scale field before writing (real).        !
 !     A            Field to write out (real).                          !
 !     SetFillVal   Logical switch to set fill value in land areas      !
-!                    (optional).                                       !
+!                    (OPTIONAL).                                       !
 !                                                                      !
 !  On Output:                                                          !
 !                                                                      !
-!     nf_fwrite  Error flag (integer).                                 !
+!     nf_fwrite    Error flag (integer).                               !
+!     MinValue     Minimum value (real, OPTIONAL).                     !
+!     MaxValue     Maximum value (real, OPTIONAL).                     !
 !                                                                      !
 #ifdef POSITIVE_ZERO
 !  Starting F95 zero values can be signed (-0 or +0) following the     !
@@ -55,7 +57,7 @@
 # ifdef MASKING
      &                      Amask,                                      &
 # endif
-     &                      A, SetFillVal)
+     &                      A, SetFillVal, MinValue, MaxValue)
 !***********************************************************************
 !
       USE mod_param
@@ -72,12 +74,12 @@
 !  Imported variable declarations.
 !
       logical, intent(in), optional :: SetFillVal
-
+!
       integer, intent(in) :: ng, model, ncid, ncvarid, tindex, gtype
       integer, intent(in) :: LBi, UBi, LBj, UBj
-
-      real(r8), intent(in) :: Ascl
-
+!
+      real(dp), intent(in) :: Ascl
+!
 # ifdef ASSUMED_SHAPE
 #  ifdef MASKING
       real(r8), intent(in) :: Amask(LBi:,LBj:)
@@ -89,6 +91,8 @@
 #  endif
       real(r8), intent(in) :: A(LBi:UBi,LBj:UBj)
 # endif
+      real(r8), intent(out), optional :: MinValue
+      real(r8), intent(out), optional :: MaxValue
 !
 !  Local variable declarations.
 !
@@ -349,7 +353,7 @@
 # ifdef MASKING
      &                      Amask,                                      &
 # endif
-     &                      A, SetFillVal)
+     &                      A, SetFillVal, MinValue, MaxValue)
 !***********************************************************************
 !
       USE mod_param
@@ -366,12 +370,12 @@
 !  Imported variable declarations.
 !
       logical, intent(in), optional :: SetFillVal
-
+!
       integer, intent(in) :: ng, model, ncid, ncvarid, tindex, gtype
       integer, intent(in) :: LBi, UBi, LBj, UBj
-
-      real(r8), intent(in) :: Ascl
-
+!
+      real(dp), intent(in) :: Ascl
+!
 # ifdef ASSUMED_SHAPE
 #  ifdef MASKING
       real(r8), intent(in) :: Amask(LBi:,LBj:)
@@ -383,6 +387,8 @@
 #  endif
       real(r8), intent(in) :: A(LBi:UBi,LBj:UBj)
 # endif
+      real(r8), intent(out), optional :: MinValue
+      real(r8), intent(out), optional :: MaxValue
 !
 !  Local variable declarations.
 !
@@ -519,6 +525,23 @@
 #  endif
       END IF
 # endif
+!
+!-----------------------------------------------------------------------
+!  If applicable, compute output field minimum and maximum values.
+!-----------------------------------------------------------------------
+!
+      IF (PRESENT(MinValue)) THEN
+        IF (OutThread) THEN
+          MinValue=spval
+          MaxValue=-spval
+          DO i=1,Npts
+            IF (ABS(Awrk(i)).lt.spval) THEN
+              MinValue=MIN(MinValue,Awrk(i))
+              MaxValue=MAX(MaxValue,Awrk(i))
+            END IF
+          END DO
+        END IF
+      END IF
 !
 !-----------------------------------------------------------------------
 !  Write output buffer into NetCDF file.

@@ -44,9 +44,9 @@
 !***********************************************************************
 !
       USE mod_param
-#if defined HYPOXIA_SRM || defined RED_TIDE
+# if defined HYPOXIA_SRM || defined RED_TIDE
       USE mod_biology
-#endif
+# endif
       USE mod_boundary
       USE mod_clima
       USE mod_forces
@@ -1375,8 +1375,11 @@
 #  endif
 # endif
 
-# if defined NLM_OUTER           || defined W4DPSAS                 ||\
-     defined W4DPSAS_SENSITIVITY || defined W4DPSAS_FCT_SENSITIVITY
+# if defined NLM_OUTER                || \
+     defined RBL4DVAR                 || \
+     defined RBL4DVAR_ANA_SENSITIVITY || \
+     defined RBL4DVAR_FCT_SENSITIVITY || \
+     defined SP4DVAR
 !
 !-----------------------------------------------------------------------
 !  Set weak contraint forcing.

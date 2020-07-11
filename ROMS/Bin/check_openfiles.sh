@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/bin/bash
 #
 # svn $Id$
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -7,16 +7,21 @@
 #   See License_ROMS.txt                                                :::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::: Hernan G. Arango :::
 #                                                                       :::
-# ROMS/TOMS Script to check open files                                  :::
+# ROMS BASH Script to check open files                                  :::
 #                                                                       :::
 # In the UNIX environment, there is a limit to the number of open files :::
 # during program execution. Use the commands to check such limit:       :::
 #                                                                       :::
+#   limit                                                               :::
 #   ulimit -a                                                           :::
 #   ulimit -S -n                                                        :::
 #                                                                       :::
 # Usually, 256 files can be openned by default. If the number of open   :::
 # files is exceeded, you will get the 'Too many open files' error.      :::
+#                                                                       :::
+# For example, in Linux we can change the default number:               :::
+#                                                                       :::
+#   limit descriptors 2048   or any other value                         :::
 #                                                                       :::
 # The C-preprocessing option CHECK_OPEN_FILES in ROMS can be used to    :::
 # report the number of files created, opened, and closed for an         :::
@@ -35,13 +40,13 @@
 
 # Set report file.
 
-set report="fort.1000"
+report="fort.1000"
 
 # Get the number of files created, opened, and closed.
 
-set CREATED=`grep CREATE ${report} | wc -l`
-set OPENED=`grep OPEN  ${report} | wc -l`
-set CLOSED=`grep CLOSE ${report} | wc -l`
+CREATED=`grep CREATE ${report} | wc -l`
+OPENED=`grep OPEN  ${report} | wc -l`
+CLOSED=`grep CLOSE ${report} | wc -l`
 
 # Report ROMS I/O NetCDF files.
 

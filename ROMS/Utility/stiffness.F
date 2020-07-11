@@ -304,7 +304,7 @@
   30      FORMAT (/,' Initial domain volumes:  TotVolume = ',1p,e17.10, &
      &            0p,' m3',/,t26,'MinCellVol = ',1p,e17.10,0p,' m3',    &
      &            /,t26, 'MaxCellVol = ',1p,e17.10,0p,' m3',            &
-     &            /,t26, '   Max/Min = ',1p,e17.10,0p)
+     &            /,t26, '   Max/Min = ',1p,e17.10,0p,/)
         END IF
       END IF
 !$OMP END CRITICAL (R_FACTOR)

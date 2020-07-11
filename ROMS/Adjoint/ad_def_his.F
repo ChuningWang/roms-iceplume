@@ -55,7 +55,7 @@
 # if defined ADJUST_STFLUX || defined ADJUST_WSTRESS
       integer :: frecdim
 # endif
-# if defined IS4DVAR
+# if defined I4DVAR
       integer :: MinnerDim, NinnerDim, NouterDim
       integer :: vardim(2)
 # endif
@@ -301,7 +301,7 @@
      &                 __FILE__)) RETURN
 # endif
 
-# if defined IS4DVAR
+# if defined I4DVAR
         status=def_dim(ng, iADM, ADM(ng)%ncid, ncname, 'Ninner',        &
      &                 Ninner, NinnerDim)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -520,7 +520,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
-# if defined IS4DVAR
+# if defined I4DVAR
 !
 !  Define Lanczos algorithm coefficients which can be used to
 !  compute the sensitivity of the observations to the 4DVAR

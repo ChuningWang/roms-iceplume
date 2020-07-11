@@ -61,10 +61,9 @@
       integer :: INPncid, INPvid
       integer :: i, gtype, status, varid
       integer :: ibuffer(2), Vsize(4)
-
-      real(r8) :: Fmin, Fmax, wscale
-
-      real(dp) :: rscale
+!
+      real(r8) :: Fmin, Fmax
+      real(dp) :: scale
       real(dp) :: inp_time(1)
 
 # include "set_bounds.h"
@@ -113,6 +112,14 @@
         WRITE (stdout,10) TRIM(INPncname)
         RETURN
       END IF
+# ifdef SP4DVAR
+!
+      Iinp=1
+      scale=1.0_dp
+!
+      DO Irec=1,Nrec
+        Iout=Irec
+# else
 !
 !  Process each record in input adjoint NetCDF except last. Note that
 !  the adjoint records are processed backwards (Nrec-1:1) and written
@@ -122,11 +129,11 @@
 !
       Iinp=1
       Iout=0
-      rscale=1.0_dp
-      wscale=1.0_r8
-
+      scale=1.0_dp
+!
       DO Irec=Nrec-1,1,-1
         Iout=Iout+1
+# endif
 !
 !  Process time.
 !
@@ -159,7 +166,7 @@
      &                      Vname(1,idZtlf), INPvid,                    &
      &                      Irec, MyType, Vsize,                        &
      &                      LBi, UBi, LBj, UBj,                         &
-     &                      rscale, Fmin, Fmax,                         &
+     &                      scale, Fmin, Fmax,                          &
 # ifdef MASKING
      &                      GRID(ng) % rmask,                           &
 # endif
@@ -179,7 +186,7 @@
           status=nf_fwrite2d(ng, model, TLF(ng)%ncid,                   &
      &                       TLF(ng)%Vid(idZtlf),                       &
      &                       Iout, MyType,                              &
-     &                       LBi, UBi, LBj, UBj, wscale,                &
+     &                       LBi, UBi, LBj, UBj, scale,                 &
 # ifdef MASKING
      &                       GRID(ng) % rmask,                          &
 # endif
@@ -212,7 +219,7 @@
      &                      Vname(1,idUbtf), INPvid,                    &
      &                      Irec, MyType, Vsize,                        &
      &                      LBi, UBi, LBj, UBj,                         &
-     &                      rscale, Fmin, Fmax,                         &
+     &                      scale, Fmin, Fmax,                          &
 #  ifdef MASKING
      &                      GRID(ng) % umask_full,                      &
 #  endif
@@ -232,7 +239,7 @@
           status=nf_fwrite2d(ng, model, TLF(ng)%ncid,                   &
      &                       TLF(ng)%Vid(idUbtf),                       &
      &                       Iout, MyType,                              &
-     &                       LBi, UBi, LBj, UBj, wscale,                &
+     &                       LBi, UBi, LBj, UBj, scale,                 &
 #  ifdef MASKING
      &                       GRID(ng) % umask_full,                     &
 #  endif
@@ -263,7 +270,7 @@
      &                      Vname(1,idVbtf), INPvid,                    &
      &                      Irec, MyType, Vsize,                        &
      &                      LBi, UBi, LBj, UBj,                         &
-     &                      rscale, Fmin, Fmax,                         &
+     &                      scale, Fmin, Fmax,                          &
 #  ifdef MASKING
      &                      GRID(ng) % vmask_full,                      &
 #  endif
@@ -283,7 +290,7 @@
           status=nf_fwrite2d(ng, model, TLF(ng)%ncid,                   &
      &                       TLF(ng)%Vid(idVbtf),                       &
      &                       Iout, MyType,                              &
-     &                       LBi, UBi, LBj, UBj, wscale,                &
+     &                       LBi, UBi, LBj, UBj, scale,                 &
 #  ifdef MASKING
      &                       GRID(ng) % vmask_full,                     &
 #  endif
@@ -316,7 +323,7 @@
      &                      Vname(1,idUtlf), INPvid,                    &
      &                      Irec, MyType, Vsize,                        &
      &                      LBi, UBi, LBj, UBj, 1, N(ng),               &
-     &                      rscale, Fmin, Fmax,                         &
+     &                      scale, Fmin, Fmax,                          &
 #  ifdef MASKING
      &                      GRID(ng) % umask_full,                      &
 #  endif
@@ -335,7 +342,7 @@
           status=nf_fwrite3d(ng, model, TLF(ng)%ncid,                   &
      &                       TLF(ng)%Vid(idUtlf),                       &
      &                       Iout, MyType,                              &
-     &                       LBi, UBi, LBj, UBj, 1, N(ng), wscale,      &
+     &                       LBi, UBi, LBj, UBj, 1, N(ng), scale,       &
 #  ifdef MASKING
      &                       GRID(ng) % umask_full,                     &
 #  endif
@@ -366,7 +373,7 @@
      &                      Vname(1,idVtlf), INPvid,                    &
      &                      Irec, MyType, Vsize,                        &
      &                      LBi, UBi, LBj, UBj, 1, N(ng),               &
-     &                      rscale, Fmin, Fmax,                         &
+     &                      scale, Fmin, Fmax,                          &
 #  ifdef MASKING
      &                      GRID(ng) % vmask_full,                      &
 #  endif
@@ -385,7 +392,7 @@
           status=nf_fwrite3d(ng, model, TLF(ng)%ncid,                   &
      &                       TLF(ng)%Vid(idVtlf),                       &
      &                       Iout, MyType,                              &
-     &                       LBi, UBi, LBj, UBj, 1, N(ng), wscale,      &
+     &                       LBi, UBi, LBj, UBj, 1, N(ng), scale,       &
 #  ifdef MASKING
      &                       GRID(ng) % vmask_full,                     &
 #  endif
@@ -418,7 +425,7 @@
      &                        Vname(1,idTtlf(i)), INPvid,               &
      &                        Irec, MyType, Vsize,                      &
      &                        LBi, UBi, LBj, UBj, 1, N(ng),             &
-     &                        rscale, Fmin, Fmax,                       &
+     &                        scale, Fmin, Fmax,                        &
 #  ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 #  endif
@@ -436,7 +443,7 @@
 !
             status=nf_fwrite3d(ng, model, TLF(ng)%ncid, TLF(ng)%Tid(i), &
      &                         Iout, MyType,                            &
-     &                         LBi, UBi, LBj, UBj, 1, N(ng), wscale,    &
+     &                         LBi, UBi, LBj, UBj, 1, N(ng), scale,     &
 #  ifdef MASKING
      &                         GRID(ng) % rmask,                        &
 #  endif
@@ -479,7 +486,11 @@
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 
+# ifdef SP4DVAR
+      IF (Master)  WRITE (stdout,60) Nrec, TRIM(TLF(ng)%name)
+# else
       IF (Master)  WRITE (stdout,60) Nrec-1, TRIM(TLF(ng)%name)
+# endif
 !
   10  FORMAT (/,' WRT_IMPULSE - unable to open input NetCDF file: ',a)
   20  FORMAT (/,' WRT_IMPULSE - error while reading variable: ',a,2x,   &
@@ -490,7 +501,7 @@
      &        /,12x,'in input NetCDF file: ',a)
   50  FORMAT (/,' WRT_IMPULSE - unable to close input NetCDF file: ',a)
   60  FORMAT (4x,'WRT_IMPULSE - wrote convolved adjoint impulses, ',    &
-     &           'records: 001 to ',i3.3,/,18x,'file: ',a)
+     &           'records: 1 to ',i0,/,18x,'file: ',a)
 
       RETURN
       END SUBROUTINE wrt_impulse

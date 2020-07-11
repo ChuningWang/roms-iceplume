@@ -11,7 +11,7 @@
 !                                                                      !
 !  This driver is used to perform the Picard iterations test for the   !
 !  representers tangent linear model used in IOMs weak constraint 4D   !
-!  variational data assimilation (W4DVAR).  Recall that all  tangent   !
+!  variational data assimilation (R4D-Var).  Recall that all tangent   !
 !  linear variables are in term of the full fields and the model can   !
 !  expressed symbolically as:                                          !
 !                                                                      !
@@ -346,7 +346,7 @@
 !
       IF (Master) THEN
         WRITE (stdout,20)
- 20     FORMAT (/,' Elapsed CPU time (seconds):',/)
+ 20     FORMAT (/,'Elapsed wall CPU time for each process (seconds):',/)
       END IF
 !
       DO ng=1,Ngrids

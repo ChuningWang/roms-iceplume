@@ -72,11 +72,13 @@
       integer :: LBij, UBij
 # endif
       integer :: gfactor, gtype, i, itrc, status, varid
-
-      real(r8) :: my_time, scale
-
-# ifdef RPCG
+!
+      real(dp) :: my_time, scale
+!
+# if defined RPCG
       character (len=35) :: string
+# elif defined SP4DVAR
+      character (len=31) :: string
 # else
       character (len=15) :: string
 # endif
@@ -103,9 +105,9 @@
 !  points (gfactor=-1) fields only.
 !
 # if defined WRITE_WATER && defined MASKING
-       gfactor=-1
+      gfactor=-1
 # else
-       gfactor=1
+      gfactor=1
 # endif
 !
 !  Write out model time (s). Use the "tdays" variable here because of
@@ -123,7 +125,7 @@
 !
 !  Write out free-surface (m)
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*r2dvar
       status=nf_fwrite2d(ng, iTLM, ITL(ng)%ncid, ITL(ng)%Vid(idFsur),   &
      &                   OutRec, gtype,                                 &
@@ -140,7 +142,7 @@
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
-          WRITE (stdout,10) TRIM(Vname(1,idFsur)), OutRec
+          WRITE (stdout,20) TRIM(Vname(1,idFsur)), OutRec
         END IF
         exit_flag=3
         ioerror=status
@@ -152,7 +154,7 @@
 !  Write out free-surface open boundaries.
 !
       IF (ANY(Lobc(:,isFsur,ng))) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         status=nf_fwrite2d_bry (ng, iTLM, ITL(ng)%name, ITL(ng)%ncid,   &
      &                          Vname(1,idSbry(isFsur)),                &
      &                          ITL(ng)%Vid(idSbry(isFsur)),            &
@@ -163,7 +165,7 @@
         IF (FoundError(status, nf90_noerr, __LINE__,                    &
      &                 __FILE__)) THEN
           IF (Master) THEN
-            WRITE (stdout,10) TRIM(Vname(1,idSbry(isFsur))), OutRec
+            WRITE (stdout,20) TRIM(Vname(1,idSbry(isFsur))), OutRec
           END IF
           exit_flag=3
           ioerror=status
@@ -174,7 +176,7 @@
 !
 !  Write out 2D U-momentum component (m/s).
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*u2dvar
       status=nf_fwrite2d(ng, iTLM, ITL(ng)%ncid, ITL(ng)%Vid(idUbar),   &
      &                   OutRec, gtype,                                 &
@@ -186,7 +188,7 @@
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
-          WRITE (stdout,10) TRIM(Vname(1,idUbar)), OutRec
+          WRITE (stdout,20) TRIM(Vname(1,idUbar)), OutRec
         END IF
         exit_flag=3
         ioerror=status
@@ -198,7 +200,7 @@
 !  Write out 2D U-momentum component open boundaries.
 !
       IF (ANY(Lobc(:,isUbar,ng))) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         status=nf_fwrite2d_bry (ng, iTLM, ITL(ng)%name, ITL(ng)%ncid,   &
      &                          Vname(1,idSbry(isUbar)),                &
      &                          ITL(ng)%Vid(idSbry(isUbar)),            &
@@ -209,7 +211,7 @@
         IF (FoundError(status, nf90_noerr, __LINE__,                    &
      &                 __FILE__)) THEN
           IF (Master) THEN
-            WRITE (stdout,10) TRIM(Vname(1,idSbry(isUbar))), OutRec
+            WRITE (stdout,20) TRIM(Vname(1,idSbry(isUbar))), OutRec
           END IF
           exit_flag=3
           ioerror=status
@@ -220,7 +222,7 @@
 !
 !  Write out 2D momentum component (m/s) in the ETA-direction.
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*v2dvar
       status=nf_fwrite2d(ng, iTLM, ITL(ng)%ncid, ITL(ng)%Vid(idVbar),   &
      &                   OutRec, gtype,                                 &
@@ -232,7 +234,7 @@
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
-          WRITE (stdout,10) TRIM(Vname(1,idVbar)), OutRec
+          WRITE (stdout,20) TRIM(Vname(1,idVbar)), OutRec
         END IF
         exit_flag=3
         ioerror=status
@@ -244,7 +246,7 @@
 !  Write out 2D V-momentum component open boundaries.
 !
       IF (ANY(Lobc(:,isVbar,ng))) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         status=nf_fwrite2d_bry (ng, iTLM, ITL(ng)%name, ITL(ng)%ncid,   &
      &                          Vname(1,idSbry(isVbar)),                &
      &                          ITL(ng)%Vid(idSbry(isVbar)),            &
@@ -255,7 +257,7 @@
         IF (FoundError(status, nf90_noerr, __LINE__,                    &
      &                 __FILE__)) THEN
           IF (Master) THEN
-            WRITE (stdout,10) TRIM(Vname(1,idSbry(isVbar))), OutRec
+            WRITE (stdout,20) TRIM(Vname(1,idSbry(isVbar))), OutRec
           END IF
           exit_flag=3
           ioerror=status
@@ -269,7 +271,7 @@
 !  own fixed time-dimension (of size Nfrec) to allow 4DVAR adjustments
 !  at other times in addition to initialization time.
 !
-      scale=1.0_r8                          ! m2/s2
+      scale=1.0_dp                          ! m2/s2
       gtype=gfactor*u3dvar
       status=nf_fwrite3d(ng, iTLM, ITL(ng)%ncid, ITL(ng)%Vid(idUsms),   &
      &                   OutRec, gtype,                                 &
@@ -281,7 +283,7 @@
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
-          WRITE (stdout,10) TRIM(Vname(1,idUsms)), OutRec
+          WRITE (stdout,20) TRIM(Vname(1,idUsms)), OutRec
         END IF
         exit_flag=3
         ioerror=status
@@ -290,7 +292,7 @@
 !
 !  Write out surface V-momentum stress.
 !
-      scale=1.0_r8                          ! m2/s2
+      scale=1.0_dp                          ! m2/s2
       gtype=gfactor*v3dvar
       status=nf_fwrite3d(ng, iTLM, ITL(ng)%ncid, ITL(ng)%Vid(idVsms),   &
      &                   OutRec, gtype,                                 &
@@ -302,7 +304,7 @@
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
-          WRITE (stdout,10) TRIM(Vname(1,idVsms)), OutRec
+          WRITE (stdout,20) TRIM(Vname(1,idVsms)), OutRec
         END IF
         exit_flag=3
         ioerror=status
@@ -313,7 +315,7 @@
 !
 !  Write out 3D U-momentum component (m/s).
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*u3dvar
       status=nf_fwrite3d(ng, iTLM, ITL(ng)%ncid, ITL(ng)%Vid(idUvel),   &
      &                   OutRec, gtype,                                 &
@@ -325,7 +327,7 @@
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
-          WRITE (stdout,10) TRIM(Vname(1,idUvel)), OutRec
+          WRITE (stdout,20) TRIM(Vname(1,idUvel)), OutRec
         END IF
         exit_flag=3
         ioerror=status
@@ -337,7 +339,7 @@
 !  Write out 3D U-momentum component open boundaries.
 !
       IF (ANY(Lobc(:,isUvel,ng))) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         status=nf_fwrite3d_bry (ng, iTLM, ITL(ng)%name, ITL(ng)%ncid,   &
      &                          Vname(1,idSbry(isUvel)),                &
      &                          ITL(ng)%Vid(idSbry(isUvel)),            &
@@ -348,7 +350,7 @@
         IF (FoundError(status, nf90_noerr, __LINE__,                    &
      &                 __FILE__)) THEN
           IF (Master) THEN
-            WRITE (stdout,10) TRIM(Vname(1,idSbry(isUvel))), OutRec
+            WRITE (stdout,20) TRIM(Vname(1,idSbry(isUvel))), OutRec
           END IF
           exit_flag=3
           ioerror=status
@@ -359,7 +361,7 @@
 !
 !  Write out 3D V-momentum component (m/s).
 !
-      scale=1.0_r8
+      scale=1.0_dp
       gtype=gfactor*v3dvar
       status=nf_fwrite3d(ng, iTLM, ITL(ng)%ncid, ITL(ng)%Vid(idVvel),   &
      &                   OutRec, gtype,                                 &
@@ -371,7 +373,7 @@
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
-          WRITE (stdout,10) TRIM(Vname(1,idVvel)), OutRec
+          WRITE (stdout,20) TRIM(Vname(1,idVvel)), OutRec
         END IF
         exit_flag=3
         ioerror=status
@@ -383,7 +385,7 @@
 !  Write out 3D V-momentum component open boundaries.
 !
       IF (ANY(Lobc(:,isVvel,ng))) THEN
-        scale=1.0_r8
+        scale=1.0_dp
         status=nf_fwrite3d_bry (ng, iTLM, ITL(ng)%name, ITL(ng)%ncid,   &
      &                          Vname(1,idSbry(isVvel)),                &
      &                          ITL(ng)%Vid(idSbry(isVvel)),            &
@@ -394,7 +396,7 @@
         IF (FoundError(status, nf90_noerr, __LINE__,                    &
      &                 __FILE__)) THEN
           IF (Master) THEN
-            WRITE (stdout,10) TRIM(Vname(1,idSbry(isVvel))), OutRec
+            WRITE (stdout,20) TRIM(Vname(1,idSbry(isVvel))), OutRec
           END IF
           exit_flag=3
           ioerror=status
@@ -406,9 +408,9 @@
 !  Write out tracer type variables.
 !
       DO itrc=1,NT(ng)
-        scale=1.0_r8
+        scale=1.0_dp
         gtype=gfactor*r3dvar
-3        status=nf_fwrite3d(ng, iTLM, ITL(ng)%ncid, ITL(ng)%Tid(itrc),  &
+        status=nf_fwrite3d(ng, iTLM, ITL(ng)%ncid, ITL(ng)%Tid(itrc),   &
      &                     OutRec, gtype,                               &
      &                     LBi, UBi, LBj, UBj, 1, N(ng), scale,         &
 #  ifdef MASKING
@@ -418,7 +420,7 @@
         IF (FoundError(status, nf90_noerr, __LINE__,                    &
      &                 __FILE__)) THEN
           IF (Master) THEN
-            WRITE (stdout,10) TRIM(Vname(1,idTvar(itrc))), OutRec
+            WRITE (stdout,20) TRIM(Vname(1,idTvar(itrc))), OutRec
           END IF
           exit_flag=3
           ioerror=status
@@ -432,7 +434,7 @@
 !
       DO itrc=1,NT(ng)
         IF (ANY(Lobc(:,isTvar(itrc),ng))) THEN
-          scale=1.0_r8
+          scale=1.0_dp
           status=nf_fwrite3d_bry (ng, iTLM, ITL(ng)%name, ITL(ng)%ncid, &
      &                            Vname(1,idSbry(isTvar(itrc))),        &
      &                            ITL(ng)%Vid(idSbry(isTvar(itrc))),    &
@@ -444,7 +446,7 @@
           IF (FoundError(status, nf90_noerr, __LINE__,                  &
      &                   __FILE__)) THEN
             IF (Master) THEN
-              WRITE (stdout,10) TRIM(Vname(1,idSbry(isTvar(itrc)))),    &
+              WRITE (stdout,20) TRIM(Vname(1,idSbry(isTvar(itrc)))),    &
      &                          OutRec
             END IF
             exit_flag=3
@@ -462,7 +464,7 @@
 !
       DO itrc=1,NT(ng)
         IF (Lstflux(itrc,ng)) THEN
-          scale=1.0_r8                      ! kinematic flux units
+          scale=1.0_dp                      ! kinematic flux units
           gtype=gfactor*r3dvar
           status=nf_fwrite3d(ng, iTLM, ITL(ng)%ncid,                    &
      &                       ITL(ng)%Vid(idTsur(itrc)),                 &
@@ -475,7 +477,7 @@
           IF (FoundError(status, nf90_noerr, __LINE__,                  &
      &                   __FILE__)) THEN
             IF (Master) THEN
-              WRITE (stdout,10) TRIM(Vname(1,idTsur(itrc))),            &
+              WRITE (stdout,20) TRIM(Vname(1,idTsur(itrc))),            &
      &                          OutRec
             END IF
             exit_flag=3
@@ -487,13 +489,13 @@
 #  endif
 # endif
 
-# if defined IS4DVAR || defined BACKGROUND
+# if defined I4DVAR || defined BACKGROUND
 !
 !-----------------------------------------------------------------------
 !  Write other 4D-Var data to DAV(ng)%name file.
 !-----------------------------------------------------------------------
 
-#  if defined IS4DVAR
+#  if defined I4DVAR
 !
 !  Write out tangent linear model misfit cost function. Notice that it
 !  is written into DAV(ng)%name file instead of ITL(ng)%name file.
@@ -519,7 +521,7 @@
      &               __FILE__)) RETURN
 #  endif
 
-#  if defined IS4DVAR
+#  if defined I4DVAR
 !
 !  Write out current optimal, normalized cost function minimum.  Notice
 !  that it is written into DAV(ng)%name file instead of ITL(ng)%name
@@ -542,14 +544,14 @@
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 
-# if defined IS4DVAR || defined BACKGROUND
+# if defined I4DVAR || defined BACKGROUND
       CALL netcdf_sync (ng, iTLM, DAV(ng)%name, DAV(ng)%ncid)
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 # endif
 !
       IF (Master) THEN
-# ifdef RPCG
+# if defined RPCG
         IF (OutRec.eq.1) THEN
           string='inner-loop initial fields          '
         ELSE IF (OutRec.eq.2) THEN
@@ -560,6 +562,14 @@
           string='sum of adjoint solutions           '
         ELSE IF (OutRec.eq.5) THEN
           string='augmented correction term          '
+        END IF
+# elif defined SP4DVAR
+        IF (OutRec.eq.1) THEN
+          string='TLM initial fields             '
+        ELSE IF ((2.le.OutRec).and.(OutRec.le.Nsaddle+1)) THEN
+          string='TLM saddle-point starting field'
+        ELSE IF ((Nsaddle+2.le.OutRec).and.(OutRec.le.2*Nsaddle+2)) THEN
+          string='ADM saddle-point starting field'
         END IF
 # else
         IF (OutRec.eq.1) THEN
@@ -573,20 +583,21 @@
         END IF
 # endif
 # ifdef SOLVE3D
-        WRITE (stdout,20) string, Nrun, Tindex, Tindex, OutRec
+        WRITE (stdout,30) string, outer, inner, Tindex, Tindex, OutRec
 # else
-        WRITE (stdout,20) string, Nrun, Tindex, OutRec
+        WRITE (stdout,30) string, outer, inner, Tindex, OutRec
 # endif
       END IF
 !
-  10  FORMAT (/,' TL_WRT_INI - error while writing variable: ',a,/,14x, &
-     &        'into tangent initial NetCDF file for time record: ',i4)
+  10  FORMAT (/,' TL_WRT_INI - unable to open initial NetCDF file: ',a)
+  20  FORMAT (/,' TL_WRT_INI - error while writing variable: ',a,/,14x, &
+     &        'into tangent initial NetCDF file for time record: ',i0)
 # ifdef SOLVE3D
-  20  FORMAT (3x,'TL_WRT_INI   - wrote ',a,' (Iter=',i4.4,', Index=',   &
-     &        i1,',',i1,', Rec=',i4.4,')')
+  30  FORMAT (3x,'TL_WRT_INI   - wrote ',a,' (Outer=',i2.2,', Inner=',  &
+     &        i3.3,', Index=',i0,',',i0,', Rec=',i0,')')
 # else
-  20  FORMAT (3x,'TL_WRT_INI   - wrote ',a,' (Iter=',i4.4,', Index=',   &
-     &        i1,', Rec=',i4.4,')')
+  30  FORMAT (3x,'TL_WRT_INI   - wrote ',a,' (Outer=',i2.2,', Inner=',  &
+     &        i3.3,', Index=',i0,', Rec=',i0,')')
 # endif
 
 #else

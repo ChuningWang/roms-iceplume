@@ -1061,7 +1061,7 @@
 !>
           ad_t(i,j,1,nrhs,isalt)=ad_t(i,j,1,nrhs,isalt)+                &
      &                           btflx(i,j,isalt)*ad_btflx(i,j,isalt)
-#   if !(defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
+#   if !(defined AD_SENSITIVITY   || defined I4DVAR_ANA_SENSITIVITY || \
          defined OPT_OBSERVATIONS || defined SO_SEMI)
           ad_btflx(i,j,isalt)=0.0_r8
 #   endif
@@ -1083,8 +1083,8 @@
      &                               EmP*ad_stflx(i,j,isalt)
           ad_EmP=ad_EmP+                                                &
                  t(i,j,N(ng),nrhs,isalt)*ad_stflx(i,j,isalt)
-#    if !(defined ADJUST_STFLUX       || defined AD_SENSITIVITY   || \
-          defined IS4DVAR_SENSITIVITY || defined OPT_OBSERVATIONS || \
+#    if !(defined ADJUST_STFLUX          || defined AD_SENSITIVITY   || \
+          defined I4DVAR_ANA_SENSITIVITY || defined OPT_OBSERVATIONS || \
           defined SO_SEMI)
           ad_stflx(i,j,isalt)=0.0_r8
 #    endif
@@ -1100,8 +1100,8 @@
      &                     (t(i,j,N(ng),nrhs,isalt)-sss(i,j))*adfac
           ad_t(i,j,N(ng),nrhs,isalt)=ad_t(i,j,N(ng),nrhs,isalt)+        &
      &                               Hz(i,j,N(ng))*adfac
-#    if !(defined ADJUST_STFLUX       || defined AD_SENSITIVITY   || \
-          defined IS4DVAR_SENSITIVITY || defined OPT_OBSERVATIONS || \
+#    if !(defined ADJUST_STFLUX          || defined AD_SENSITIVITY   || \
+          defined I4DVAR_ANA_SENSITIVITY || defined OPT_OBSERVATIONS || \
           defined SO_SEMI)
           ad_stflx(i,j,isalt)=0.0_r8
 #    endif
@@ -1113,8 +1113,8 @@
      &                               EmP*ad_stflx(i,j,isalt)
           ad_EmP=ad_EmP+                                                &
                  t(i,j,N(ng),nrhs,isalt)*ad_stflx(i,j,isalt)
-#    if !(defined ADJUST_STFLUX       || defined AD_SENSITIVITY   || \
-          defined IS4DVAR_SENSITIVITY || defined OPT_OBSERVATIONS || \
+#    if !(defined ADJUST_STFLUX          || defined AD_SENSITIVITY   || \
+          defined I4DVAR_ANA_SENSITIVITY || defined OPT_OBSERVATIONS || \
           defined SO_SEMI)
           ad_stflx(i,j,isalt)=0.0_r8
 #    endif
@@ -1190,8 +1190,8 @@
 !>
           ad_t(i,j,N(ng),nrhs,itemp)=ad_t(i,j,N(ng),nrhs,itemp)+        &
      &                               dqdt(i,j)*ad_stflx(i,j,itemp)
-#   if !(defined ADJUST_STFLUX       || defined AD_SENSITIVITY   || \
-         defined IS4DVAR_SENSITIVITY || defined OPT_OBSERVATIONS || \
+#   if !(defined ADJUST_STFLUX          || defined AD_SENSITIVITY   || \
+         defined I4DVAR_ANA_SENSITIVITY || defined OPT_OBSERVATIONS || \
          defined SO_SEMI)
           ad_stflx(i,j,itemp)=0.0_r8
 #   endif

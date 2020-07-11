@@ -2,7 +2,7 @@
       MODULE adsen_force_mod
 
 #if defined ADJOINT          && \
-   (defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
+   (defined AD_SENSITIVITY   || defined I4DVAR_ANA_SENSITIVITY || \
     defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR)
 !
 !svn $Id$
@@ -199,7 +199,7 @@
 !  arbitrarily defined.
 !
       adFac=0.0_r8
-#  ifdef IS4DVAR_SENSITIVITY
+#  ifdef I4DVAR_ANA_SENSITIVITY
       IF ((MOD(iic(ng)-1,nHIS(ng)).eq.0).and.                           &
      &    (DendS(ng).ge.tdays(ng)).and.(tdays(ng).ge.DstrS(ng))) THEN
 #  else

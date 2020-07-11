@@ -148,7 +148,10 @@
             wrtHIS=(iic(ng).ne.ntstart(ng)).and.                        &
      &             (MOD(iic(ng)-1,nADJ(ng)).eq.0) ! avoid ntstart rec
           ELSE
-#  ifdef WEAK_CONSTRAINT
+#  if defined WEAK_CONSTRAINT && !defined WEAK_NOINTERP
+#   ifdef SP4DVAR
+            wrtHIS=(MOD(iic(ng)-1,nADJ(ng)).eq.0)
+#   endif
             wrtHIS=(iic(ng).ne.ntstart(ng)).and.                        &
      &             (MOD(iic(ng)-1,nADJ(ng)).eq.0) ! avoid ntstart-1 rec
 #  else

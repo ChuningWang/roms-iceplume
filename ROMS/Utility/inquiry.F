@@ -132,6 +132,14 @@
               FRCids(ifile,ng)=-1
               S(ifile)%ncid=-1
             END IF
+            IF (label(1:3).eq.'BRY') THEN
+              BRYids(ifile,ng)=-1
+              S(ifile)%ncid=-1
+            END IF
+            IF (label(1:3).eq.'CLM') THEN
+              CLMids(ifile,ng)=-1
+              S(ifile)%ncid=-1
+            END IF
             EXIT
           ELSE                       ! S(ifile)%name and Fcount already
             Fcount=S(ifile)%Fcount   ! updated in first field processed
@@ -366,6 +374,20 @@
               WRITE (stdout,'(15x,a)') TRIM(S(i)%name)
             END DO
           END IF
+        ELSE IF ((nfiles.gt.1).and.(label(1:3).eq.'BRY')) THEN
+          IF (Master) THEN
+            WRITE (stdout,50) TRIM(Vname(1,ifield)), 'files:'
+            DO i=1,nfiles
+              WRITE (stdout,'(15x,a)') TRIM(S(i)%name)
+            END DO
+          END IF
+        ELSE IF ((nfiles.gt.1).and.(label(1:3).eq.'CLM')) THEN
+          IF (Master) THEN
+            WRITE (stdout,50) TRIM(Vname(1,ifield)), 'files:'
+            DO i=1,nfiles
+              WRITE (stdout,'(15x,a)') TRIM(S(i)%name)
+            END DO
+          END IF
         ELSE
           lstr=LEN_TRIM(ncfile)
           IF (Master) THEN
@@ -384,6 +406,20 @@
       END IF
       IF (.not.got_time) THEN
         IF ((nfiles.gt.1).and.(label(1:3).eq.'FRC')) THEN
+          IF (Master) THEN
+            WRITE (stdout,50) TRIM(Tname(ifield)), 'files:'
+            DO i=1,nfiles
+              WRITE (stdout,'(15x,a)') TRIM(S(i)%name)
+            END DO
+          END IF
+        ELSE IF ((nfiles.gt.1).and.(label(1:3).eq.'BRY')) THEN
+          IF (Master) THEN
+            WRITE (stdout,50) TRIM(Tname(ifield)), 'files:'
+            DO i=1,nfiles
+              WRITE (stdout,'(15x,a)') TRIM(S(i)%name)
+            END DO
+          END IF
+        ELSE IF ((nfiles.gt.1).and.(label(1:3).eq.'CLM')) THEN
           IF (Master) THEN
             WRITE (stdout,50) TRIM(Tname(ifield)), 'files:'
             DO i=1,nfiles
@@ -421,6 +457,26 @@
           END IF
         END DO
       END IF
+      IF (label(1:3).eq.'BRY') THEN
+        DO ifile=1,nfiles
+          IF ((TRIM(ncfile).eq.TRIM(S(ifile)%name)).and.                &
+     &        (BRYids(ifile,ng).ne.-1).and.                             &
+     &        (ncid.ne.BRYids(ifile,ng))) THEN
+            ncid=BRYids(ifile,ng)
+            EXIT
+          END IF
+        END DO
+      END IF
+      IF (label(1:3).eq.'CLM') THEN
+        DO ifile=1,nfiles
+          IF ((TRIM(ncfile).eq.TRIM(S(ifile)%name)).and.                &
+     &        (CLMids(ifile,ng).ne.-1).and.                             &
+     &        (ncid.ne.CLMids(ifile,ng))) THEN
+            ncid=CLMids(ifile,ng)
+            EXIT
+          END IF
+        END DO
+      END IF
 !
 !  If appropriate, open input NetCDF file for reading.
 !  (HGA: it is not needed since file was already open and
@@ -441,6 +497,22 @@
         DO ifile=1,nfiles
           IF (TRIM(ncfile).eq.TRIM(S(ifile)%name)) THEN
             FRCids(ifile,ng)=ncid
+            S(ifile)%ncid=ncid
+            EXIT
+          END IF
+        END DO
+      ELSE IF (label(1:3).eq.'BRY') THEN
+        DO ifile=1,nfiles
+          IF (TRIM(ncfile).eq.TRIM(S(ifile)%name)) THEN
+            BRYids(ifile,ng)=ncid
+            S(ifile)%ncid=ncid
+            EXIT
+          END IF
+        END DO
+      ELSE IF (label(1:3).eq.'CLM') THEN
+        DO ifile=1,nfiles
+          IF (TRIM(ncfile).eq.TRIM(S(ifile)%name)) THEN
+            CLMids(ifile,ng)=ncid
             S(ifile)%ncid=ncid
             EXIT
           END IF

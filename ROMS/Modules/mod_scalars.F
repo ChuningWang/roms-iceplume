@@ -204,11 +204,15 @@
 !    F_code        Final time string for simulation
 !    I_code        Initial time string for simulation
 !    INItime       Nonlinear model initial conditions time (s).
+!    INItimeS      Saved nonlinear model initial conditions time (s).
 !    IMPtime       Impulse forcing time (s) to process.
 !    ObsTime       Observation time (s) to process.
 !    FrcTime       Adjoint or tangent linear Impulse forcing time (s).
 !    dstart        Time stamp assigned to model initialization (usually
 !                    a Calendar day, like modified Julian Day).
+#ifdef SP4DVAR
+!    dstartS       Saved original dstart for saddle-point 4D-Var.
+#endif
 !    tide_start    Reference time for tidal forcing (days).
 !
         logical, allocatable :: PerfectRST(:)
@@ -235,10 +239,14 @@
         real(dp), allocatable :: DIAtime(:)              ! seconds
         real(dp), allocatable :: IMPtime(:)              ! seconds
         real(dp), allocatable :: INItime(:)              ! seconds
+        real(dp), allocatable :: INItimeS(:)             ! seconds
         real(dp), allocatable :: ObsTime(:)              ! seconds
         real(dp), allocatable :: FrcTime(:)              ! seconds
 
         real(dp) :: dstart = 0.0_dp                      ! days
+#ifdef SP4DVAR
+        real(dp) :: dstartS = 0.0_dp                     ! days
+#endif
         real(dp) :: io_time = 0.0_dp                     ! seconds
         real(dp) :: run_time = 0.0_dp                    ! seconds
         real(dp) :: MyRunInterval = 0.0_dp               ! seconds
@@ -310,11 +318,20 @@
         integer :: Ninner = 1                   ! number of inner loops
         integer :: Nouter = 1                   ! number of outer loops
         integer :: Nrun = 1                     ! Current counter
-        integer :: inner = 0                    ! inner loop counter
-        integer :: outer = 0                    ! outer loop counter
 #ifdef SENSITIVITY_4DVAR
         integer :: NrunSAVE = 0                 ! Loop counter
 #endif
+        integer :: OuterLoop = 0                ! split outer loop
+        integer :: inner = 0                    ! inner loop counter
+        integer :: outer = 0                    ! outer loop counter
+!
+! Split 4D-Var phase.
+!
+        character (len=20) :: Phase4DVAR
+!
+! Number of sadde point 4D-Var intervals.
+!
+        integer :: Nsaddle = 1
 !
 !  First, starting, and ending timestepping parameters
 !
@@ -595,13 +612,23 @@
 !
 !  Minimun and maximum grid spacing
 !
-        real(dp), allocatable :: DXmin(:)
+        real(dp), allocatable :: DXmin(:)       ! all grid points
         real(dp), allocatable :: DXmax(:)
         real(dp), allocatable :: DYmin(:)
         real(dp), allocatable :: DYmax(:)
+#ifdef MASKING
+        real(dp), allocatable :: DXminW(:)      ! only water points
+        real(dp), allocatable :: DXmaxW(:)
+        real(dp), allocatable :: DYminW(:)
+        real(dp), allocatable :: DYmaxW(:)
+#endif
 #ifdef SOLVE3D
-        real(dp), allocatable :: DZmin(:)
+        real(dp), allocatable :: DZmin(:)       ! all grid points
         real(dp), allocatable :: DZmax(:)
+# ifdef MASKING
+        real(dp), allocatable :: DZminW(:)      ! only water points
+        real(dp), allocatable :: DZmaxW(:)
+# endif
 #endif
 !
 !  Maximum size of a grid node (m) over the whole curvilinear grid
@@ -881,6 +908,12 @@
         logical, allocatable :: LdefMOD(:)       ! 4DVAR file
         logical, allocatable :: LdefQCK(:)       ! Quicksave file
         logical, allocatable :: LdefRST(:)       ! Restart file
+#ifdef SP4DVAR
+        logical, allocatable :: LdefSCA(:)       ! AD scratch state file
+        logical, allocatable :: LdefSCT(:)       ! TL scratch state file
+        logical, allocatable :: LdefSPA(:)       ! AD Arnoldi state file
+        logical, allocatable :: LdefSPT(:)       ! TL Arnoldi state file
+#endif
         logical, allocatable :: LdefSTA(:)       ! Stations file
         logical, allocatable :: LdefTIDE(:)      ! tide forcing file
         logical, allocatable :: LdefTLM(:)       ! Tangent linear file
@@ -963,6 +996,13 @@
         integer, allocatable :: nRST(:)          ! Restart file
         integer, allocatable :: nSTA(:)          ! Stations file
         integer, allocatable :: nTLM(:)          ! Tangent linear file
+#ifdef SP4DVAR
+        integer, allocatable :: nSCA(:)          ! AD scratch state file
+        integer, allocatable :: nSCT(:)          ! TL scratch state file
+        integer, allocatable :: nSPA(:)          ! AD Arnoldi state file
+        integer, allocatable :: nSPT(:)          ! TL Arnoldi state file
+        integer, allocatable :: Crec(:)          ! Convolution records
+#endif
 !
 !  Number of timesteps between print of single line information to
 !  standard output.
@@ -1301,6 +1341,9 @@
         real(dp) :: ad_bc_area = 0.0_dp
         real(dp) :: ad_bc_flux = 0.0_dp
         real(dp) :: ad_ubar_xs = 0.0_dp
+#endif
+#ifdef SP4DVAR
+        real(r8) :: sp_sumdot = 0.0_r8
 #endif
 
 #ifdef BULK_FLUXES
@@ -1879,6 +1922,10 @@
         allocate ( INItime(Ngrids) )
         Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
       END IF
+      IF (.not.allocated(INItimeS)) THEN
+        allocate ( INItimeS(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
       IF (.not.allocated(ObsTime)) THEN
         allocate ( ObsTime(Ngrids) )
         Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
@@ -2196,6 +2243,27 @@
         allocate ( DYmax(Ngrids) )
         Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
       END IF
+
+#ifdef MASKING
+      IF (.not.allocated(DXminW)) THEN
+        allocate ( DXminW(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(DXmaxW)) THEN
+        allocate ( DXmaxW(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(DYminW)) THEN
+        allocate ( DYminW(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(DYmaxW)) THEN
+        allocate ( DYmaxW(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+#endif
+
+
 #ifdef SOLVE3D
       IF (.not.allocated(DZmin)) THEN
         allocate ( DZmin(Ngrids) )
@@ -2205,6 +2273,16 @@
         allocate ( DZmax(Ngrids) )
         Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
       END IF
+# ifdef MASKING
+      IF (.not.allocated(DZminW)) THEN
+        allocate ( DZminW(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(DZmaxW)) THEN
+        allocate ( DZmaxW(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+# endif
 #endif
 
       IF (.not.allocated(grdmax)) THEN
@@ -2525,6 +2603,24 @@
         allocate ( LdefRST(Ngrids) )
         Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
       END IF
+#ifdef SP4DVAR
+      IF (.not.allocated(LdefSCA)) THEN
+        allocate ( LdefSCA(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(LdefSCT)) THEN
+        allocate ( LdefSCT(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(LdefSPA)) THEN
+        allocate ( LdefSPA(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(LdefSPT)) THEN
+        allocate ( LdefSPT(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+#endif
       IF (.not.allocated(LdefSTA)) THEN
         allocate ( LdefSTA(Ngrids) )
         Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
@@ -2719,6 +2815,28 @@
         allocate ( nTLM(Ngrids) )
         Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
       END IF
+#ifdef SP4DVAR
+      IF (.not.allocated(nSCA)) THEN
+        allocate ( nSCA(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(nSCT)) THEN
+        allocate ( nSCT(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(nSPA)) THEN
+        allocate ( nSPA(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(nSPT)) THEN
+        allocate ( nSPT(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+      IF (.not.allocated(Crec)) THEN
+        allocate ( Crec(Ngrids) )
+        Dmem(1)=Dmem(1)+REAL(Ngrids,r8)
+      END IF
+#endif
 
       IF (.not.allocated(ninfo)) THEN
         allocate ( ninfo(Ngrids) )
@@ -3283,9 +3401,19 @@
         DXmax(ng)=-Large
         DYmin(ng)= Large
         DYmax(ng)=-Large
+#ifdef MASKING
+        DXminW(ng)= Large
+        DXmaxW(ng)=-Large
+        DYminW(ng)= Large
+        DYmaxW(ng)=-Large
+#endif
 #ifdef SOLVE3D
         DZmin(ng)= Large
         DZmax(ng)=-Large
+# ifdef MASKING
+        DZminW(ng)= Large
+        DZmaxW(ng)=-Large
+# endif
 #endif
         grdmax(ng)=-Large
 #ifdef DIFF_3DCOEF
@@ -3478,6 +3606,7 @@
 !
       DO ng=1,Ngrids
         INItime(ng)=-1.0_dp
+        INItimeS(ng)=-1.0_dp
       END DO
 
 # if defined SG_BBL || defined SSW_BBL

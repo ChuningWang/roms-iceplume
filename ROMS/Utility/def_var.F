@@ -964,7 +964,7 @@
 #if defined MASKING && !defined WRITE_WATER
 !
 !  If land/sea masking, define "_FillValue" attribute since masking
-!  areas are overwrite with special value (spval) during output.
+!  areas are overwritten with special value (spval) during output.
 !  Notice that the coordinate attribute is used to check which
 !  variables need the "_FillValue" attribute.
 !

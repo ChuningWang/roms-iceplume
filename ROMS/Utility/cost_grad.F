@@ -1,6 +1,6 @@
 #include "cppdefs.h"
       MODULE cost_grad_mod
-#if defined IS4DVAR
+#if defined I4DVAR
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===

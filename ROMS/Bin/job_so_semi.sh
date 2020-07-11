@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/bin/bash
 #
 # svn $Id$
 #######################################################################
@@ -9,7 +9,7 @@
 #                                                                     #
 #  Generalized Stability Theory: Stochastic Optimals, seminorm        #
 #                                                                     #
-#  This script is used to run the ROMS/TOMS stochastic optimals with  #
+#  This script is used to set-up ROMS stochastic optimals with        #
 #  respect to the seminorm of the chosen functional.                  #
 #                                                                     #
 #######################################################################
@@ -18,26 +18,26 @@
 # "dirname" command returns a path by removing any suffix from
 # the last slash ('/').  It returns a path above current diretory.
 
-set Dir=`dirname ${PWD}`
+Dir=`dirname ${PWD}`
 
 # Set basic state trajectory, forward file:
 
-#set HISname=${Dir}/Forward/gyre3d_his_00.nc
- set HISname=${Dir}/Forward/gyre3d_his_01.nc
+#HISname=${Dir}/Forward/gyre3d_his_00.nc
+ HISname=${Dir}/Forward/gyre3d_his_01.nc
 
-set FWDname=gyre3d_fwd.nc
+FWDname=gyre3d_fwd.nc
 
-if (-e $FWDname) then
+if [ -f $FWDname ]; then
   /bin/rm $FWDname
-endif
+fi
 ln -s -v $HISname $FWDname
 
 # Set adjoint model initial conditions file: zero fields.
 
-set IADname=gyre3d_iad.nc
+IADname=gyre3d_iad.nc
 
-if (-e $IADname) then
+if [ -f $IADname ]; then
   /bin/rm $IADname
-endif
+fi
 
 ln -s -v ${Dir}/Data/gyre3d_ini_zero.nc $IADname

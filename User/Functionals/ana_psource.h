@@ -265,7 +265,9 @@
           DO k=1,N(ng)
             DO is=1,Nsrc(ng)
               SOURCES(ng)%Tsrc(is,k,itemp)=???
+#  ifdef SALINITY
               SOURCES(ng)%Tsrc(is,k,isalt)=???
+#  endif
             END DO
           END DO
         END IF

@@ -31,7 +31,7 @@
       USE mod_storage
 # endif
 !
-# if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
+# if defined AD_SENSITIVITY   || defined I4DVAR_ANA_SENSITIVITY || \
      defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR
       USE adsen_force_mod,         ONLY : adsen_force
 # endif
@@ -160,7 +160,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 
-# if (defined FOUR_DVAR    && !defined IS4DVAR_SENSITIVITY) && \
+# if (defined FOUR_DVAR    && !defined I4DVAR_ANA_SENSITIVITY) && \
       defined OBSERVATIONS
 !
 !-----------------------------------------------------------------------
@@ -186,6 +186,12 @@
 !$OMP END MASTER
 !$OMP BARRIER
 !
+#  ifdef SP4DVAR
+!
+!  Skip assimilation of obs on first timestep unless inter=Nsaddle.
+!
+          IF ((iic(ng).ne.ntstart(ng)).or.Lsadd(ng)) THEN
+#  endif
             DO tile=first_tile(ng),last_tile(ng),+1
 #  ifdef WEAK_CONSTRAINT
               CALL ad_htobs (ng, tile, iADM)
@@ -197,6 +203,9 @@
             IF (FoundError(exit_flag, NoError, __LINE__,                &
      &                     __FILE__)) RETURN
 #  ifdef SENSITIVITY_4DVAR
+          END IF
+#  endif
+#  ifdef SP4DVAR
           END IF
 #  endif
         END DO
@@ -491,7 +500,7 @@
         END DO
 # endif
 
-# ifdef WEAK_CONSTRAINT
+# if defined WEAK_CONSTRAINT && !defined SP4DVAR
 !
 !-----------------------------------------------------------------------
 !  Gather weak constraint forcing to storage arrays.
@@ -520,7 +529,7 @@
      &                   __FILE__)) RETURN
         END DO
 
-# ifdef WEAK_CONSTRAINT
+# if defined WEAK_CONSTRAINT && !defined SP4DVAR
 !
 !-----------------------------------------------------------------------
 !  Copy storage arrays index 1 into index 2, and clear index 1.
@@ -536,7 +545,7 @@
         END DO
 # endif
 
-# if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
+# if defined AD_SENSITIVITY   || defined I4DVAR_ANA_SENSITIVITY || \
      defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR
 !
 !-----------------------------------------------------------------------

@@ -82,7 +82,9 @@
         DO j=JstrT,JendT
           DO i=IstrT,IendT
             tclm(i,j,k,itemp)=???
+# ifdef SALINITY
             tclm(i,j,k,isalt)=???
+# endif
           END DO
         END DO
       END DO

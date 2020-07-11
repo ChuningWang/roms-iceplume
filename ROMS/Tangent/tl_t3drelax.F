@@ -1,8 +1,10 @@
 #include "cppdefs.h"
       MODULE tl_t3drelax_mod
 
-#if defined TL_IOMS && defined RPM_RELAXATION && defined SOLVE3D && \
-    defined W4DVAR_SENSITIVITY
+#if defined TL_IOMS                && \
+    defined RPM_RELAXATION         && \
+    defined R4DVAR_ANA_SENSITIVITY && \
+    defined SOLVE3D
 !
 !svn $Id$
 !=================================================== Andrew M. Moore ===

@@ -34,7 +34,7 @@
       USE mod_diags
 # endif
       USE mod_forces
-# if defined W4DVAR_SENSITIVITY && defined RPM_RELAXATION
+# if defined R4DVAR_ANA_SENSITIVITY && defined RPM_RELAXATION
       USE mod_fourdvar
 # endif
       USE mod_grid
@@ -54,7 +54,7 @@
       USE tl_t3dmix_mod, ONLY : tl_t3dmix4
 #  endif
 # endif
-# if defined W4DVAR_SENSITIVITY && defined RPM_RELAXATION
+# if defined R4DVAR_ANA_SENSITIVITY && defined RPM_RELAXATION
       USE tl_t3drelax_mod, ONLY : tl_t3drelax
       USE tl_uv3drelax_mod, ONLY : tl_uv3drelax
 # endif
@@ -103,7 +103,7 @@
       CALL tl_t3dmix4 (ng, tile)
 #  endif
 # endif
-# if defined W4DVAR_SENSITIVITY && defined RPM_RELAXATION
+# if defined R4DVAR_ANA_SENSITIVITY && defined RPM_RELAXATION
 !
 !-----------------------------------------------------------------------
 !  Improve stability and convergence of the tangent linear representer
@@ -197,7 +197,7 @@
 !
       CALL tl_uv3dmix4 (ng, tile)
 # endif
-# if defined W4DVAR_SENSITIVITY && defined RPM_RELAXATION
+# if defined R4DVAR_ANA_SENSITIVITY && defined RPM_RELAXATION
 !
 !-----------------------------------------------------------------------
 !  Improve stability and convergence of the tangent linear representer

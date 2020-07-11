@@ -201,6 +201,7 @@
 #  endif
       END IF
 
+#  ifdef SALINITY
       IF (Lstflux(isalt,ng)) THEN
         DO j=JstrR,JendR
           DO i=IstrR,IendR
@@ -210,6 +211,7 @@
           END DO
         END DO
       END IF
+#  endif
 
       DO itrc=NAT+1,NT(ng)
         IF (Lstflux(itrc,ng)) THEN

@@ -624,7 +624,7 @@
             cff=0.5_r8*dt(ng)
           ELSE
             Gamma=1.0_r8/6.0_r8
-           cff=(1.0_r8-Gamma)*dt(ng)
+            cff=(1.0_r8-Gamma)*dt(ng)
           END IF
           iage=inert(itrc+1)                   ! even inert tracer index
           DO k=1,N(ng)
@@ -646,7 +646,7 @@
 !-----------------------------------------------------------------------
 !
       J_LOOP1 : DO j=Jstr,Jend
-        T_LOOP2: DO itrc=1,NT(ng)
+        T_LOOP2 : DO itrc=1,NT(ng)
 !
           VADV_FLUX : IF (Vadvection(itrc,ng)%SPLINES) THEN
 !
@@ -814,40 +814,8 @@
             END DO
           END IF VADV_FLUX
 !
-!  Apply mass point sources (volume vertical influx), if any.
-!  (Notice the j-loop is pipelined above).
-!
-          IF (LwSrc(ng)) THEN
-            DO is=1,Nsrc(ng)
-              Isrc=SOURCES(ng)%Isrc(is)
-              Jsrc=SOURCES(ng)%Jsrc(is)
-              IF (LtracerSrc(itrc,ng).and.                              &
-     &            ((Istr.le.Isrc).and.(Isrc.le.Iend+1)).and.            &
-     &            (j.eq.Jsrc)) THEN
-                cff=0.0_r8
-                DO k=1,N(ng)
-                  cff=cff+SOURCES(ng)%Qsrc(is,k)*                       &
-     &                    SOURCES(ng)%Tsrc(is,k,itrc)
-# ifdef ICEPLUME
-                  cff=cff+PLUME(ng)%det   (is,k     )*                  &
-#  ifdef ICEPLUME_DET_NEUTRAL
-     &                    PLUME(ng)%detTrc(is,k,itrc)+                  &
-#  else
-     &                    PLUME(ng)%trc   (is,  itrc)+                  &
-#  endif
-     &                    PLUME(ng)%ent   (is,k     )*                  &
-     &                    PLUME(ng)%trcAm (is,k,itrc)+                  &
-     &                    PLUME(ng)%mB    (is,k     )*                  &
-     &                    PLUME(ng)%trcB  (is,  itrc)
-# endif
-                  FC(Isrc,k)=FC(Isrc,k)-cff
-                END DO
-              END IF
-            END DO
-          END IF
-!
 !  Compute artificial continuity equation and load it into private
-!  array DC (1/m). It is needed to preserve tracer constancy. It is
+!  array DC (1/m). It is imposed to preserve tracer constancy. It is
 !  not the same for all the tracer advection schemes because of the
 !  Gamma value.
 !

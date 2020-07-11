@@ -163,6 +163,11 @@
 !
 !  Apply mass point sources (volume vertical influx), if any.
 !
+!  Overwrite W(Isrc,Jsrc,k) with the same divergence of Huon,Hvom as
+!  above but add in point source Qsrc(k) and reaccumulate the vertical
+!  sum to obtain the correct net Qbar given in user input - J. Levin
+!  (Jupiter Intelligence Inc.) and J. Wilkin
+!
         IF (LwSrc(ng)) THEN
           DO is=1,Nsrc(ng)
             ii=SOURCES(ng)%Isrc(is)
@@ -172,9 +177,9 @@
      &          (j.eq.jj)) THEN
               DO k=1,N(ng)
                 W(ii,jj,k)=W(ii,jj,k-1)-                                &
-     &               (Huon(ii+1,jj,k)-Huon(ii,jj,k)+                    &
-     &                Hvom(ii,jj+1,k)-Hvom(ii,jj,k))+                   &
-     &                SOURCES(ng)%Qsrc(is,k)
+     &                     (Huon(ii+1,jj,k)-Huon(ii,jj,k)+              &
+     &                      Hvom(ii,jj+1,k)-Hvom(ii,jj,k))+             &
+     &                     SOURCES(ng)%Qsrc(is,k)
 # ifdef ICEPLUME
                 W(ii,jj,k)=W(ii,jj,k)+                                  &
      &                     (PLUME(ng)%det(is,k)+PLUME(ng)%ent(is,k)+    &

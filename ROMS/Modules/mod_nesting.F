@@ -499,7 +499,7 @@
 # ifdef SOLVE3D
               allocate ( BRY_CONTACT(ibry,cr) % Tflux(LBi:UBi,          &
      &                                                N(rg),NT(rg)) )
-              Dmem(rg)=Dmem(rg)+REAL((UBj-LBj)*N(rg)*NT(rg),r8)
+              Dmem(rg)=Dmem(rg)+REAL((UBi-LBi)*N(rg)*NT(rg),r8)
 # endif
           END SELECT
         END DO

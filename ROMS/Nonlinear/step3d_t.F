@@ -854,11 +854,9 @@
 # endif
 !
 !  If MPDATA, time-step horizontal advection for intermediate diffusive
-!  tracer, Ta. Otherwise, time-step horizontal advection term.
-!  Advective fluxes have units of Tunits m3/s.  The new tracer has
-!  units of m Tunits.
+!  tracer, Ta (m Tunits).
 !
-          IF (Hadvection(itrc,ng)%MPDATA) THEN
+          HADV_STEPPING : IF (Hadvection(itrc,ng)%MPDATA) THEN
             DO j=JstrVm2,Jendp2i
               DO i=IstrUm2,Iendp2i
                 cff=dt(ng)*pm(i,j)*pn(i,j)
@@ -883,7 +881,11 @@
               END DO
             END DO
 # endif
-          ELSE                                               ! otherwise
+!
+!  OTHERWISE, time-step horizontal advection term.  Advective fluxes
+!  have units of Tunits m3/s.  The new tracer has units of m Tunits.
+!
+          ELSE
             DO j=Jstr,Jend
               DO i=Istr,Iend
                 cff=dt(ng)*pm(i,j)*pn(i,j)
@@ -898,7 +900,7 @@
 # endif
               END DO
             END DO
-          END IF
+          END IF HADV_STEPPING
         END DO K_LOOP
       END DO T_LOOP1
 !
@@ -921,7 +923,7 @@
 !
 !  Build conservative parabolic splines for the vertical derivatives
 !  "FC" of the tracer.  Then, the interfacial "FC" values are
-!  converted to vertical advective flux.
+!  converted to vertical advective flux (Tunits m3/s).
 !
             DO i=Istr,Iend
 # ifdef NEUMANN
@@ -964,7 +966,7 @@
 !
           ELSE IF (Vadvection(itrc,ng)%AKIMA4) THEN
 !
-!  Fourth-order, Akima vertical advective flux.
+!  Fourth-order, Akima vertical advective flux (Tunits m3/s).
 !
             DO k=1,N(ng)-1
               DO i=Istr,Iend
@@ -1006,7 +1008,8 @@
 !
           ELSE IF (Vadvection(itrc,ng)%CENTERED2) THEN
 !
-!  Second-order, central differences vertical advective flux.
+!  Second-order, central differences vertical advective flux
+!  (Tunits m3/s).
 !
             DO k=1,N(ng)-1
               DO i=Istr,Iend
@@ -1026,7 +1029,8 @@
 !
           ELSE IF (Vadvection(itrc,ng)%MPDATA) THEN
 !
-!  First_order, upstream differences vertical advective flux.
+!  First_order, upstream differences vertical advective flux
+!  (Tunits m3/s).
 !
             DO i=IstrUm2,Iendp2i
               DO k=1,N(ng)-1
@@ -1047,7 +1051,7 @@
 !
 !  Third High-order Spatial Interpolation at the Middle Temporal level
 !  (HSIMT; Wu and Zhu, 2010) with a Total Variation Diminishing (TVD)
-!  limiter vertical advection flux.
+!  limiter vertical advection flux (Tunits m3/s).
 !
             DO i=Istr,Iend
               KaZ(0)=0.0_r8
@@ -1115,7 +1119,8 @@
           ELSE IF ((Vadvection(itrc,ng)%CENTERED4).or.                  &
      &             (Vadvection(itrc,ng)%SPLIT_U3)) THEN
 !
-!  Fourth-order, central differences vertical advective flux.
+!  Fourth-order, central differences vertical advective flux
+!  (Tunits m3/s).
 !
             cff1=0.5_r8
             cff2=7.0_r8/12.0_r8
@@ -1149,59 +1154,59 @@
             END DO
           END IF VADV_FLUX
 !
-!  Apply mass point sources (volume vertical influx), if any.
+!  If MPDATA and cell-centered point source (LwSrc), augment the
+!  intermediate tracer, Ta, with the tracer divergence. For other
+!  advection schemes LwSrc is applied after the vertical advection
+!  is completed (J. Wilkin).
 !
           IF (LwSrc(ng)) THEN
-            DO is=1,Nsrc(ng)
-              Isrc=SOURCES(ng)%Isrc(is)
-              Jsrc=SOURCES(ng)%Jsrc(is)
-              IF (LtracerSrc(itrc,ng)) THEN
-                IF ((Vadvection(itrc,ng)%MPDATA).or.                    &
-     &              (Vadvection(itrc,ng)%HSIMT)) THEN
-                  LapplySrc=(IstrUm2.le.Isrc).and.                      &
-     &                      (Isrc.le.Iendp2i).and.(j.eq.Jsrc)
-                ELSE
-                  LapplySrc=(IstrR.le.Isrc).and.                        &
-     &                      (Isrc.le.IendR).and.(j.eq.Jsrc)
-                END IF
-                IF (LapplySrc) THEN
-                  cff=0.0_r8
+            IF (Hadvection(itrc,ng)%MPDATA) THEN
+              DO is=1,Nsrc(ng)
+                Isrc=SOURCES(ng)%Isrc(is)
+                Jsrc=SOURCES(ng)%Jsrc(is)
+                IF (((Istr.le.Isrc).and.(Isrc.le.Iend+1)).and.          &
+     &               ((Jstr.le.Jsrc).and.(Jsrc.le.Jend+1)).and.         &
+     &               (j.eq.Jsrc)) THEN
                   DO k=1,N(ng)
-                    cff=cff+SOURCES(ng)%Qsrc(is,k)*                     &
-     &                      SOURCES(ng)%Tsrc(is,k,itrc)
-# ifdef ICEPLUME
-                    cff=cff+PLUME(ng)%det   (is,k     )*                &
-#  ifdef ICEPLUME_DET_NEUTRAL
-     &                      PLUME(ng)%detTrc(is,k,itrc)+                &
-#  else
-     &                      PLUME(ng)%trc   (is,  itrc)+                &
-#  endif
-     &                      PLUME(ng)%ent   (is,k     )*                &
-     &                      PLUME(ng)%trcAm (is,k,itrc)+                &
-     &                      PLUME(ng)%mB    (is,k     )*                &
-     &                      PLUME(ng)%trcB  (is,  itrc)
-# endif
-# ifdef SPLINES_VDIFF
-                    IF (.not.((Hadvection(itrc,ng)%MPDATA).and.         &
-     &                 (Vadvection(itrc,ng)%MPDATA))) THEN
-                      cff=cff*oHz(Isrc,Jsrc,k)
+                    cff=dt(ng)*pm(i,j)*pn(i,j)
+                    IF (LtracerSrc(itrc,ng)) THEN
+                      cff3=SOURCES(ng)%Tsrc(is,k,itrc)
+                    ELSE
+                      cff3=t(Isrc,Jsrc,k,3,itrc)
                     END IF
+                    Ta(Isrc,Jsrc,k,itrc)=Ta(Isrc,Jsrc,k,itrc)+          &
+     &                                   cff*SOURCES(ng)%Qsrc(is,k)*    &
+     &                                   cff3
+# ifdef ICEPLUME
+!
+! Add ICEPLUME type tracers.
+!
+                    cff3=PLUME(ng)%det   (is,k     )*                   &
+#  ifdef ICEPLUME_DET_NEUTRAL
+     &                   PLUME(ng)%detTrc(is,k,itrc)+                   &
+#  else
+     &                   PLUME(ng)%trc   (is,  itrc)+                   &
+#  endif
+     &                   PLUME(ng)%ent   (is,k     )*                   &
+     &                   PLUME(ng)%trcAm (is,k,itrc)+                   &
+     &                   PLUME(ng)%mB    (is,k     )*                   &
+     &                   PLUME(ng)%trcB  (is,  itrc)
+                    Ta(Isrc,Jsrc,k,itrc)=Ta(Isrc,Jsrc,k,itrc)+          &
+     &                                   cff*cff3
 # endif
-                    FC(Isrc,k)=FC(Isrc,k)-cff
                   END DO
                 END IF
-              END IF
-            END DO
+              END DO
+            END IF
           END IF
 !
 !  If MPDATA, time-step vertical advection for intermediate diffusive
-!  tracer, Ta (Tunits). Otherwise, time-step vertical advection term
-!  (m Tunits, except parabolic splines has Tunits).
+!  tracer, Ta (Tunits).
 # ifdef DIAGNOSTICS_TS
 !  Convert units of tracer diagnostic terms to Tunits.
 # endif
 !
-          IF (Vadvection(itrc,ng)%MPDATA) THEN
+          VADV_STEPPING : IF (Vadvection(itrc,ng)%MPDATA) THEN
             DO i=IstrUm2,Iendp2i
               CF(i,0)=dt(ng)*pm(i,j)*pn(i,j)
             END DO
@@ -1214,7 +1219,14 @@
 # endif
               END DO
             END DO
-          ELSE                                               ! otherwise
+!
+!  OTHERWISE, time-step vertical advection term (m Tunits, or Tunits if
+!  conservative, parabolic splines diffusion).
+# ifdef DIAGNOSTICS_TS
+!  Convert units of tracer diagnostic terms to Tunits.
+# endif
+!
+          ELSE
             DO i=Istr,Iend
               CF(i,0)=dt(ng)*pm(i,j)*pn(i,j)
             END DO
@@ -1234,7 +1246,7 @@
 # endif
               END DO
             END DO
-          END IF
+          END IF VADV_STEPPING
         END DO J_LOOP1
       END DO T_LOOP2
 !
@@ -1292,14 +1304,14 @@
                 cff2=cff*(FE(i,j+1)-FE(i,j))
                 cff3=cff1+cff2
                 t(i,j,k,nnew,itrc)=Ta(i,j,k,itrc)*Hz(i,j,k)-cff3
-#  ifdef DIAGNOSTICS_TS
+# ifdef DIAGNOSTICS_TS
                 DiaTwrk(i,j,k,itrc,iTxadv)=DiaTwrk(i,j,k,itrc,iTxadv)-  &
      &                                     cff1
                 DiaTwrk(i,j,k,itrc,iTyadv)=DiaTwrk(i,j,k,itrc,iTyadv)-  &
      &                                     cff2
                 DiaTwrk(i,j,k,itrc,iThadv)=DiaTwrk(i,j,k,itrc,iThadv)-  &
      &                                     cff3
-#  endif
+# endif
               END DO
             END DO
           END DO
@@ -1321,9 +1333,9 @@
             END DO
 !
 !  Time-step corrected vertical advection (Tunits).
-#  ifdef DIAGNOSTICS_TS
+# ifdef DIAGNOSTICS_TS
 !  Convert units of tracer diagnostic terms to Tunits.
-#  endif
+# endif
 !
             DO i=Istr,Iend
               CF(i,0)=dt(ng)*pm(i,j)*pn(i,j)
@@ -1332,19 +1344,74 @@
               DO i=Istr,Iend
                 cff1=CF(i,0)*(FC(i,k)-FC(i,k-1))
                 t(i,j,k,nnew,itrc)=t(i,j,k,nnew,itrc)-cff1
-#  ifdef DIAGNOSTICS_TS
+# ifdef DIAGNOSTICS_TS
                 DiaTwrk(i,j,k,itrc,iTvadv)=Dvadv(i,j,k,itrc)-           &
      &                                     cff1
                 DO idiag=1,NDT
                   DiaTwrk(i,j,k,itrc,idiag)=DiaTwrk(i,j,k,itrc,idiag)*  &
      &                                      oHz(i,j,k)
                 END DO
-#  endif
+# endif
               END DO
             END DO
           END DO
         END IF MPDATA
       END DO T_LOOP3
+!
+!-----------------------------------------------------------------------
+!  Add tracer divergence due to cell-centered (LwSrc) point sources.
+!-----------------------------------------------------------------------
+!
+!  When LTracerSrc is .true. the inflowing concentration is Tsrc.
+!  When LtracerSrc is .false. we add tracer mass to compensate for the
+!  added volume to keep the receiving cell concentration unchanged.
+!  J. Levin (Jupiter Intelligence Inc.) and J. Wilkin
+!
+      IF (LwSrc(ng)) THEN
+        IF (.not.((Hadvection(itrc,ng)%MPDATA).and.                     &
+     &            (Vadvection(itrc,ng)%MPDATA))) THEN
+          DO itrc=1,NT(ng)
+            DO is=1,Nsrc(ng)
+              Isrc=SOURCES(ng)%Isrc(is)
+              Jsrc=SOURCES(ng)%Jsrc(is)
+              IF (((Istr.le.Isrc).and.(Isrc.le.Iend+1)).and.            &
+     &            ((Jstr.le.Jsrc).and.(Jsrc.le.Jend+1))) THEN
+                DO k=1,N(ng)
+                  cff=dt(ng)*pm(i,j)*pn(i,j)
+# ifdef SPLINES_VDIFF
+                  cff=cff*oHz(Isrc,Jsrc,k)
+# endif
+                  IF (LtracerSrc(itrc,ng)) THEN
+                    cff3=SOURCES(ng)%Tsrc(is,k,itrc)
+                  ELSE
+                    cff3=t(Isrc,Jsrc,k,3,itrc)
+                  END IF
+                  t(Isrc,Jsrc,k,nnew,itrc)=t(Isrc,Jsrc,k,nnew,itrc)+    &
+     &                                     cff*SOURCES(ng)%Qsrc(is,k)*  &
+     &                                     cff3
+# ifdef ICEPLUME
+!
+! Add ICEPLUME type tracers.
+!
+                  cff3=PLUME(ng)%det   (is,k     )*                     &
+#  ifdef ICEPLUME_DET_NEUTRAL
+     &                 PLUME(ng)%detTrc(is,k,itrc)+                     &
+#  else
+     &                 PLUME(ng)%trc   (is,  itrc)+                     &
+#  endif
+     &                 PLUME(ng)%ent   (is,k     )*                     &
+     &                 PLUME(ng)%trcAm (is,k,itrc)+                     &
+     &                 PLUME(ng)%mB    (is,k     )*                     &
+     &                 PLUME(ng)%trcB  (is,  itrc)
+                  t(Isrc,Jsrc,k,nnew,itrc)=t(Isrc,Jsrc,k,nnew,itrc)+    &
+     &                                     cff*cff3
+# endif
+                END DO
+              END IF
+            END DO
+          END DO
+        END IF
+      END IF
 !
 !-----------------------------------------------------------------------
 !  Time-step vertical diffusion term.

@@ -26,6 +26,7 @@
       USE mod_parallel
       USE mod_iounits
       USE mod_strings
+
 #ifdef DISTRIBUTE
 !
       USE distribute_mod, ONLY : mp_barrier
@@ -50,6 +51,7 @@
 #ifndef DISTRIBUTE
       integer :: my_threadnum
 #else
+      integer :: MyCOMM, nPETs, PETrank
 # ifdef ROMS_STDOUT
       integer :: node
       integer, parameter :: Pspv = 0
@@ -60,12 +62,21 @@
       real(r8) :: my_wtime
 !
 !-----------------------------------------------------------------------
-! Initialize timing for all threads.
+!  Initialize timing for all threads.
 !-----------------------------------------------------------------------
 !
 !  Set number of subdivisions, same as for global reductions.
 !
-#ifdef MPI
+#ifdef DISTRIBUTE
+# ifdef DISJOINTED
+      MyCOMM=FULL_COMM_WORLD
+      nPETs=FullSize
+      PETrank=FullRank
+# else
+      MyCOMM=OCN_COMM_WORLD
+      nPETs=numthreads
+      PETrank=MyRank
+# endif
       NSUB=1
 #else
       NSUB=numthreads
@@ -93,23 +104,23 @@
 !$OMP CRITICAL (START_WCLOCK)
         IF (ng.eq.1) THEN
 #ifdef DISTRIBUTE
-          CALL mp_barrier (ng, model)
+          CALL mp_barrier (ng, model, MyCOMM)
 # ifdef ROMS_STDOUT
           IF (.not.allocated(Pids)) THEN
-            allocate ( Pids(numthreads) )
+            allocate ( Pids(nPETs) )
             Pids=0
           END IF
-          Pids(MyRank+1)=proc(0,MyModel,ng)
-          CALL mp_collect (ng, model, numthreads, Pspv, Pids)
+          Pids(PETrank+1)=proc(0,MyModel,ng)
+          CALL mp_collect (ng, model, nPETs, Pspv, Pids, MyCOMM)
           IF (Master) THEN
-            DO node=1,numthreads
+            DO node=1,nPETs
               WRITE (stdout,10) ' Node #', node-1,                      &
      &                      ' (pid=',Pids(node),') is active.'
             END DO
           END IF
           IF (allocated(Pids)) deallocate (Pids)
 # else
-          WRITE (stdout,10) ' Node #', MyRank,                          &
+          WRITE (stdout,10) ' Node #', PETrank,                         &
      &                      ' (pid=',proc(0,MyModel,ng),') is active.'
 # endif
           CALL my_flush (stdout)
@@ -137,7 +148,7 @@
 !                                                                      !
 !     ng         Nested grid number (integer)                          !
 !     model      Calling model identifier (integer)                    !
-!     region     Profiling reagion number (integer)                    !
+!     region     Profiling region number (integer)                     !
 !     line       Calling model routine line (integer)                  !
 !     routine    Calling model routine (string)                        !
 !                                                                      !
@@ -147,12 +158,12 @@
       USE mod_parallel
       USE mod_iounits
       USE mod_strings
+
 #ifdef DISTRIBUTE
 !
       USE distribute_mod, ONLY : mp_barrier, mp_reduce
-# ifdef ROMS_STDOUT
       USE distribute_mod, ONLY : mp_collect
-# endif
+      USE strings_mod,    ONLY : uppercase
 #endif
 !
       implicit none
@@ -165,23 +176,26 @@
 !
 !  Local variable declarations.
 !
-      integer :: imodel, iregion, MyModel, NSUB
-#if defined DISTRIBUTE && defined ROMS_STDOUT
+      integer :: ig, imodel, iregion, MyModel, NSUB
+#ifdef DISTRIBUTE
+      integer :: MyCOMM, nPETs, PETrank
+# ifdef ROMS_STDOUT
       integer :: node
+# endif
 #endif
       integer :: my_threadnum
 
-      real(r8) :: percent, sumcpu, sumper, total
+      real(r8) :: percent, sumcpu, sumper, sumsum, total
 
       real(r8), dimension(2) :: wtime
 
       real(r8) :: my_wtime
 
 #ifdef DISTRIBUTE
-# ifdef ROMS_STDOUT
+      real(r8) :: TendMin, TendMax
+
       real(r8), parameter :: Tspv = 0.0_r8
       real(r8), allocatable :: Tend(:)
-# endif
       real(r8), dimension(0:Nregion) :: buffer
 
       character (len= 3), dimension(0:Nregion) :: op_handle
@@ -194,7 +208,16 @@
 !
 !  Set number of subdivisions, same as for global reductions.
 !
-#ifdef MPI
+#ifdef DISTRIBUTE
+# ifdef DISJOINTED
+      MyCOMM=FULL_COMM_WORLD
+      nPETs=FullSize
+      PETrank=FullRank
+# else
+      MyCOMM=OCN_COMM_WORLD
+      nPETs=numthreads
+      PETrank=MyRank
+# endif
       NSUB=1
 #else
       NSUB=numthreads
@@ -239,24 +262,25 @@
 !
         IF (ng.eq.1) THEN
 #ifdef DISTRIBUTE
-          CALL mp_barrier (ng, model)
-# ifdef ROMS_STDOUT
+          CALL mp_barrier (ng, model, MyCOMM)
           IF (.not.allocated(Tend)) THEN
-            allocate ( Tend(numthreads) )
+            allocate ( Tend(nPETs) )
             Tend=0.0_r8
           END IF
-          Tend(MyRank+1)=Cend(region,MyModel,ng)
-          CALL mp_collect (ng, model, numthreads, Tspv, Tend)
+          Tend(PETrank+1)=Cend(region,MyModel,ng)
+          CALL mp_collect (ng, model, nPETs, Tspv, Tend, MyCOMM)
+          TendMin=MINVAL(Tend)
+          TendMax=MAXVAL(Tend)
+# ifdef ROMS_STDOUT
           IF (Master) THEN
-            DO node=1,numthreads
+            DO node=1,nPETs
                WRITE (stdout,10) ' Node   #', node-1,                   &
      &                           ' CPU:', Tend(node)
             END DO
           END IF
-          IF (allocated(Tend)) deallocate (Tend)
 # else
-          WRITE (stdout,10) ' Node   #', MyRank, ' CPU:',               &
-     &                      Cend(region,MyModel,ng)
+          WRITE (stdout,10) ' Node   #', PETrank,                       &
+     &                      ' CPU:', Tend(PETrank+1)
 # endif
           CALL my_flush (stdout)
 #else
@@ -276,7 +300,7 @@
           END DO
         END DO
 !
-!  Compute total elapsed CPU wall time between all parallel threads.
+!  Compute total elapsed CPU wall time between all parallel processes.
 !
         IF (thread_count.eq.NSUB) THEN
           thread_count=0
@@ -287,7 +311,7 @@
               buffer(iregion)=Csum(iregion,imodel,ng)
             END DO
             CALL mp_reduce (ng, MyModel, Nregion+1, buffer(0:),         &
-     &                      op_handle(0:))
+     &                      op_handle(0:), MyCOMM)
             DO iregion=0,Nregion
               Csum(iregion,imodel,ng)=buffer(iregion)
             END DO
@@ -306,9 +330,21 @@
             END DO
             IF (ng.eq.1) THEN
               WRITE (stdout,20) ' Total:', total_cpu
- 20           FORMAT (a,10x,f14.3)
+ 20           FORMAT (a,t18,f14.3)
+              IF (numthreads.gt.1) THEN
+                WRITE (stdout,20) ' Average:', total_cpu/numthreads
+#ifdef DISTRIBUTE
+                WRITE (stdout,20) ' Minimum:', TendMin
+                WRITE (stdout,20) ' Maximum:', TendMax
+#endif
+              END IF
             END IF
           END IF
+
+#ifdef DISTRIBUTE
+          IF (allocated(Tend)) deallocate (Tend)
+#endif
+
 #ifdef PROFILE
 !
 !  Report profiling times.
@@ -339,54 +375,173 @@
  40         FORMAT (2x,a,t53,f14.3,2x,'(',f7.4,' %)')
             IF (Master.and.(total_model(imodel).gt.0.0_r8)) THEN
               WRITE (stdout,50) sumcpu, sumper
- 50           FORMAT (t47,'Total:',f14.3,2x,f8.4)
+ 50           FORMAT (t47,'Total:',f14.3,2x,f8.4,' %')
             END IF
           END DO
-# ifdef DISTRIBUTE
 !
-!  Report elapsed time for message passage communications.
+!  Sometimes the profiling does not fully accounts for all the CPU
+!  spend outside of the ROMS kernels. In data assimilation algorithms,
+!  there is a lot of CPU expend outside the kernels. A separated
+!  profiling is reported bellow.
 !
-          DO imodel=1,4
-            total=0.0_r8
-            DO iregion=Mregion,Nregion
-              total=total+Csum(iregion,imodel,ng)
-            END DO
-            IF (Master.and.(total.gt.0.0_r8)) THEN
-              WRITE (stdout,30) TRIM(label(imodel)),                    &
-     &                          'model message Passage profile, Grid:', &
-     &                          ng
-            END IF
-            sumcpu=0.0_r8
-            sumper=0.0_r8
-            IF (total.gt.0.0_r8) THEN
-              DO iregion=Mregion,Nregion
-                IF (Master.and.(Csum(iregion,imodel,ng).gt.0.0_r8)) THEN
-                  percent=100.0_r8*Csum(iregion, imodel,ng)/total_cpu
-                  WRITE (stdout,40) Pregion(iregion),                   &
-     &                              Csum(iregion,imodel,ng), percent
-                  sumcpu=sumcpu+Csum(iregion,imodel,ng)
-                  sumper=sumper+percent
-                END IF
-              END DO
-              IF (Master.and.(total.gt.0.0_r8)) THEN
-                WRITE (stdout,50) sumcpu, sumper
-              END IF
-            END IF
-          END DO
-# endif
           IF (Master.and.(ng.eq.Ngrids)) THEN
             percent=100.0_r8*Ctotal/total_cpu
             WRITE (stdout,60) Ctotal, percent,                          &
      &                        total_cpu-Ctotal, 100.0_r8-percent
  60         FORMAT (/,2x,                                               &
-     &              'Unique code regions profiled .....................'&
+     &             'Unique kernel(s) regions profiled ................',&
      &               f14.3,2x,f8.4,' %'/,2x,                            &
-     &              'Residual, non-profiled code ......................'&
+     &             'Residual, non-profiled code ......................',&
      &               f14.3,2x,f8.4,' %'/)
             WRITE (stdout,70) total_cpu
  70         FORMAT (/,' All percentages are with respect to',           &
      &                ' total time =',5x,f12.3,/)
           END IF
+
+# ifdef FOUR_DVAR
+!
+!  Report elapsed time for 4D-Var algorithms.
+!
+          total=0.0_r8
+          DO iregion=Fregion,Nregion-3
+            DO imodel=1,4
+              total=total+Csum(iregion,imodel,ng)
+            END DO
+          END DO
+          IF (Master.and.(total.gt.0.0_r8)) THEN
+            WRITE (stdout,30) 'Variational',                            &
+     &                        'data assimilation profile, Grid:', ng
+          END IF
+          IF (total.gt.0.0_r8) THEN
+            sumper=0.0_r8
+            sumsum=0.0_r8
+            DO iregion=Fregion,Nregion-3
+              sumcpu=0.0_r8
+              DO imodel=1,4
+                sumcpu=sumcpu+Csum(iregion,imodel,ng)
+              END DO
+              IF (Master.and.(sumcpu.gt.0.0_r8)) THEN
+                percent=100.0_r8*sumcpu/total_cpu
+                WRITE (stdout,40) Pregion(iregion), sumcpu, percent
+                sumsum=sumsum+sumcpu
+                sumper=sumper+percent
+              END IF
+            END DO
+            IF (Master.and.(total.gt.0.0_r8)) THEN
+              WRITE (stdout,80) sumsum
+ 80           FORMAT (t47,'Total:',f14.3)
+            END IF
+          END IF
+!
+!  The background, increment, and analysis should be close to 100
+!  percent.  The are listed last in Pregion.
+!
+          total=0.0_r8
+          DO iregion=Nregion-2,Nregion
+            DO imodel=1,4
+              total=total+Csum(iregion,imodel,ng)
+            END DO
+          END DO
+          IF (Master.and.(total.gt.0.0_r8)) THEN
+            WRITE (stdout,'(1x)')
+          END IF
+          IF (total.gt.0.0_r8) THEN
+            sumper=0.0_r8
+            sumsum=0.0_r8
+            DO iregion=Nregion-2,Nregion
+              sumcpu=0.0_r8
+              DO imodel=1,4
+                sumcpu=sumcpu+Csum(iregion,imodel,ng)
+              END DO
+              IF (Master.and.(sumcpu.gt.0.0_r8)) THEN
+                percent=100.0_r8*sumcpu/total_cpu
+                WRITE (stdout,40) Pregion(iregion), sumcpu, percent
+                sumsum=sumsum+sumcpu
+                sumper=sumper+percent
+              END IF
+            END DO
+            IF (Master.and.(total.gt.0.0_r8)) THEN
+              WRITE (stdout,50) sumsum, sumper
+            END IF
+          END IF
+# endif
+# ifdef DISTRIBUTE
+!
+!  Report elapsed time for message passage communications.
+!
+          total=0.0_r8
+          DO iregion=Mregion,Fregion-1
+            DO imodel=1,4
+              total=total+Csum(iregion,imodel,ng)
+            END DO
+          END DO
+          IF (Master.and.(total.gt.0.0_r8)) THEN
+            WRITE (stdout,30) uppercase('mpi'),                         &
+     &                        'communications profile, Grid:', ng
+          END IF
+          IF (total.gt.0.0_r8) THEN
+            sumper=0.0_r8
+            sumsum=0.0_r8
+            DO iregion=Mregion,Fregion-1
+              sumcpu=0.0_r8
+              DO imodel=1,4
+                sumcpu=sumcpu+Csum(iregion,imodel,ng)
+              END DO
+              IF (Master.and.(sumcpu.gt.0.0_r8)) THEN
+                percent=100.0_r8*sumcpu/total_cpu
+                WRITE (stdout,40) Pregion(iregion), sumcpu, percent
+                sumsum=sumsum+sumcpu
+                sumper=sumper+percent
+              END IF
+            END DO
+            IF (Master.and.(total.gt.0.0_r8)) THEN
+              WRITE (stdout,50) sumsum, sumper
+            END IF
+          END IF
+
+#  ifdef NESTING
+!
+!  Report total elapsed time for message passage communications for
+!  all nested grids.
+!
+          IF (ng.eq.Ngrids) THEN
+            total=0.0_r8
+            DO ig=1,Ngrids
+              DO iregion=Mregion,Fregion-1
+                DO imodel=1,4
+                  total=total+Csum(iregion,imodel,ig)
+                END DO
+              END DO
+            END DO
+            IF (Master.and.(total.gt.0.0_r8)) THEN
+               WRITE (stdout,90) uppercase('mpi'),                         &
+     &                      'communications profile over all nested grids:'
+ 90            FORMAT (/,1x,a,1x,a,/)
+            END IF
+            IF (total.gt.0.0_r8) THEN
+              sumper=0.0_r8
+              sumsum=0.0_r8
+              DO iregion=Mregion,Fregion-1
+                sumcpu=0.0_r8
+                DO ig=1,Ngrids
+                  DO imodel=1,4
+                    sumcpu=sumcpu+Csum(iregion,imodel,ig)
+                  END DO
+                END DO
+                IF (Master.and.(sumcpu.gt.0.0_r8)) THEN
+                  percent=100.0_r8*sumcpu/total_cpu
+                  WRITE (stdout,40) Pregion(iregion), sumcpu, percent
+                  sumsum=sumsum+sumcpu
+                  sumper=sumper+percent
+                END IF
+              END DO
+              IF (Master.and.(total.gt.0.0_r8)) THEN
+                WRITE (stdout,50) sumsum, sumper
+              END IF
+            END IF
+          END IF
+#  endif
+# endif
 #endif
         END IF
 !$OMP END CRITICAL (FINALIZE_WCLOCK)
