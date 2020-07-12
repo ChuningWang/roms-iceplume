@@ -132,11 +132,11 @@ GridsInLayer =  1
 
    Hadvection == HSIMT    \                     ! temperature
                  HSIMT    \                     ! salinity
-                 HSIMT                          ! dye_01, inert(1)
+                 MPDATA                         ! dye_01, inert(1)
 
    Vadvection == HSIMT    \                     ! temperature
                  HSIMT    \                     ! salinity
-                 HSIMT                          ! dye_01, inert(1)
+                 MPDATA                         ! dye_01, inert(1)
 
 ! Adjoint-based algorithms can have different horizontal and schemes
 ! for active and inert tracers.
@@ -451,8 +451,8 @@ LtracerSponge == F F                            ! temperature, salinity, inert
 ! point Sources/Sinks (like river runoff transport) and mass point
 ! Sources/Sinks (like volume vertical influx), [1:Ngrids].
 
-      LuvSrc == F                          ! horizontal momentum transport
-       LwSrc == T                          ! volume vertical influx
+      LuvSrc == T                          ! horizontal momentum transport
+       LwSrc == F                          ! volume vertical influx
 
 ! Logical switches (TRUE/FALSE) to activate tracers point Sources/Sinks
 ! (like river runoff) and to specify which tracer variables to consider:
