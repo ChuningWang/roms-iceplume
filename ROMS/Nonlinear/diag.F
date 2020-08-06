@@ -1,7 +1,8 @@
 #include "cppdefs.h"
       MODULE diag_mod
 !
-!svn $Id$
+!git $Id$
+!svn $Id: diag.F 1007 2020-02-25 22:29:41Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !

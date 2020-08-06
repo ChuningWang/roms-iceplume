@@ -2,7 +2,8 @@
 #if defined NONLINEAR && defined SOLVE3D
       SUBROUTINE main3d (RunInterval)
 !
-!svn $Id$
+!git $Id$
+!svn $Id: main3d.F 1031 2020-07-14 01:39:55Z arango $
 !=======================================================================
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -56,7 +57,7 @@
       USE forcing_mod,          ONLY : forcing
 # endif
 # if defined ADJUST_STFLUX || defined ADJUST_WSTRESS
-      USE frc_adjust_mod,       ONLY : frc_adjust
+      USE frc_adjust_mod,       ONLY : frc_adjust, load_frc
 # endif
 # ifdef GLS_MIXING
       USE gls_corstep_mod,      ONLY : gls_corstep
@@ -447,6 +448,7 @@
               IF (iic(ng).lt.(ntend(ng)+1)) THEN
                 DO tile=first_tile(ng),last_tile(ng),+1
                   CALL frc_adjust (ng, tile, Lfinp(ng))
+                  CALL load_frc (ng, tile, Lfout(ng))
                 END DO
 !$OMP BARRIER
               END IF

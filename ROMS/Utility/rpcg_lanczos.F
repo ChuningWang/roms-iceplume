@@ -1,10 +1,11 @@
 #include "cppdefs.h"
 
+      MODULE rpcg_lanczos_mod
+
 #if defined WEAK_CONSTRAINT && defined RPCG
-      SUBROUTINE rpcg_lanczos (ng, model, outLoop, innLoop, NinnLoop,   &
-     &                         Lcgini)
 !
-!svn $Id$
+!git $Id$
+!svn $Id: rpcg_lanczos.F 1035 2020-07-28 00:49:02Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group       Selime Gurol      !
 !    Licensed under a MIT/X style license            Andrew M. Moore   !
@@ -36,6 +37,22 @@
 !                                                                      !
 !=======================================================================
 !
+      implicit none
+!
+      PUBLIC  :: rpcg_lanczos
+      PUBLIC  :: cg_read_rpcg
+!
+      PRIVATE :: RPevecs
+      PRIVATE :: rprecond
+      PRIVATE :: cg_write_rpcg
+!
+      CONTAINS
+!
+!***********************************************************************
+      SUBROUTINE rpcg_lanczos (ng, model, outLoop, innLoop, NinnLoop,   &
+     &                         Lcgini)
+!***********************************************************************
+!
       USE mod_param
       USE mod_parallel
       USE mod_fourdvar
@@ -57,11 +74,12 @@
 !  Local variable declarations.
 !
       logical :: Ltrans, Laug
+!
       integer :: i, ic, j, iobs, ivec, Lscale, info
-
+!
       real(r8) :: zbet, eps, preducv, preducy
       real(r8) :: Jopt, Jf, Jmod, Jdata, Jb, Jobs, Jact, cff
-
+!
       real(r8), dimension(NinnLoop) :: zu, zgam, zfact, ztemp3
       real(r8), dimension(NinnLoop) :: ztemp1, ztemp2, zu1, zu2
       real(r8), dimension(NinnLoop) :: ztemp4
@@ -70,7 +88,7 @@
       real(r8), dimension(Ninner,3) :: zwork
       real(r8), dimension(2*(NinnLoop-1)) :: work
       real(r8), dimension(Ninner,Ninner) :: zgv
-
+!
       character (len=13) :: string
 !
 !=======================================================================
@@ -109,11 +127,13 @@
       Jb=Jb0(outLoop-1)
       Jobs=0.0_r8
       Jact=0.0_r8
+      RitzMaxErr=HevecErr
       eps=0.0_r8
       preducv=0.0_r8
       preducy=0.0_r8
       zwork=0.0_r8
       zgv=0.0_r8
+
 !
       MASTER_THREAD : IF (Master) THEN
 !
@@ -981,7 +1001,6 @@
 !
 !  Change the error bounds for the acceptable eigenvectors.
 !
-            RitzMaxErr=HevecErr
             DO ivec=1,NinnLoop-1
               cg_RitzErr(ivec,outLoop)=cg_RitzErr(ivec,outLoop)/        &
      &                                 cg_Ritz(NinnLoop-1,outLoop)
@@ -1098,7 +1117,7 @@
      &        ' algorithm:',/,                                          &
      &        /,11x,'cg_delta = ',1p,e15.8,0p,3x,'(',i3.3,', ',i3.3,')')
  30   FORMAT (/,' RPCG_LANCZOS - Conjugate Gradient Information:',/,    &
-     &        /,11x,'Ndatum     = ',i7.7,/,/,                           &
+     &        /,11x,'Ndatum     = ',i0,/,  /,                           &
      &        1x,'(',i3.3,',',i3.3,'): ',                               &
      &        'Residual estimate,                      eps = ',         &
      &        1p,e14.7,/,1x,'(',i3.3,',',i3.3,'): ',                    &
@@ -1134,17 +1153,17 @@
 100   FORMAT (/,1x,'(',i3.3,',',i3.3,'): ',                             &
      &        'New Ritz eigenvalues and their accuracy,  ',             &
      &        'RitzMaxErr = ',1p,e12.5,/)
-
+!
       RETURN
       END SUBROUTINE rpcg_lanczos
-
-      SUBROUTINE RPevecs (ng, outLoop, NinnLoop)
 !
-!=======================================================================
+!***********************************************************************
+      SUBROUTINE RPevecs (ng, outLoop, NinnLoop)
+!***********************************************************************
 !                                                                      !
 !  This routine computes the converged eigenvectors of (R_n+Cobs).     !
 !                                                                      !
-!=======================================================================
+!***********************************************************************
 !
       USE mod_param
       USE mod_parallel
@@ -1160,7 +1179,7 @@
 !  Local variable declarations.
 !
       integer :: iobs, ivec, jn, jk, ij, jkk, ingood
-
+!
       real(r8) :: dla, zfact
       real(r8), dimension(Ndatum(ng)+1) :: zt
 !
@@ -1181,7 +1200,7 @@
       ij=0
       DO jn=NinnLoop,1,-1
         ij=ij+1
-!  AUGMENTED
+!                                                             AUGMENTED
         DO iobs=1,Ndatum(ng)
           vcglev(iobs,ij,outLoop)=0.0_r8
         END DO
@@ -1226,26 +1245,26 @@
           END DO
         END DO
         dla=0.0_r8
-!  AUGMENTED
+!                                                            AUGMENTED
         DO iobs=1,Ndatum(ng)
           dla=dla+vcglev(iobs,ij,outLoop)*vcglev(iobs,ij,outLoop)
         END DO
-!  AUGMENTED+1
+!                                                            AUGMENTED+1
         DO iobs=1,Ndatum(ng)
           vcglev(iobs,ij,outLoop)=vcglev(iobs,ij,outLoop)/SQRT(dla)
         END DO
       END DO
-
+!
       RETURN
       END SUBROUTINE RPevecs
-
-      SUBROUTINE rprecond (ng, Lscale, Laug, outLoop, NinnLoop, py)
 !
-!=======================================================================
+!***********************************************************************
+      SUBROUTINE rprecond (ng, Lscale, Laug, outLoop, NinnLoop, py)
+!***********************************************************************
 !                                                                      !
 !  This routine is the preconditioner in observation space.            !
 !                                                                      !
-!=======================================================================
+!***********************************************************************
 !
       USE mod_param
       USE mod_scalars
@@ -1258,8 +1277,8 @@
 !
       logical, intent(in) :: Laug
       integer, intent(in) :: ng, Lscale, outLoop, NinnLoop
-!  AUGMENTED
-      real(r8), intent(inout) :: py(Ndatum(ng)+1)
+!
+      real(r8), intent(inout) :: py(Ndatum(ng)+1)            ! AUGMENTED
 !
 !  Local variable declarations.
 !
@@ -1267,7 +1286,7 @@
       integer :: nol, nols, nole, ninc
       integer :: ingood
       integer :: iobs, nvec, ivec
-
+!
       real(r8) :: dla, dlar, fac, facritz, zfact
       real(r8), dimension(NinnLoop) :: zvect
       real(r8), dimension(Ndatum(ng)+1) :: zt
@@ -1394,19 +1413,20 @@
      &              FOURDVAR(ng)%cg_Dpxsum(iobs)*py(Ndatum(ng)+1)
         END DO
       END IF
-
+!
+      RETURN
       END SUBROUTINE rprecond
-
+!
+!***********************************************************************
       SUBROUTINE cg_write_rpcg (ng, model, innLoop, outLoop,            &
      &                          Jf, Jdata, Jmod, Jopt, Jb, Jobs, Jact,  &
      &                          preducv, preducy)
-!
-!=======================================================================
+!***********************************************************************
 !                                                                      !
 !  This routine writes conjugate gradient vectors into 4D-Var NetCDF   !
-!  for restart purposes.                                               !
+!  (DAV struc) file for restart purposes.                              !
 !                                                                      !
-!=======================================================================
+!***********************************************************************
 !
       USE mod_param
       USE mod_parallel
@@ -1491,7 +1511,7 @@
      &                 __FILE__)) RETURN
       END IF
 !
-!  Write normalization coefficients for Lanczos vectos.
+!  Write normalization coefficients for Lanczos vectors.
 !
       IF (innLoop.gt.0) THEN
         CALL netcdf_put_fvar (ng, model, DAV(ng)%name, 'cg_dla',        &
@@ -1653,11 +1673,6 @@
      &                        ncid = DAV(ng)%ncid)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
-        CALL netcdf_put_fvar (ng, model, DAV(ng)%name, 'Jb0',           &
-     &                        Jb0(0:), (/1/), (/Nouter+1/),             &
-     &                        ncid = DAV(ng)%ncid)
-        IF (FoundError(exit_flag, NoError, __LINE__,                    &
-     &                 __FILE__)) RETURN
       END IF
 !
 !  Lanczos vectors.
@@ -1693,12 +1708,234 @@
 !-----------------------------------------------------------------------
 !
       CALL netcdf_sync (ng, model, DAV(ng)%name, DAV(ng)%ncid)
-
+!
       RETURN
       END SUBROUTINE cg_write_rpcg
-
-#else
-      SUBROUTINE rpcg_lanczos
+!
+      SUBROUTINE cg_read_rpcg (ng, model, outLoop)
+!
+!=======================================================================
+!                                                                      !
+!  This routine reads conjugate gradient variables for previous outer  !
+!  loops from 4D-Var NetCDF (DAV) file.                                !
+!                                                                      !
+!=======================================================================
+!
+      USE mod_param
+      USE mod_fourdvar
+      Use mod_iounits
+      USE mod_netcdf
+      USE mod_scalars
+!
+      USE strings_mod, ONLY : FoundError
+!
+      implicit none
+!
+!  Imported variable declarations
+!
+      integer, intent(in) :: ng, model, outLoop
+!
+!  Local variable declarations.
+!
+      integer :: status
+!
+      SourceFile=__FILE__ // ", cg_read_rpcg"
+!
+!-----------------------------------------------------------------------
+!  If split 4D-Var and outer>1, Read in conjugate gradient variables
+!  four outerloop restart.
+!-----------------------------------------------------------------------
+!
+!  Open DAV NetCDF file for reading.
+!
+      IF (DAV(ng)%ncid.eq.-1) THEN
+        CALL netcdf_open (ng, model, DAV(ng)%name, 1, DAV(ng)%ncid)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+      END IF
+!
+!  Read in number of converget Ritz eigenvalues
+!
+      CALL netcdf_get_ivar (ng, model, DAV(ng)%name,                    &
+     &                      'nConvRitz', nConvRitz,                     &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/outLoop-1/),                      &
+     &                      total = (/1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+!  Read in Ritz eigenvalues.
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'Ritz', Ritz,                               &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1,outLoop-1/),                    &
+     &                      total = (/Ninner,1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+!  Read in conjugate gradient "beta" coefficients.
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'cg_beta', cg_beta,                         &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1,1/),                            &
+     &                      total = (/Ninner+1,outLoop-1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+!  Read in conjugate gradient "delta" coefficients.
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'cg_delta', cg_delta,                       &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1,1/),                            &
+     &                      total = (/Ninner,outLoop-1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+!  Read in normalization coefficients for Lanczos vectors.
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'cg_dla', cg_dla,                           &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1,1/),                            &
+     &                      total = (/Ninner,outLoop-1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+!  Read in initial gradient normalization factor.
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'cg_Gnorm_y', cg_Gnorm_y,                   &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1/),                              &
+     &                      total = (/outLoop-1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'cg_Gnorm_v', cg_Gnorm_v,                   &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1/),                              &
+     &                      total = (/outLoop-1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+!  Read in Lanczos vector normalization factor.
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'cg_QG', cg_QG,                             &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1,1/),                            &
+     &                      total = (/Ninner+1,outLoop-1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+!  Read in eigenvalues of Lanczos recurrence relationship.
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'cg_Ritz', cg_Ritz,                         &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1,1/),                            &
+     &                      total = (/Ninner,outLoop-1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+!  Read eigenvalues relative error.
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'cg_RitzErr', cg_RitzErr,                   &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1,1/),                            &
+     &                      total = (/Ninner,outLoop-1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+!  Read in eigenvectors of Lanczos recurrence relationship.
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'cg_zv', cg_zv,                             &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1,1,1/),                          &
+     &                      total = (/Ninner,Ninner,outLoop-1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+!  Read in initial gradient for minimization.
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'zgrad0', zgrad0,                           &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1,1/),                            &
+     &                      total = (/Ndatum(ng)+1,outLoop-1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'vgrad0', vgrad0,                           &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1/),                              &
+     &                      total = (/Ndatum(ng)+1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'Hbk', Hbk,                                 &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1,1/),                            &
+     &                      total = (/Ndatum(ng),outLoop-1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'Jb0', Jb0(0:),                             &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1/),                              &
+     &                      total = (/Nouter+1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+!  Read in Lanczos vectors.
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'zcglwk', zcglwk,                           &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1,1,1/),                          &
+     &                      total = (/Ndatum(ng)+1,Ninner+1,outLoop-1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'vcglwk', vcglwk,                           &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1,1,1/),                          &
+     &                      total = (/Ndatum(ng)+1,Ninner+1,outLoop-1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+!  Read in converged Lanczos eigenvectors.
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'vcglev', vcglev,                           &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1,1,1/),                          &
+     &                      total = (/Ndatum(ng)+1,Ninner,outLoop-1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
+!  Read in TLmodVal_S.
+!
+      CALL netcdf_get_fvar (ng, model, DAV(ng)%name,                    &
+     &                      'TLmodVal_S', TLmodVal_S,                   &
+     &                      ncid = DAV(ng)%ncid,                        &
+     &                      start = (/1,1,1/),                          &
+     &                      total = (/Ndatum(ng),Ninner,outLoop-1/))
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
+!
       RETURN
-      END SUBROUTINE rpcg_lanczos
+      END SUBROUTINE cg_read_rpcg
 #endif
+      END MODULE rpcg_lanczos_mod
+

@@ -1,7 +1,8 @@
 /*
 ** Include file "globaldef.h"
 **
-** svn $Id$
+** git $Id$
+** svn $Id: globaldefs.h 1026 2020-05-20 02:05:37Z arango $
 ********************************************************** Hernan G. Arango ***
 ** Copyright (c) 2002-2020 The ROMS/TOMS Group     Alexander F. Shchepetkin  **
 **   Licensed under a MIT/X style license                                    **

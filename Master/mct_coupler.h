@@ -3,7 +3,8 @@
 
 #if defined MODEL_COUPLING && defined MCT_LIB
 !
-!svn $Id$
+!git $Id$
+!svn $Id: mct_coupler.h 995 2020-01-10 04:01:28Z arango $
 !==================================================== John C. Warner ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group      Hernan G. Arango   !
 !    Licensed under a MIT/X style license                              !

@@ -1,6 +1,7 @@
 #!/bin/csh -f
 #
-# svn $Id$
+# git $Id$
+# svn $Id: build_cice.csh 1025 2020-05-14 22:31:20Z arango $
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Copyright (c) 2002-2020 The ROMS/TOMS Group                           :::
 #   Licensed under a MIT/X style license                                :::

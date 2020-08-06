@@ -2,7 +2,8 @@
 #if (defined FOUR_DVAR || defined VERIFICATION) && defined OBSERVATIONS
       SUBROUTINE obs_initial (ng, model, backward)
 !
-!svn $Id$
+!git $Id$
+!svn $Id: obs_initial.F 1031 2020-07-14 01:39:55Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -211,8 +212,9 @@
         END DO
 # ifndef SP4DVAR
         IF (Ifirst.eq.0) THEN
-          WRITE (stdout,30) tend, tdays(ng)
-          STOP
+          IF (Master) WRITE (stdout,30) tend, tdays(ng)
+          exit_flag=2
+          RETURN
         END IF
 # endif
       ELSE
@@ -226,8 +228,9 @@
         END DO
 # ifndef SP4DVAR
         IF (Ifirst.eq.0) THEN
-          WRITE (stdout,30) tdays(ng), tend
-          STOP
+          IF (Master) WRITE (stdout,30) tdays(ng), tend
+          exit_flag=2
+          RETURN
         END IF
 # endif
       END IF

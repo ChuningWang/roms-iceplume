@@ -1,7 +1,8 @@
 #include "cppdefs.h"
       MODULE inp_decode_mod
 !
-!svn $Id$
+!git $Id$
+!svn $Id: inp_decode.F 1014 2020-04-06 15:48:43Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !

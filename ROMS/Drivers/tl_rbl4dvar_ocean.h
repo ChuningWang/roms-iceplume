@@ -1,6 +1,7 @@
       MODULE ocean_control_mod
 !
-!svn $Id$
+!git $Id$
+!svn $Id: tl_rbl4dvar_ocean.h 1035 2020-07-28 00:49:02Z arango $
 !=================================================== Andrew M. Moore ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group      Hernan G. Arango   !
 !    Licensed under a MIT/X style license                              !
@@ -75,6 +76,7 @@
       USE mod_iounits
       USE mod_scalars
 !
+      USE inp_par_mod,       ONLY : inp_par
 #ifdef MCT_LIB
 # ifdef ATM_COUPLING
       USE ocean_coupler_mod, ONLY : initialize_ocn2atm_coupling
@@ -280,6 +282,11 @@
       USE mod_scalars
       USE mod_stepping
 !
+#ifdef RPCG
+      USE rpcg_lanczos_mod,  ONLY : rpcg_lanczos
+#else
+      USE congrad_mod,       ONLY : congrad
+#endif
       USE convolve_mod,      ONLY : error_covariance
 #ifdef ADJUST_BOUNDARY
       USE mod_boundary,      ONLY : initialize_boundary
@@ -1024,7 +1031,7 @@
             CALL initialize_boundary (ng, tile, iTLM)
 # endif
           END DO
-!$OMF END PARALLEL
+!$OMP END PARALLEL
         END DO
 !
 !  Initialize nonlinear model INI(ng)%name file, record outer+2.

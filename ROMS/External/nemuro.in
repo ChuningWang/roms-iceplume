@@ -1,6 +1,7 @@
 !  NEMURO Ecosystem Model Parameters.
 !
-!svn $Id$
+!git $Id$
+!svn $Id: nemuro.in 1009 2020-03-03 20:38:52Z arango $
 !========================================================= Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                                !
 !    Licensed under a MIT/X style license                                     !

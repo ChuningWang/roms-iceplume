@@ -1,6 +1,7 @@
       SUBROUTINE read_BioPar (model, inp, out, Lwrite)
 !
-!svn $Id$
+!git $Id$
+!svn $Id: fennel_inp.h 1031 2020-07-14 01:39:55Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -577,7 +578,7 @@
 !  Report input parameters.
 !-----------------------------------------------------------------------
 !
-      IF (Lwrite) THEN
+      IF (Master.and.Lwrite) THEN
         DO ng=1,Ngrids
           IF (Lbiology(ng)) THEN
             WRITE (out,60) ng

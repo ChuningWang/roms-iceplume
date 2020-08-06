@@ -2,7 +2,8 @@
       MODULE step3d_t_mod
 #if !defined TS_FIXED && (defined NONLINEAR && defined SOLVE3D)
 !
-!svn $Id$
+!git $Id$
+!svn $Id: step3d_t.F 1034 2020-07-15 21:16:28Z arango $
 !=======================================================================
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -1520,32 +1521,32 @@
 !
 !  Compute new solution by back substitution.
 !
-          DO i=Istr,Iend
-#  ifdef DIAGNOSTICS_TS
-            cff1=t(i,j,N(ng),nnew,itrc)*oHz(i,j,N(ng))
-#  endif
-            DC(i,N(ng))=(DC(i,N(ng))-FC(i,N(ng)-1)*DC(i,N(ng)-1))/      &
-     &                  (BC(i,N(ng))-FC(i,N(ng)-1)*CF(i,N(ng)-1))
-            t(i,j,N(ng),nnew,itrc)=DC(i,N(ng))
-#  ifdef DIAGNOSTICS_TS
-            DiaTwrk(i,j,N(ng),itrc,iTvdif)=                             &
-     &                            DiaTwrk(i,j,N(ng),itrc,iTvdif)+       &
-     &                            t(i,j,N(ng),nnew,itrc)-cff1
-#  endif
-          END DO
-          DO k=N(ng)-1,1,-1
             DO i=Istr,Iend
-#  ifdef DIAGNOSTICS_TS
-              cff1=t(i,j,k,nnew,itrc)*oHz(i,j,k)
-#  endif
-              DC(i,k)=DC(i,k)-CF(i,k)*DC(i,k+1)
-              t(i,j,k,nnew,itrc)=DC(i,k)
-#  ifdef DIAGNOSTICS_TS
-              DiaTwrk(i,j,k,itrc,iTvdif)=DiaTwrk(i,j,k,itrc,iTvdif)+    &
-     &                                   t(i,j,k,nnew,itrc)-cff1
-#  endif
+# ifdef DIAGNOSTICS_TS
+               cff1=t(i,j,N(ng),nnew,itrc)*oHz(i,j,N(ng))
+# endif
+               DC(i,N(ng))=(DC(i,N(ng))-FC(i,N(ng)-1)*DC(i,N(ng)-1))/   &
+     &                     (BC(i,N(ng))-FC(i,N(ng)-1)*CF(i,N(ng)-1))
+               t(i,j,N(ng),nnew,itrc)=DC(i,N(ng))
+# ifdef DIAGNOSTICS_TS
+               DiaTwrk(i,j,N(ng),itrc,iTvdif)=                          &
+     &                              DiaTwrk(i,j,N(ng),itrc,iTvdif)+     &
+     &                              t(i,j,N(ng),nnew,itrc)-cff1
+# endif
             END DO
-          END DO
+            DO k=N(ng)-1,1,-1
+              DO i=Istr,Iend
+# ifdef DIAGNOSTICS_TS
+                cff1=t(i,j,k,nnew,itrc)*oHz(i,j,k)
+# endif
+                DC(i,k)=DC(i,k)-CF(i,k)*DC(i,k+1)
+                t(i,j,k,nnew,itrc)=DC(i,k)
+# ifdef DIAGNOSTICS_TS
+                DiaTwrk(i,j,k,itrc,iTvdif)=DiaTwrk(i,j,k,itrc,iTvdif)+  &
+     &                                     t(i,j,k,nnew,itrc)-cff1
+# endif
+              END DO
+            END DO
 # ifdef SPLINES_VDIFF
           END IF
 # endif

@@ -2,7 +2,8 @@
       MODULE rp_u3dbc_mod
 #if defined TL_IOMS && defined SOLVE3D
 !
-!svn $Id$
+!git $Id$
+!svn $Id: rp_u3dbc_im.F 995 2020-01-10 04:01:28Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group       Andrew M. Moore   !
 !    Licensed under a MIT/X style license                              !

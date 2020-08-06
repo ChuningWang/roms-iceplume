@@ -3,7 +3,8 @@
 
 #if defined FOUR_DVAR || defined VERIFICATION
 !
-!svn $Id$
+!git $Id$
+!svn $Id: mod_fourdvar.F 1027 2020-05-27 17:06:32Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !

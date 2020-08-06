@@ -1,7 +1,8 @@
 #include "cppdefs.h"
       MODULE exchange_2d_mod
 !
-!svn $Id$
+!git $Id$
+!svn $Id: exchange_2d.F 995 2020-01-10 04:01:28Z arango $
 !=======================================================================
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !

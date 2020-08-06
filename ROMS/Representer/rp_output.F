@@ -2,7 +2,8 @@
 #ifdef TL_IOMS
       SUBROUTINE rp_output (ng)
 !
-!svn $Id$
+!git $Id$
+!svn $Id: rp_output.F 1036 2020-07-29 05:39:53Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -79,6 +80,7 @@
           END IF
           IF ((nrrec(ng).ne.0).and.(iic(ng).eq.ntstart(ng))) THEN
             IF ((iic(ng)-1).eq.idefTLM(ng)) THEN
+              TLM(ng)%load=0                  ! restart, reset counter
               Ldefine=.FALSE.                 ! finished file, delay
             ELSE                              ! creation of next file
               Ldefine=.TRUE.
@@ -99,13 +101,22 @@
             IF (iic(ng).eq.ntstart(ng)) THEN    ! inquire existing file
               TLM(ng)%load=0                    ! reset filename counter
             END IF
+            ifile=(iic(ng)-1)/ndefTLM(ng)+1     ! next filename suffix
             TLM(ng)%load=TLM(ng)%load+1
+            IF (TLM(ng)%load.gt.TLM(ng)%Nfiles) THEN
+              IF (Master) THEN
+                WRITE (stdout,10) 'TLM(ng)%load = ', TLM(ng)%load,      &
+     &                            TLM(ng)%Nfiles, TRIM(TLM(ng)%base),   &
+     &                            ifile
+              END IF
+              exit_flag=4
+              IF (FoundError(exit_flag, NoError, __LINE__,              &
+     &                       __FILE__)) RETURN
+            END IF
             Fcount=TLM(ng)%load
             TLM(ng)%Nrec(Fcount)=0
-            ifile=(iic(ng)-1)/ndefTLM(ng)+1
             IF (Master) THEN
-              WRITE (TLM(ng)%name,10) TRIM(TLM(ng)%base), ifile
-  10          FORMAT (a,'_',i4.4,'.nc')
+              WRITE (TLM(ng)%name,20) TRIM(TLM(ng)%base), ifile
             END IF
 # ifdef DISTRIBUTE
             CALL mp_bcasts (ng, iRPM, TLM(ng)%name)
@@ -177,6 +188,7 @@
           END IF
           IF ((nrrec(ng).ne.0).and.(iic(ng).eq.ntstart(ng))) THEN
             IF ((iic(ng)-1).eq.idefAVG(ng)) THEN
+              AVG(ng)%load=0                  ! restart, reset counter
               Ldefine=.FALSE.                 ! finished file, delay
             ELSE                              ! creation of next file
               NewFile=.FALSE.
@@ -197,17 +209,26 @@
             IF (iic(ng).eq.ntstart(ng)) THEN
               AVG(ng)%load=0                  ! reset filename counter
             END IF
-            AVG(ng)%load=AVG(ng)%load+1
-            Fcount=AVG(ng)%load
-            AVG(ng)%Nrec(Fcount)=0
-            IF (ndefAVG(ng).eq.nAVG(ng)) THEN
+            IF (ndefAVG(ng).eq.nAVG(ng)) THEN ! next filename suffix
               ifile=(iic(ng)-1)/ndefAVG(ng)
             ELSE
               ifile=(iic(ng)-1)/ndefAVG(ng)+1
             END IF
+            AVG(ng)%load=AVG(ng)%load+1
+            IF (AVG(ng)%load.gt.AVG(ng)%Nfiles) THEN
+              IF (Master) THEN
+                WRITE (stdout,10) 'AVG(ng)%load = ', AVG(ng)%load,      &
+     &                            AVG(ng)%Nfiles, TRIM(AVG(ng)%base),   &
+     &                            ifile
+              END IF
+              exit_flag=4
+              IF (FoundError(exit_flag, NoError, __LINE__,              &
+     &                       __FILE__)) RETURN
+            END IF
+            Fcount=AVG(ng)%load
+            AVG(ng)%Nrec(Fcount)=0
             IF (Master) THEN
               WRITE (AVG(ng)%name,20) TRIM(AVG(ng)%base), ifile
-  20          FORMAT (a,'_',i4.4,'.nc')
             END IF
 #  ifdef DISTRIBUTE
             CALL mp_bcasts (ng, iRPM, AVG(ng)%name)
@@ -295,6 +316,14 @@
 !
       CALL wclock_off (ng, iRPM, 8, __LINE__, __FILE__)
 # endif
+!
+ 10   FORMAT (/,' RP_OUTPUT - multi-file counter ',a,i0,                &
+     &          ', is greater than Nfiles = ',i0,1x,'dimension',        &
+     &        /,13x,'in structure when creating next file: ',           &
+     &           a,'_',i4.4,'.nc',                                      &
+     &        /,13x,'Incorrect OutFiles logic in ''read_phypar''.')
+ 20   FORMAT (a,'_',i4.4,'.nc')
+!
       RETURN
       END SUBROUTINE rp_output
 #else

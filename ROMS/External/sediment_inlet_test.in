@@ -1,7 +1,8 @@
 !
 !  ROMS/TOMS Cohesive and Non-cohesive Sediment Model Parameters.
 !
-!svn $Id$
+!git $Id$
+!svn $Id: sediment_inlet_test.in 1002 2020-01-13 22:04:50Z arango $
 !========================================================= Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                                !
 !    Licensed under a MIT/X style license                                     !

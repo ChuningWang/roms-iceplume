@@ -2,7 +2,8 @@
 #ifdef TL_IOMS
       SUBROUTINE rp_initial (ng)
 !
-!svn $Id$
+!git $Id$
+!svn $Id: rp_initial.F 1035 2020-07-28 00:49:02Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -18,6 +19,7 @@
 # ifdef BBL_MODEL_NOT_YET
       USE mod_bbl
 # endif
+      Use mod_boundary
 # ifdef SOLVE3D
       USE mod_coupling
 # endif
@@ -44,7 +46,6 @@
       USE ini_adjust_mod,      ONLY : tl_ini_perturb
 # endif
       USE ini_hmixcoef_mod,    ONLY : ini_hmixcoef
-      USE metrics_mod,         ONLY : metrics
 # if !(defined SEDIMENT_NOT_YET && defined SED_MORPH_NOT_YET)
       USE rp_set_depth_mod,    ONLY : rp_bath
 # endif
@@ -94,7 +95,6 @@
 !   Initialize model variables.
 !=======================================================================
 !
-!$OMP MASTER
       IF (Master) THEN
 # if defined PERTURBATION
         WRITE (stdout,10) Nrun
@@ -109,7 +109,6 @@
      &                    'initializing representer model ...'
  20     FORMAT (/,1x,a,a,/)
       END IF
-!$OMP END MASTER
 !
 !-----------------------------------------------------------------------
 !  Initialize time stepping indices and counters.
@@ -158,12 +157,9 @@
       tdays(ng)=dstart
 # endif
       time(ng)=tdays(ng)*day2sec
-!$OMP MASTER
       ntstart(ng)=INT((time(ng)-dstart*day2sec)/dt(ng))+1
       ntend(ng)=ntstart(ng)+ntimes(ng)-1
       ntfirst(ng)=ntstart(ng)
-!$OMP END MASTER
-!$OMP BARRIER
 
       CALL time_string (time(ng), time_code(ng))
 
@@ -174,6 +170,13 @@
       UBi=UBOUND(GRID(ng)%h,DIM=1)
       LBj=LBOUND(GRID(ng)%h,DIM=2)
       UBj=UBOUND(GRID(ng)%h,DIM=2)
+!
+!  Initialize global diagnostics variables.
+!
+      avgke=0.0_dp
+      avgpe=0.0_dp
+      avgkp=0.0_dp
+      volume=0.0_dp
 
 # ifdef PROFILE
 !
@@ -184,7 +187,6 @@
       DO thread=THREAD_RANGE
         CALL wclock_on (ng, iRPM, 2, __LINE__, __FILE__)
       END DO
-!$OMP BARRIER
 # endif
 
 # ifdef WEAK_CONSTRAINT
@@ -228,99 +230,16 @@
       TLM(ng)%Rindex=0
       Fcount=TLM(ng)%Fcount
       TLM(ng)%Nrec(Fcount)=0
-!$OMP BARRIER
-# endif
-!
-!=======================================================================
-!  On first pass of ensemble run loop, initialize model configuration.
-!=======================================================================
-!
-      IF (Nrun.eq.ERstr) THEN
-!
-!-----------------------------------------------------------------------
-!  Set horizontal grid, bathymetry, and Land/Sea masking (if any).
-!  Use analytical functions or read in from a grid NetCDF.
-!-----------------------------------------------------------------------
-!
-# ifdef ANA_GRID
-        DO tile=first_tile(ng),last_tile(ng),+1
-          CALL ana_grid (ng, tile, iRPM)
-#  ifdef MASKING
-          CALL ana_mask (ng, tile, iRPM)
-#  endif
-        END DO
-!$OMP BARRIER
-# else
-!$OMP MASTER
-        CALL get_grid (ng, iRPM)
-!$OMP END MASTER
-!$OMP BARRIER
-        if (FoundError(exit_flag, NoError, __LINE__,                    &
-     &                 __FILE__)) RETURN
-# endif
-
-# ifdef SOLVE3D
-!
-!-----------------------------------------------------------------------
-!  Set vertical S-coordinate transformation function.
-!-----------------------------------------------------------------------
-!
-!$OMP MASTER
-        CALL set_scoord (ng)
-!$OMP END MASTER
-!$OMP BARRIER
-# endif
-
-# ifdef SOLVE3D
-!
-!-----------------------------------------------------------------------
-!  Set barotropic time-steps average weighting function.
-!-----------------------------------------------------------------------
-!
-!$OMP MASTER
-        CALL set_weights (ng)
-!$OMP END MASTER
-!$OMP BARRIER
-# endif
-
-# if defined WTYPE_GRID && defined ANA_WTYPE     && \
-    (defined LMD_SKPP   || defined SOLAR_SOURCE)
-!
-!-----------------------------------------------------------------------
-!  Set spatially varying Jerlov water type.
-!-----------------------------------------------------------------------
-!
-        DO tile=first_tile(ng),last_tile(ng),+1
-          CALL ana_wtype (ng, tile, iRPM)
-        END DO
-!$OMP BARRIER
 # endif
 !
 !-----------------------------------------------------------------------
-!  If appropriate, set spatially varying nudging coefficients time
-!  scales.
+!  Set application grid, metrics, and associated variables and
+!  parameters.
 !-----------------------------------------------------------------------
 !
-# ifdef ANA_NUDGCOEF
-        IF (Lnudging(ng)) THEN
-          DO tile=first_tile(ng),last_tile(ng),+1
-            CALL ana_nudgcoef (ng, tile, iRPM)
-          END DO
-!$OMP BARRIER
-        END IF
-# else
-        IF (Lnudging(ng)) THEN
-!$OMP MASTER
-          CALL get_nudgcoef (ng, iRPM)
-!$OMP END MASTER
-#  ifdef DISTRIBUTE
-          CALL mp_bcasti (ng, iRPM, exit_flag)
-#  endif
-!$OMP BARRIER
-          IF (FoundError(exit_flag, NoError, __LINE__,                  &
-     &                   __FILE__)) RETURN
-        END IF
-# endif
+      IF (SetGridConfig(ng)) THEN
+        CALL set_grid (ng, iTLM)
+        SetGridConfig(ng)=.FALSE.
       END IF
 !
 !-----------------------------------------------------------------------
@@ -335,7 +254,6 @@
       DO tile=first_tile(ng),last_tile(ng),+1
         CALL ini_hmixcoef (ng, tile, iRPM)
       END DO
-!$OMP BARRIER
 
 # ifdef ANA_SPONGE
 !
@@ -348,18 +266,8 @@
         DO tile=first_tile(ng),last_tile(ng),+1
           CALL ana_sponge (ng, tile, iRPM)
         END DO
-!$OMP BARRIER
       END IF
 # endif
-!
-!-----------------------------------------------------------------------
-!  Compute various metric term combinations.
-!-----------------------------------------------------------------------
-!
-      DO tile=first_tile(ng),last_tile(ng),+1
-        CALL metrics (ng, tile, iRPM)
-      END DO
-!$OMP BARRIER
 !
 !=======================================================================
 !  Initialize model state variables and forcing.  This part is
@@ -377,12 +285,11 @@
         CALL initialize_coupling (ng, tile, 0)
         CALL initialize_mixing (ng, tile, iRPM)
 #  endif
-        CALL initialize_forces (ng, tile, iRPM)
-        CALL initialize_forces (ng, tile, iTLM)
-        CALL initialize_forces (ng, tile, iNLM)
+!!      CALL initialize_boundary (ng, tile, iRPM)
         CALL initialize_forces (ng, tile, iADM)
+        CALL initialize_forces (ng, tile, iNLM)
+        CALL initialize_forces (ng, tile, iRPM)
       END DO
-!$OMP BARRIER
 # endif
 
 # if defined SOLVE3D && !defined INI_FILE
@@ -395,7 +302,6 @@
       DO tile=first_tile(ng),last_tile(ng),+1
         CALL set_depth (ng, tile, iRPM)
       END DO
-!$OMP BARRIER
 # endif
 
 # if !(defined SEDIMENT_NOT_YET && defined SED_MORPH_NOT_YET)
@@ -408,20 +314,19 @@
       DO tile=first_tile(ng),last_tile(ng),+1
         CALL rp_bath (ng, tile)
       END DO
-!$OMP BARRIER
 # endif
 !
 !-----------------------------------------------------------------------
 !  Set primitive variables initial conditions.  Use analytical
 !  functions or read from an initial or restart NetCDF file.
 !-----------------------------------------------------------------------
-!
+
 # ifdef ANA_INITIAL
+!
       IF (nrrec(ng).eq.0) THEN
         DO tile=first_tile(ng),last_tile(ng),+1
           CALL ana_initial (ng, tile, iRPM)
         END DO
-!$OMP BARRIER
       END IF
 # endif
 
@@ -433,7 +338,6 @@
         DO tile=first_tile(ng),last_tile(ng),+1
           CALL ana_passive (ng, tile, iRPM)
         END DO
-!$OMP BARRIER
       END IF
 # endif
 
@@ -445,7 +349,6 @@
         DO tile=first_tile(ng),last_tile(ng),+1
           CALL ana_biology (ng, tile, iRPM)
         END DO
-!$OMP BARRIER
       END IF
 # endif
 
@@ -457,24 +360,17 @@
         DO tile=first_tile(ng),last_tile(ng),+1
           CALL ana_sediment (ng, tile, iRPM)
         END DO
-!$OMP BARRIER
       END IF
 # endif
 !
 !  Read in representer model initial conditions.
 !
 # ifdef INI_FILE
-!$OMP MASTER
       CALL get_state (ng, iRPM, 1, IRP(ng)%name, IniRec, Tindex)
-!$OMP END MASTER
-!$OMP BARRIER
       time(ng)=io_time                       ! needed for shared-memory
 # else
       IF (nrrec(ng).ne.0) THEN
-!$OMP MASTER
         CALL get_state (ng, iRPM, 1, IRP(ng)name, IniRec, Tindex)
-!$OMP END MASTER
-!$OMP BARRIER
         time(ng)=io_time                     ! needed for shared-memory
 # ifdef DISTRIBUTE
         CALL mp_bcasti (ng, iNLM, exit_flag)
@@ -493,20 +389,16 @@
 !  If restart, read in wet/dry masks.
 !
       IF (nrrec(ng).ne.0) THEN
-!$OMP MASTER
         CALL get_wetdry (ng, iRPM, IniRec(ng))
-!$OMP END MASTER
 #  ifdef DISTRIBUTE
         CALL mp_bcasti (ng, iRPM, exit_flag)
 #  endif
-!$OMP BARRIER
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
       ELSE
         DO tile=first_tile(ng),last_tile(ng),+1
           CALL wetdry (ng, tile, Tindex(ng), .TRUE.)
         END DO
-!$OMP BARRIER
       END IF
 # endif
 
@@ -520,10 +412,7 @@
 !  the first "ObsTime" to process.
 !-----------------------------------------------------------------------
 !
-!$OMP MASTER
       CALL obs_initial (ng, iRPM, .FALSE.)
-!$OMP END MASTER
-!$OMP BARRIER
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 # endif
@@ -538,7 +427,6 @@
       DO tile=first_tile(ng),last_tile(ng),+1
         CALL ana_perturb (ng, tile, iRPM)
       END DO
-!$OMP BARRIER
 # endif
 
 # ifdef SOLVE3D
@@ -551,7 +439,6 @@
         CALL set_depth (ng, tile, iRPM)
         CALL rp_set_depth (ng, tile, iRPM)
       END DO
-!$OMP BARRIER
 !
 !-----------------------------------------------------------------------
 !  Compute initial horizontal mass fluxes, Hz*u/n and Hz*v/m.
@@ -561,7 +448,6 @@
         CALL rp_set_massflux (ng, tile, iRPM)
         CALL set_massflux (ng, tile, iRPM)
       END DO
-!$OMP BARRIER
 !
 !-----------------------------------------------------------------------
 !  Compute initial representer tangent linear and basic state
@@ -572,7 +458,6 @@
         CALL rp_omega (ng, tile, iRPM)
         CALL omega (ng, tile, iRPM)
       END DO
-!$OMP BARRIER
 # endif
 
 #ifdef ANA_PSOURCE
@@ -589,7 +474,6 @@
           CALL ana_psource (ng, tile, iRPM)
         END DO
       END IF
-!$OMP BARRIER
 #endif
 !
 !-----------------------------------------------------------------------
@@ -601,14 +485,11 @@
 !  during initialization/restart.
 !-----------------------------------------------------------------------
 !
-!$OMP MASTER
       CALL close_inp (ng, iRPM)
       CALL check_multifile (ng, iRPM)
-!$OMP END MASTER
 # ifdef DISTRIBUTE
       CALL mp_bcasti (ng, iRPM, exit_flag)
 # endif
-!$OMP BARRIER
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 !
@@ -618,11 +499,8 @@
 !  the time-interpolation between snapshots.
 !-----------------------------------------------------------------------
 !
-!$OMP MASTER
       CALL rp_get_idata (ng)
       CALL rp_get_data (ng)
-!$OMP END MASTER
-!$OMP BARRIER
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 
@@ -635,7 +513,6 @@
       DO tile=first_tile(ng),last_tile(ng),+1
         CALL set_masks (ng, tile, iRPM)
       END DO
-!$OMP BARRIER
 # endif
 
 # if defined PROPAGATOR || \
@@ -649,7 +526,6 @@
       DO tile=first_tile(ng),last_tile(ng),+1
         CALL wpoints (ng, tile, iRPM)
       END DO
-!$OMP BARRIER
 # endif
 
 # ifdef SOLVE3D
@@ -662,7 +538,6 @@
         CALL rp_rho_eos (ng, tile, iRPM)
         CALL rho_eos (ng, tile, iRPM)
       END DO
-!$OMP BARRIER
 # endif
 
 # if defined ANA_DRAG && defined UV_DRAG_GRID
@@ -675,7 +550,6 @@
         DO tile=first_tile(ng),last_tile(ng),+1
           CALL ana_drag (ng, tile, iRPM)
         END DO
-!$OMP BARRIER
       END IF
 # endif
 !
@@ -688,7 +562,6 @@
         DO tile=first_tile(ng),last_tile(ng),+1
           CALL stiffness (ng, tile, iRPM)
         END DO
-!$OMP BARRIER
       END IF
 
 # if defined FLOATS_NOT_YET || defined STATIONS
@@ -698,10 +571,7 @@
 !  coordinates.
 !-----------------------------------------------------------------------
 !
-!$OMP MASTER
       CALL grid_coords (ng, iRPM)
-!$OMP END MASTER
-!$OMP BARRIER
 # endif
 
 # if defined WAV_COUPLING_NOT_YET && defined MCT_LIB
@@ -713,7 +583,6 @@
       DO tile=first_tile(ng),last_tile(ng),+1
         CALL ocn2wav_coupling (ng, tile)
       END DO
-!$OMP BARRIER
 # endif
 !
 !-----------------------------------------------------------------------
@@ -724,10 +593,7 @@
 !  in the main time-stepping routine.
 !
       iic(ng)=ntstart(ng)-1
-!$OMP MASTER
       time(ng)=time(ng)-dt(ng)
-!$OMP END MASTER
-!$OMP BARRIER
 
 # ifdef PROFILE
 !
@@ -738,8 +604,8 @@
       DO thread=THREAD_RANGE
         CALL wclock_off (ng, iRPM, 2, __LINE__, __FILE__)
       END DO
-!$OMP BARRIER
 # endif
+!
       RETURN
       END SUBROUTINE rp_initial
 #else

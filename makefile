@@ -1,4 +1,5 @@
-# svn $Id$
+# git $Id$
+# svn $Id: makefile 968 2019-06-17 16:02:48Z arango $
 #::::::::::::::::::::::::::::::::::::::::::::::::::::: Hernan G. Arango :::
 # Copyright (c) 2002-2020 The ROMS/TOMS Group             Kate Hedstrom :::
 #   Licensed under a MIT/X style license                                :::
@@ -171,13 +172,12 @@ endif
 #--------------------------------------------------------------------------
 #  Notice that the token "libraries" is initialized with the ROMS/Utility
 #  library to account for calls to objects in other ROMS libraries or
-#  cycling dependencies. These types of dependencies are problematic in
-#  some compilers during linking. Such libraries appear twice at linking
-#  step (beginning and almost the end of ROMS library list).
+#  cycling dependencies. These type of dependencies are problematic in
+#  some compilers during linking. This library appears twice at linking
+#  step (beggining and almost the end of ROMS library list).
 #--------------------------------------------------------------------------
 
-   libraries := $(SCRATCH_DIR)/libNLM.a $(SCRATCH_DIR)/libDRIVER.a \
-		$(SCRATCH_DIR)/libUTIL.a
+   libraries := $(SCRATCH_DIR)/libNLM.a $(SCRATCH_DIR)/libUTIL.a
 
 #--------------------------------------------------------------------------
 #  Set Pattern rules.
@@ -409,7 +409,6 @@ endif
 		ROMS/Nonlinear/Sediment \
 		ROMS/Functionals \
 		ROMS/Utility \
-		ROMS/Drivers \
 		ROMS/Modules \
  		ROMS/IcePlume
 
@@ -437,8 +436,7 @@ endif
 		ROMS/Nonlinear/Sediment \
 		ROMS/Utility \
 		ROMS/Drivers \
-		ROMS/Functionals
-
+                ROMS/Functionals
 ifdef MY_HEADER_DIR
  includes +=	$(MY_HEADER_DIR)
 endif

@@ -1,6 +1,7 @@
 #!/bin/bash
 #
-# svn $Id$
+# git $Id$
+# svn $Id: check_nc.sh 1019 2020-04-30 20:46:51Z arango $
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Copyright (c) 2002-2020 The ROMS/TOMS Group                           :::
 #   Licensed under a MIT/X style license                                :::

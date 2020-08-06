@@ -1,6 +1,7 @@
       SUBROUTINE ad_uv3dmix4 (ng, tile)
 !
-!svn $Id$
+!git $Id$
+!svn $Id: ad_uv3dmix4_geo.h 1009 2020-03-03 20:38:52Z arango $
 !************************************************** Hernan G. Arango ***
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group       Andrew M. Moore   !
 !    Licensed under a MIT/X style license                              !

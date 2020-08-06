@@ -2,7 +2,8 @@
       MODULE ad_convolution_mod
 #if defined ADJOINT && defined FOUR_DVAR
 !
-!svn $Id$
+!git $Id$
+!svn $Id: ad_convolution.F 995 2020-01-10 04:01:28Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group       Andrew M. Moore   !
 !    Licensed under a MIT/X style license                              !

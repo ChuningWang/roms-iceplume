@@ -1,6 +1,7 @@
 !
 !  ROMS/TOMS Standard Input parameters.
 !
+!git $Id$
 !svn $Id: roms_wc13.in 74 2020-04-30 01:12:35Z arango $
 !========================================================= Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                                !

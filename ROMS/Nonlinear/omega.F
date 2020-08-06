@@ -2,7 +2,8 @@
       MODULE omega_mod
 #ifdef SOLVE3D
 !
-!svn $Id$
+!git $Id$
+!svn $Id: omega.F 1029 2020-07-11 02:11:09Z arango $
 !=======================================================================
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !

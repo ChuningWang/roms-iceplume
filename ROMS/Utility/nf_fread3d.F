@@ -1,7 +1,8 @@
 #include "cppdefs.h"
       MODULE nf_fread3d_mod
 !
-!svn $Id$
+!git $Id$
+!svn $Id: nf_fread3d.F 1031 2020-07-14 01:39:55Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -36,6 +37,8 @@
 !     Amin       Field minimum value (real)                            !
 !     Amax       Field maximum value (real)                            !
 !     A          Field to read in (real 3D array)                      !
+!     checksum   Field checksum value (32-bit integer; OPTIONAL)       !
+!                                                                      !
 !     nf_fread3d Error flag (integer)                                  !
 !                                                                      !
 !=======================================================================
@@ -55,7 +58,7 @@
 # ifdef MASKING
      &                     Amask,                                       &
 # endif
-     &                     A)
+     &                     A, checksum)
 !***********************************************************************
 !
       USE mod_param
@@ -69,6 +72,7 @@
 # if defined MASKING && defined READ_WATER
       USE distribute_mod, ONLY : mp_collect
 # endif
+      USE get_hash_mod,   ONLY : get_hash
       USE strings_mod,    ONLY : FoundError
 !
       implicit none
@@ -78,14 +82,16 @@
       integer, intent(in) :: ng, model, ncid, ncvarid, tindex, gtype
       integer, intent(in) :: LBi, UBi, LBj, UBj, LBk, UBk
       integer, intent(in) :: Vsize(4)
-
+!
+      integer(i8b), intent(out), optional :: checksum
+!
       real(dp), intent(in)  :: Ascl
       real(r8), intent(out) :: Amin
       real(r8), intent(out) :: Amax
-
+!
       character (len=*), intent(in) :: ncname
       character (len=*), intent(in) :: ncvname
-
+!
 # ifdef ASSUMED_SHAPE
 #  ifdef MASKING
       real(r8), intent(in) :: Amask(LBi:,LBj:)
@@ -100,8 +106,9 @@
 !
 !  Local variable declarations.
 !
+      logical :: Lchecksum
       logical, dimension(3) :: foundit
-
+!
       integer :: i, ic, ij, j, jc, k, kc, np, MyNpts, Npts
       integer :: Imin, Imax, Isize, Jmin, Jmax, Jsize, IJsize
       integer :: Istr, Iend
@@ -112,7 +119,7 @@
       integer, dimension(4) :: start, total
 
       integer :: nf_fread3d
-
+!
       real(r8) :: Afactor, Aoffset, Aspval
 
       real(r8), parameter :: IniVal= 0.0_r8
@@ -124,7 +131,7 @@
       real(r8), allocatable :: A2d(:)
 # endif
       real(r8), allocatable :: wrk(:)
-
+!
       character (len= 3), dimension(2) :: op_handle
       character (len=12), dimension(3) :: AttName
 !
@@ -230,6 +237,15 @@
         Aspval=AttValue(3)
       END IF
 !
+!  Initialize checsum value.
+!
+      IF (PRESENT(checksum)) THEN
+        Lchecksum=.TRUE.
+        checksum=0_i8b
+      ELSE
+        Lchecksum=.FALSE.
+      END IF
+!
 !-----------------------------------------------------------------------
 !  Parallel I/O: Read in tile data from requested field and scale it.
 !                Processing both water and land points.
@@ -302,6 +318,11 @@
               Amax=MAX(Amax,wrk(i))
             END IF
           END DO
+          IF ((ABS(Amin).ge.ABS(Aspval)).and.                           &
+     &        (ABS(Amax).ge.ABS(Aspval))) THEN
+            Amin=0.0_r8                       ! the entire data is all
+            Amax=0.0_r8                       ! field value, _FillValue
+          END IF
 !
 !  Set minimum and maximum values: global reduction.
 !
@@ -423,6 +444,11 @@
               Amax=MAX(Amax,wrk(i))
             END IF
           END DO
+          IF ((ABS(Amin).ge.ABS(Aspval)).and.                           &
+     &        (ABS(Amax).ge.ABS(Aspval))) THEN
+            Amin=0.0_r8                       ! the entire data is all
+            Amax=0.0_r8                       ! field value, _FillValue
+          END IF
 !
 !  Unpack read data.  This is tricky in parallel I/O.  The cheapeast
 !  thing to do is reconstruct a packed 2D global array and then select
@@ -479,7 +505,7 @@
 # ifdef MASKING
      &                     Amask,                                       &
 # endif
-     &                     A)
+     &                     A, checksum)
 !***********************************************************************
 !
       USE mod_param
@@ -497,6 +523,7 @@
       USE distribute_mod, ONLY : mp_scatter3d
 #  endif
 # endif
+      USE get_hash_mod,   ONLY : get_hash
       USE strings_mod,    ONLY : FoundError
 !
       implicit none
@@ -506,14 +533,16 @@
       integer, intent(in) :: ng, model, ncid, ncvarid, tindex, gtype
       integer, intent(in) :: LBi, UBi, LBj, UBj, LBk, UBk
       integer, intent(in) :: Vsize(4)
-
+!
+      integer(i8b), intent(out), optional :: checksum
+!
       real(dp), intent(in)  :: Ascl
       real(r8), intent(out) :: Amin
       real(r8), intent(out) :: Amax
-
+!
       character (len=*), intent(in) :: ncname
       character (len=*), intent(in) :: ncvname
-
+!
 # ifdef ASSUMED_SHAPE
 #  ifdef MASKING
       real(r8), intent(in) :: Amask(LBi:,LBj:)
@@ -528,8 +557,9 @@
 !
 !  Local variable declarations.
 !
+      logical :: Lchecksum
       logical, dimension(3) :: foundit
-
+!
       integer :: i, j, k, ic, Npts, NWpts, status, wtype
       integer :: Imin, Imax, Jmin, Jmax, Koff
       integer :: Ilen, Jlen, Klen, IJlen, MyType
@@ -717,6 +747,15 @@
 !
       wrk=0.0_r8
 !
+!  Initialize checsum value.
+!
+      IF (PRESENT(checksum)) THEN
+        Lchecksum=.TRUE.
+        checksum=0_i8b
+      ELSE
+        Lchecksum=.FALSE.
+      END IF
+!
 !-----------------------------------------------------------------------
 !  Serial I/O: Read in requested field and scale it.
 !-----------------------------------------------------------------------
@@ -746,6 +785,14 @@
                 Amax=MAX(Amax,wrk(i))
               END IF
             END DO
+            IF ((ABS(Amin).ge.ABS(Aspval)).and.                         &
+     &          (ABS(Amax).ge.ABS(Aspval))) THEN
+              Amin=0.0_r8                     ! the entire data is all
+              Amax=0.0_r8                     ! field value, _FillValue
+            END IF
+          END IF
+          IF (Lchecksum) THEN
+            CALL get_hash (wrk, Npts, checksum)
           END IF
         END IF
 # ifdef DISTRIBUTE

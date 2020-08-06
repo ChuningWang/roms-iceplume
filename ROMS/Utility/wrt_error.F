@@ -3,7 +3,8 @@
    (defined POSTERIOR_ERROR_F || defined POSTERIOR_ERROR_I)
       SUBROUTINE wrt_error (ng, kout, nout)
 !
-!svn $Id$
+!git $Id$
+!svn $Id: wrt_error.F 1028 2020-06-01 00:24:59Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !

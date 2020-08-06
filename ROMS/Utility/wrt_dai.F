@@ -2,7 +2,8 @@
 #if defined FOUR_DVAR || defined ENKF_RESTART
       SUBROUTINE wrt_dai (ng, tile)
 !
-!svn $Id$
+!git $Id$
+!svn $Id: wrt_dai.F 1035 2020-07-28 00:49:02Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -203,11 +204,20 @@
 # ifdef MASKING
      &                   GRID(ng) % rmask,                              &
 # endif
-# ifdef WET_DRY
+# if defined R4DVAR || defined SPLIT_R4DVAR
+#  ifdef WET_DRY
+     &                   OCEAN(ng) % tl_zeta(:,:,KOUT),                 &
+     &                   SetFillVal = .FALSE.)
+#  else
+     &                   OCEAN(ng) % tl_zeta(:,:,KOUT))
+#  endif
+# else
+#  ifdef WET_DRY
      &                   OCEAN(ng) % zeta(:,:,KOUT),                    &
      &                   SetFillVal = .FALSE.)
-# else
+#  else
      &                   OCEAN(ng) % zeta(:,:,KOUT))
+#  endif
 # endif
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
@@ -229,7 +239,11 @@
 # ifdef MASKING
      &                   GRID(ng) % umask_full,                         &
 # endif
+# if defined R4DVAR || defined SPLIT_R4DVAR
+     &                   OCEAN(ng) % tl_ubar(:,:,KOUT))
+# else
      &                   OCEAN(ng) % ubar(:,:,KOUT))
+# endif
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
@@ -250,7 +264,11 @@
 # ifdef MASKING
      &                   GRID(ng) % vmask_full,                         &
 # endif
+# if defined R4DVAR || defined SPLIT_R4DVAR
+     &                   OCEAN(ng) % tl_vbar(:,:,KOUT))
+# else
      &                   OCEAN(ng) % vbar(:,:,KOUT))
+# endif
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
@@ -273,7 +291,11 @@
 #  ifdef MASKING
      &                   GRID(ng) % umask_full,                         &
 #  endif
+#  if defined R4DVAR || defined SPLIT_R4DVAR
+     &                   OCEAN(ng) % tl_u(:,:,:,NOUT))
+#  else
      &                   OCEAN(ng) % u(:,:,:,NOUT))
+#  endif
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
@@ -294,7 +316,11 @@
 #  ifdef MASKING
      &                   GRID(ng) % vmask_full,                         &
 #  endif
+#  if defined R4DVAR || defined SPLIT_R4DVAR
+     &                   OCEAN(ng) % tl_v(:,:,:,NOUT))
+#  else
      &                   OCEAN(ng) % v(:,:,:,NOUT))
+#  endif
       IF (FoundError(status, nf90_noerr, __LINE__,                      &
      &               __FILE__)) THEN
         IF (Master) THEN
@@ -316,7 +342,11 @@
 #  ifdef MASKING
      &                     GRID(ng) % rmask,                            &
 #  endif
+#  if defined R4DVAR || defined SPLIT_R4DVAR
+     &                     OCEAN(ng) % tl_t(:,:,:,NOUT,itrc))
+#  else
      &                     OCEAN(ng) % t(:,:,:,NOUT,itrc))
+#  endif
         IF (FoundError(status, nf90_noerr, __LINE__,                    &
      &                 __FILE__)) THEN
           IF (Master) THEN
@@ -371,6 +401,7 @@
         ioerror=status
         RETURN
       END IF
+
 #  ifdef SALINITY
 !
 !  Write out vertical diffusion coefficient for salinity.

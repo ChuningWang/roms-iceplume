@@ -1,0 +1,62 @@
+#!/usr/bin/env perl
+
+# get first argument (full path name)
+$path = shift;
+
+if (0 < length($path)) {
+  # extract file name
+  $path =~ /.*\/(.*)/;
+  $filename = $1;
+
+  # not a full path, return the entire path as file name
+  if (0 == length($filename)) {
+    $filename = $path;
+  }
+
+  # Need to grab filename and to use git log for this to be accurate.
+  use IPC::Open3;
+
+  # fetch log info from remote origin
+  $fetch = open3(0,\*READ,\*ERROR,"git", "fetch");
+  waitpid( $fetch, 0 );
+
+  # read error pipe
+  chomp($f_error = <ERROR>);
+
+  # If an error occurs, write out the file unchanged and exit
+  if (0 != length($f_error)) {
+    while (<STDIN>){
+      print;
+    }
+    exit;
+  }
+
+  # Grab log info for this file from the remote origin
+  # "--" is needed to separate branch specs from paths
+  $pid = open3(0,\*READ,\*ERROR,"git", "log", "-n", "1", "--format=%H%n", "origin/master", "--", "$path");
+  waitpid( $pid, 0 );
+
+  # read error pipe
+  chomp($error = <ERROR>);
+
+  # if there is no error message
+  if (0 == length($error)) {
+    # read the 2 output lines of svn log
+    chomp($revision = <READ>); # 1st line is revision hash
+
+    # main processing loop
+    # read from stdin
+    while (<STDIN>) {
+      # replace keyword "Id"
+      s/git \$([Ii][Dd])([^\$]*)\$/"git \$" . $1 . ": " . $revision . " \$"/eg;
+    } continue {
+      # output generated text to stdout
+      print;
+    }
+  } else {
+    # If an error occurs, write out the file unchanged
+    while (<STDIN>){
+      print;
+    }
+  }
+}

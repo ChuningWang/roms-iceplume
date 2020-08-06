@@ -1,7 +1,8 @@
 #include "cppdefs.h"
       MODULE nf_fread3d_bry_mod
 !
-!svn $Id$
+!git $Id$
+!svn $Id: nf_fread3d_bry.F 1031 2020-07-14 01:39:55Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -33,6 +34,8 @@
 !     Amin         Field minimum value (real)                          !
 !     Amax         Field maximum value (real)                          !
 !     A            3D boundary field to read in (real array)           !
+!     checksum     Field checksum value (integer*8; OPTIONAL)          !
+!                                                                      !
 !     status       Error flag (integer)                                !
 !                                                                      !
 !=======================================================================
@@ -48,7 +51,7 @@
      &                         tindex, gtype,                           &
      &                         LBij, UBij, LBk, UBk, Nrec,              &
      &                         Ascl, Amin, Amax,                        &
-     &                         A)  RESULT(status)
+     &                         A, checksum)  RESULT(status)
 !***********************************************************************
 !
       USE mod_param
@@ -61,20 +64,23 @@
 #if !defined PARALLEL_IO && defined DISTRIBUTE
       USE distribute_mod, ONLY : mp_bcastf
 #endif
+      USE get_hash_mod,   ONLY : get_hash
       USE strings_mod,    ONLY : FoundError
 !
 !  Imported variable declarations.
 !
       integer, intent(in) :: ng, model, ncid, ncvarid, tindex, gtype
       integer, intent(in) :: LBij, UBij, LBk, UBk, Nrec
-
+!
+      integer(i8b), intent(out), optional :: checksum
+!
       real(dp), intent(in)  :: Ascl
       real(r8), intent(out) :: Amin
       real(r8), intent(out) :: Amax
-
+!
       character (len=*), intent(in) :: ncname
       character (len=*), intent(in) :: ncvname
-
+!
 #ifdef ASSUMED_SHAPE
       real(r8), intent(out) :: A(LBij:,:,:,:)
 #else
@@ -83,16 +89,17 @@
 !
 !  Local variable declarations.
 !
+      logical :: Lchecksum
       logical, dimension(3) :: foundit
       logical, dimension(4) :: bounded
-
+!
       integer :: bc, ghost, i, ib, ic, ir, j, k, kc, rc, tile
       integer :: IorJ, IJKlen, Imin, Imax, Jmin, Jmax, Klen, Npts
       integer :: Cgrid, Istr, Iend, Jstr, Jend
       integer, dimension(5) :: start, total
 
       integer :: status
-
+!
       real(r8) :: Afactor, Aoffset, Aspval
 
       real(r8), dimension(3) :: AttValue
@@ -101,7 +108,7 @@
       real(r8), dimension(3) :: buffer
 #endif
       real(r8), dimension((UBij-LBij+1)*(UBk-LBk+1)*4*Nrec) :: wrk
-
+!
       character (len=12), dimension(3) :: AttName
 !
 !-----------------------------------------------------------------------
@@ -225,6 +232,15 @@
         Aspval=AttValue(3)
       END IF
 !
+!  Initialize checsum value.
+!
+      IF (PRESENT(checksum)) THEN
+        Lchecksum=.TRUE.
+        checksum=0_i8b
+      ELSE
+        Lchecksum=.FALSE.
+      END IF
+!
 !-----------------------------------------------------------------------
 !  Read in requested data and scale it.
 !-----------------------------------------------------------------------
@@ -244,6 +260,14 @@
               Amax=MAX(Amax,wrk(i))
             END IF
           END DO
+          IF ((ABS(Amin).ge.ABS(Aspval)).and.                           &
+     &        (ABS(Amax).ge.ABS(Aspval))) THEN
+            Amin=0.0_r8                       ! the entire data is all
+            Amax=0.0_r8                       ! field value, _FillValue
+          END IF
+          IF (Lchecksum) THEN
+            CALL get_hash (wrk, Npts, checksum)
+          END IF
         END IF
       END IF
 

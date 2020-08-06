@@ -2,7 +2,8 @@
       MODULE rp_diag_mod
 #ifdef TL_IOMS
 !
-!svn $Id$
+!git $Id$
+!svn $Id: rp_diag.F 995 2020-01-10 04:01:28Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !

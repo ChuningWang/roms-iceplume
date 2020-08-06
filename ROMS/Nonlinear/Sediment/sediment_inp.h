@@ -1,6 +1,7 @@
       SUBROUTINE read_SedPar (model, inp, out, Lwrite)
 !
-!svn $Id$
+!git $Id$
+!svn $Id: sediment_inp.h 1031 2020-07-14 01:39:55Z arango $
 !=======================================================================
 !                                                                      !
 !  This routine reads in cohesive and non-cohesive sediment model      !
@@ -1328,7 +1329,7 @@
 !  Report input parameters.
 !-----------------------------------------------------------------------
 !
-      IF (Lwrite) THEN
+      IF (Master.and.Lwrite) THEN
         DO ng=1,Ngrids
           IF (Lsediment(ng)) THEN
             WRITE (out,50) ng

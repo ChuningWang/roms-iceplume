@@ -1,7 +1,8 @@
 #include "cppdefs.h"
       SUBROUTINE checkadj
 !
-!svn $Id$
+!git $Id$
+!svn $Id: checkadj.F 1022 2020-05-13 03:03:15Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !

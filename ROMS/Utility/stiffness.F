@@ -1,7 +1,8 @@
 #include "cppdefs.h"
       MODULE stiffness_mod
 !
-!svn $Id$
+!git $Id$
+!svn $Id: stiffness.F 1031 2020-07-14 01:39:55Z arango $
 !=======================================================================
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -285,7 +286,7 @@
         rx1(ng)=buffer(5)
 # endif
 #endif
-        IF (Master) THEN
+        IF (Master.and.LwrtInfo(ng)) THEN
           WRITE (stdout,10) ng
   10      FORMAT (/,' Basin information for Grid ',i2.2,':',/)
 #ifdef SOLVE3D

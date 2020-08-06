@@ -1,7 +1,8 @@
 #include "cppdefs.h"
       SUBROUTINE get_state (ng, model, msg, ncname, IniRec, Tindex)
 !
-!svn $Id$
+!git $Id$
+!svn $Id: get_state.F 1031 2020-07-14 01:39:55Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -78,7 +79,7 @@
       integer, intent(in) :: ng, model, msg, Tindex
 
       integer, intent(inout) :: IniRec
-
+!
       character (len=*), intent(in) :: ncname
 !
 !  Local variable declarations.
@@ -89,7 +90,7 @@
       logical :: get_adjust
 #endif
       logical, dimension(NV) :: get_var, have_var
-
+!
       integer :: LBi, UBi, LBj, UBj
 #ifdef ADJUST_BOUNDARY
       integer :: IorJ, LBij, UBij
@@ -97,14 +98,15 @@
       integer :: IDmod, InpRec, gtype, i, ifield, itrc, lstr, lend
       integer :: Nrec, mySize, ncINPid, nvatts, nvdim, status, varid
       integer :: Vsize(4), start(4), total(4)
-
+      integer(i8b) :: Fhash
+!
       real(dp), parameter :: Fscl = 1.0_r8
 
       real(dp) :: INPtime, Tmax, my_dstart, scale, time_scale
       real(r8) :: Fmax, Fmin
 
       real(dp), allocatable :: TimeVar(:)
-
+!
       character (len=6 ) :: string
       character (len=15) :: Tstring, attnam, tvarnam
       character (len=22) :: t_code
@@ -498,7 +500,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        GRID(ng) % h,                             &
+     &                        checksum = Fhash)
+#  else
      &                        GRID(ng) % h)
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -510,7 +517,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idbath)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idbath)), Fmin, Fmax
+#  endif
+
               END IF
             END IF
           ELSE
@@ -547,7 +560,12 @@
 # ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 # endif
+# ifdef CHECKSUM
+     &                          OCEAN(ng) % zeta,                       &
+     &                          checksum = Fhash)
+# else
      &                          OCEAN(ng) % zeta)
+# endif
             ELSE
               status=nf_fread2d(ng, IDmod, ncname, ncINPid,             &
      &                          Vname(1,idFsur), varid,                 &
@@ -557,7 +575,12 @@
 # ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 # endif
+# ifdef CHECKSUM
+     &                          OCEAN(ng) % zeta(:,:,Tindex),           &
+     &                          checksum = Fhash)
+# else
      &                          OCEAN(ng) % zeta(:,:,Tindex))
+# endif
             END IF
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
@@ -570,7 +593,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idFsur)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idFsur)), Fmin, Fmax
+# endif
+
               END IF
             END IF
           ELSE
@@ -601,7 +630,12 @@
 # ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % rzeta,                        &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % rzeta)
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -613,7 +647,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idRzet)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idRzet)), Fmin, Fmax
+# endif
+
               END IF
             END IF
           ELSE
@@ -649,7 +689,12 @@
 # ifdef MASKING
      &                          GRID(ng) % umask,                       &
 # endif
+# ifdef CHECKSUM
+     &                          OCEAN(ng) % ubar,                       &
+     &                          checksum = Fhash)
+# else
      &                          OCEAN(ng) % ubar)
+# endif
             ELSE
               status=nf_fread2d(ng, IDmod, ncname, ncINPid,             &
      &                          Vname(1,idUbar), varid,                 &
@@ -659,7 +704,12 @@
 # ifdef MASKING
      &                          GRID(ng) % umask,                       &
 # endif
+# ifdef CHECKSUM
+     &                          OCEAN(ng) % ubar(:,:,Tindex),           &
+     &                          checksum = Fhash)
+# else
      &                          OCEAN(ng) % ubar(:,:,Tindex))
+# endif
             END IF
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
@@ -672,7 +722,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUbar)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idUbar)), Fmin, Fmax
+# endif
+
               END IF
             END IF
           ELSE
@@ -703,7 +759,12 @@
 # ifdef MASKING
      &                        GRID(ng) % umask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % rubar,                        &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % rubar)
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -715,7 +776,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idRu2d)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idRu2d)), Fmin, Fmax
+# endif
+
               END IF
             END IF
           ELSE
@@ -731,7 +798,7 @@
           END IF
         END IF
 !
-!  Read in nonlinear 2D U-momentum component (m/s).
+!  Read in nonlinear 2D V-momentum component (m/s).
 !
         IF (get_var(idVbar)) THEN
           foundit=find_string(var_name, n_var, TRIM(Vname(1,idVbar)),   &
@@ -751,7 +818,12 @@
 # ifdef MASKING
      &                          GRID(ng) % vmask,                       &
 # endif
+# ifdef CHECKSUM
+     &                          OCEAN(ng) % vbar,                       &
+     &                          checksum = Fhash)
+# else
      &                          OCEAN(ng) % vbar)
+# endif
             ELSE
               status=nf_fread2d(ng, IDmod, ncname, ncINPid,             &
      &                          Vname(1,idVbar), varid,                 &
@@ -761,7 +833,12 @@
 # ifdef MASKING
      &                          GRID(ng) % vmask,                       &
 # endif
+# ifdef CHECKSUM
+     &                          OCEAN(ng) % vbar(:,:,Tindex),           &
+     &                          checksum = Fhash)
+# else
      &                          OCEAN(ng) % vbar(:,:,Tindex))
+# endif
             END IF
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
@@ -774,7 +851,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVbar)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idVbar)), Fmin, Fmax
+# endif
+
               END IF
             END IF
           ELSE
@@ -790,7 +873,7 @@
           END IF
         END IF
 !
-!  Read in nonlinear RHS 2D U-momentum component.
+!  Read in nonlinear RHS 2D V-momentum component.
 !
         IF (get_var(idRv2d).and.Perfect2D) THEN
           foundit=find_string(var_name, n_var, TRIM(Vname(1,idRv2d)),   &
@@ -805,7 +888,12 @@
 # ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % rvbar,                        &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % rvbar)
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -817,7 +905,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idRv2d)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idRv2d)), Fmin, Fmax
+# endif
+
               END IF
             END IF
           ELSE
@@ -851,7 +945,12 @@
 #  ifdef MASKING
      &                          GRID(ng) % umask,                       &
 #  endif
+#  ifdef CHECKSUM
+     &                          OCEAN(ng) % u,                          &
+     &                          checksum = Fhash)
+#  else
      &                          OCEAN(ng) % u)
+#  endif
             ELSE
               status=nf_fread3d(ng, IDmod, ncname, ncINPid,             &
      &                          Vname(1,idUvel), varid,                 &
@@ -861,7 +960,12 @@
 #  ifdef MASKING
      &                          GRID(ng) % umask,                       &
 #  endif
+#  ifdef CHECKSUM
+     &                          OCEAN(ng) % u(:,:,:,Tindex),            &
+     &                          checksum = Fhash)
+#  else
      &                          OCEAN(ng) % u(:,:,:,Tindex))
+#  endif
             END IF
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
@@ -874,7 +978,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUvel)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idUvel)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -905,7 +1014,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % umask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % ru,                           &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % ru)
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -917,7 +1031,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idRu3d)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idRu3d)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -949,7 +1068,12 @@
 #  ifdef MASKING
      &                          GRID(ng) % vmask,                       &
 #  endif
+#  ifdef CHECKSUM
+     &                          OCEAN(ng) % v,                          &
+     &                          checksum = Fhash)
+#  else
      &                          OCEAN(ng) % v)
+#  endif
             ELSE
               status=nf_fread3d(ng, IDmod, ncname, ncINPid,             &
      &                          Vname(1,idVvel), varid,                 &
@@ -959,7 +1083,12 @@
 #  ifdef MASKING
      &                          GRID(ng) % vmask,                       &
 #  endif
+#  ifdef CHECKSUM
+     &                          OCEAN(ng) % v(:,:,:,Tindex),            &
+     &                          checksum = Fhash)
+#  else
      &                          OCEAN(ng) % v(:,:,:,Tindex))
+#  endif
             END IF
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
@@ -972,7 +1101,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVvel)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idVvel)), Fmin, Fmax
+#  endif
+
               END IF
             END IF
           ELSE
@@ -1003,7 +1138,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % rv,                           &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % rv)
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -1015,7 +1155,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idRv3d)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idRv3d)), Fmin, Fmax
+#  endif
+
               END IF
             END IF
           ELSE
@@ -1048,7 +1194,12 @@
 #  ifdef MASKING
      &                            GRID(ng) % rmask,                     &
 #  endif
+#  ifdef CHECKSUM
+     &                            OCEAN(ng) % t(:,:,:,:,itrc),          &
+     &                            checksum = Fhash)
+#  else
      &                            OCEAN(ng) % t(:,:,:,:,itrc))
+#  endif
               ELSE
                 status=nf_fread3d(ng, IDmod, ncname, ncINPid,           &
      &                            Vname(1,idTvar(itrc)), varid,         &
@@ -1058,7 +1209,12 @@
 #  ifdef MASKING
      &                            GRID(ng) % rmask,                     &
 #  endif
+#  ifdef CHECKSUM
+     &                            OCEAN(ng) % t(:,:,:,Tindex,itrc),     &
+     &                            checksum = Fhash)
+#  else
      &                            OCEAN(ng) % t(:,:,:,Tindex,itrc))
+#  endif
               END IF
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
@@ -1071,8 +1227,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
+#  ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idTvar(itrc))),        &
+     &                              Fmin, Fmax, Fhash
+#  else
                   WRITE (stdout,70) TRIM(Vname(2,idTvar(itrc))),        &
      &                              Fmin, Fmax
+#  endif
                 END IF
               END IF
             ELSE
@@ -1106,7 +1267,12 @@
 #   ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 #   endif
+#   ifdef CHECKSUM
+     &                        MIXING(ng) % AKv,                         &
+     &                        checksum = Fhash)
+#   else
      &                        MIXING(ng) % AKv)
+#   endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -1118,7 +1284,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+#   ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVvis)), Fmin, Fmax,    &
+     &                            Fhash
+#   else
                 WRITE (stdout,70) TRIM(Vname(2,idVvis)), Fmin, Fmax
+#   endif
+
               END IF
             END IF
 #   ifdef DISTRIBUTE
@@ -1156,7 +1328,12 @@
 #   ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 #   endif
+#   ifdef CHECKSUM
+     &                        MIXING(ng) % AKt(:,:,:,itemp),            &
+     &                        checksum = Fhash)
+#   else
      &                        MIXING(ng) % AKt(:,:,:,itemp))
+#   endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -1168,7 +1345,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+#   ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idTdif)), Fmin, Fmax,    &
+     &                            Fhash
+#   else
                 WRITE (stdout,70) TRIM(Vname(2,idTdif)), Fmin, Fmax
+#   endif
+
               END IF
             END IF
 #   ifdef DISTRIBUTE
@@ -1207,7 +1390,12 @@
 #    ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 #    endif
+#    ifdef CHECKSUM
+     &                        MIXING(ng) % AKt(:,:,:,isalt),            &
+     &                        checksum = Fhash)
+#    else
      &                        MIXING(ng) % AKt(:,:,:,isalt))
+#    endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -1219,16 +1407,22 @@
               RETURN
             ELSE
               IF (Master) THEN
+#    ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idSdif)), Fmin, Fmax,    &
+     &                            Fhash
+#    else
                 WRITE (stdout,70) TRIM(Vname(2,idSdif)), Fmin, Fmax
+#    endif
+
               END IF
             END IF
-#   ifdef DISTRIBUTE
+#    ifdef DISTRIBUTE
             CALL mp_exchange3d (ng, MyRank, IDmod, 1,                   &
      &                          LBi, UBi, LBj, UBj, 0, N(ng),           &
      &                          NghostPoints,                           &
      &                          EWperiodic(ng), NSperiodic(ng),         &
      &                          MIXING(ng) % AKt(:,:,:,isalt))
-#   endif
+#    endif
           ELSE
             IF (Master) THEN
               WRITE (stdout,80) string, TRIM(Vname(1,idSdif)),          &
@@ -1257,10 +1451,15 @@
      &                        InpRec, gtype, Vsize,                     &
      &                        LBi, UBi, LBj, UBj,                       &
      &                        Fscl, Fmin, Fmax,                         &
-# ifdef MASKING
+#   ifdef MASKING
      &                        GRID(ng) % rmask,                         &
-# endif
+#   endif
+#   ifdef CHECKSUM
+     &                        MIXING(ng) % Hsbl,                        &
+     &                        checksum = Fhash)
+#   else
      &                        MIXING(ng) % Hsbl)
+#   endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -1272,7 +1471,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+#   ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idHsbl)), Fmin, Fmax,    &
+     &                            Fhash
+#   else
                 WRITE (stdout,70) TRIM(Vname(2,idHsbl)), Fmin, Fmax
+#   endif
+
               END IF
             END IF
           ELSE
@@ -1305,7 +1510,12 @@
 # ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        MIXING(ng) % Hbbl,                        &
+     &                        checksum = Fhash)
+# else
      &                        MIXING(ng) % Hbbl)
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -1317,7 +1527,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idHbbl)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idHbbl)), Fmin, Fmax
+#  endif
+
               END IF
             END IF
           ELSE
@@ -1351,7 +1567,12 @@
 #   ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 #   endif
+#   ifdef CHECKSUM
+     &                        MIXING(ng) % Ghats(:,:,:,itrc),           &
+     &                        checksum = Fhash)
+#   else
      &                        MIXING(ng) % Ghats(:,:,:,itrc))
+#   endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -1363,8 +1584,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+#   ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idGhat(itrc))),          &
+     &                            Fmin, Fmax, Fhash
+#   else
                 WRITE (stdout,70) TRIM(Vname(2,idGhat(itrc))),          &
      &                            Fmin, Fmax
+#   endif
               END IF
             END IF
           ELSE
@@ -1398,7 +1624,12 @@
 #   ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 #   endif
+#   ifdef CHECKSUM
+     &                        MIXING(ng) % tke,                         &
+     &                        checksum = Fhash)
+#   else
      &                        MIXING(ng) % tke)
+#   endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -1410,7 +1641,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+#   ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idMtke)), Fmin, Fmax,    &
+     &                            Fhash
+#   else
                 WRITE (stdout,70) TRIM(Vname(2,idMtke)), Fmin, Fmax
+#   endif
+
               END IF
             END IF
           ELSE
@@ -1441,7 +1678,12 @@
 #   ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 #   endif
+#   ifdef CHECKSUM
+     &                        MIXING(ng) % gls,                         &
+     &                        checksum = Fhash)
+#   else
      &                        MIXING(ng) % gls)
+#   endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -1453,7 +1695,13 @@
              RETURN
             ELSE
               IF (Master) THEN
+#   ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idMtls)), Fmin, Fmax,    &
+     &                            Fhash
+#   else
                 WRITE (stdout,70) TRIM(Vname(2,idMtls)), Fmin, Fmax
+#   endif
+
               END IF
             END IF
           ELSE
@@ -1484,7 +1732,12 @@
 #   ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 #   endif
+#   ifdef CHECKSUM
+     &                        MIXING(ng) % Lscale,                      &
+     &                        checksum = Fhash)
+#   else
      &                        MIXING(ng) % Lscale)
+#   endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -1496,7 +1749,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+#   ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVmLS)), Fmin, Fmax,    &
+     &                            Fhash
+#   else
                 WRITE (stdout,70) TRIM(Vname(2,idVmLS)), Fmin, Fmax
+#   endif
+
               END IF
             END IF
           ELSE
@@ -1527,7 +1786,12 @@
 #   ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 #   endif
+#   ifdef CHECKSUM
+     &                        MIXING(ng) % Akk,                         &
+     &                        checksum = Fhash)
+#   else
      &                        MIXING(ng) % Akk)
+#   endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -1539,7 +1803,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+#   ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVmKK)), Fmin, Fmax,    &
+     &                            Fhash
+#   else
                 WRITE (stdout,70) TRIM(Vname(2,idVmKK)), Fmin, Fmax
+#   endif
+
               END IF
             END IF
           ELSE
@@ -1571,7 +1841,12 @@
 #    ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 #    endif
+#    ifdef CHECKSUM
+     &                        MIXING(ng) % Akp,                         &
+     &                        checksum = Fhash)
+#    else
      &                        MIXING(ng) % Akp)
+#    endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -1583,7 +1858,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+#    ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVmKP)), Fmin, Fmax,    &
+     &                            Fhash
+#    else
                 WRITE (stdout,70) TRIM(Vname(2,idVmKP)), Fmin, Fmax
+#    endif
+
               END IF
             END IF
           ELSE
@@ -1619,7 +1900,12 @@
 #   ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #   endif
+#   ifdef CHECKSUM
+     &                          SEDBED(ng) % bed_frac(:,:,:,i),         &
+     &                          checksum = Fhash)
+#   else
      &                          SEDBED(ng) % bed_frac(:,:,:,i))
+#   endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -1631,7 +1917,14 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idfrac(i))), Fmin, Fmax
+#   ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idfrac(i))),           &
+     &                              Fmin, Fmax, Fhash
+#   else
+                  WRITE (stdout,70) TRIM(Vname(2,idfrac(i))),           &
+     &                              Fmin, Fmax
+#   endif
+
                 END IF
               END IF
             ELSE
@@ -1662,7 +1955,12 @@
 #   ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #   endif
+#   ifdef CHECKSUM
+     &                          SEDBED(ng) % bed_mass(:,:,:,Tindex,i),  &
+     &                          checksum = Fhash)
+#   else
      &                          SEDBED(ng) % bed_mass(:,:,:,Tindex,i))
+#   endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -1674,7 +1972,14 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idBmas(i))), Fmin, Fmax
+#  ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idBmas(i))),           &
+     &                              Fmin, Fmax, Fhash
+#  else
+                  WRITE (stdout,70) TRIM(Vname(2,idBmas(i))),           &
+     &                              Fmin, Fmax
+#  endif
+
                 END IF
               END IF
             ELSE
@@ -1707,7 +2012,12 @@
 #   ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #   endif
+#   ifdef CHECKSUM
+     &                          SEDBED(ng) % bed(:,:,:,i),              &
+     &                          checksum = Fhash)
+#   else
      &                          SEDBED(ng) % bed(:,:,:,i))
+#   endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -1719,7 +2029,14 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idSbed(i))), Fmin, Fmax
+#   ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idSbed(i))),           &
+     &                              Fmin, Fmax, Fhash
+#   else
+                  WRITE (stdout,70) TRIM(Vname(2,idSbed(i))),           &
+     &                              Fmin, Fmax
+#   endif
+
                 END IF
               END IF
             ELSE
@@ -1754,7 +2071,12 @@
 #    ifdef MASKING
      &                          GRID(ng) % umask,                       &
 #    endif
+#    ifdef CHECKSUM
+     &                          SEDBED(ng) % bedldu(:,:,i),             &
+     &                          checksum = Fhash)
+#    else
      &                          SEDBED(ng) % bedldu(:,:,i))
+#    endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -1766,7 +2088,14 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idUbld(i))), Fmin, Fmax
+#    ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idUbld(i))),           &
+     &                              Fmin, Fmax, Fhash
+#    else
+                  WRITE (stdout,70) TRIM(Vname(2,idUbld(i))),           &
+     &                              Fmin, Fmax
+#    endif
+
                 END IF
               END IF
             ELSE
@@ -1795,7 +2124,12 @@
 #    ifdef MASKING
      &                          GRID(ng) % vmask,                       &
 #    endif
+#    ifdef CHECKSUM
+     &                          SEDBED(ng) % bedldv(:,:,i),             &
+     &                          checksum = Fhash)
+#    else
      &                          SEDBED(ng) % bedldv(:,:,i))
+#    endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -1807,7 +2141,14 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idVbld(i))), Fmin, Fmax
+#    ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idVbld(i))),           &
+     &                              Fmin, Fmax, Fhash
+#    else
+                  WRITE (stdout,70) TRIM(Vname(2,idVbld(i))),           &
+     &                              Fmin, Fmax
+#    endif
+
                 END IF
               END IF
             ELSE
@@ -1844,7 +2185,12 @@
 #   ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #   endif
+#   ifdef CHECKSUM
+     &                          SEDBED(ng) % bottom(:,:,i),             &
+     &                          checksum = Fhash)
+#   else
      &                          SEDBED(ng) % bottom(:,:,i))
+#   endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -1856,7 +2202,14 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idBott(i))), Fmin, Fmax
+#   ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idBott(i))),           &
+     &                              Fmin, Fmax, Fhash
+#   else
+                  WRITE (stdout,70) TRIM(Vname(2,idBott(i))),           &
+     &                              Fmin, Fmax
+#   endif
+
                 END IF
               END IF
             ELSE
@@ -1909,7 +2262,12 @@
 # ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % tl_zeta(:,:,Tindex),          &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % tl_zeta(:,:,Tindex))
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -1921,7 +2279,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idFsur)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idFsur)), Fmin, Fmax
+# endif
               END IF
             END IF
           ELSE
@@ -1951,8 +2314,14 @@
      &                             InpRec, r2dvar,                      &
      &                             LBij, UBij, Nbrec(ng),               &
      &                             Fscl, Fmin, Fmax,                    &
+#  ifdef CHECKSUM
+     &                             BOUNDARY(ng) % tl_zeta_obc(:,:,:,    &
+     &                                                        Tindex),  &
+     &                             checksum = Fhash)
+#  else
      &                             BOUNDARY(ng) % tl_zeta_obc(:,:,:,    &
      &                                                        Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -1964,7 +2333,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -1996,7 +2370,12 @@
 # ifdef MASKING
      &                        GRID(ng) % umask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % tl_ubar(:,:,Tindex),          &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % tl_ubar(:,:,Tindex))
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -2008,7 +2387,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUbar)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idUbar)), Fmin, Fmax
+# endif
               END IF
             END IF
           ELSE
@@ -2038,8 +2422,14 @@
      &                             InpRec, u2dvar,                      &
      &                             LBij, UBij, Nbrec(ng),               &
      &                             Fscl, Fmin, Fmax,                    &
+#  ifdef CHECKSUM
+     &                             BOUNDARY(ng) % tl_ubar_obc(:,:,:,    &
+     &                                                        Tindex),  &
+     &                             checksum = Fhash)
+#  else
      &                             BOUNDARY(ng) % tl_ubar_obc(:,:,:,    &
      &                                                        Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -2051,7 +2441,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -2083,7 +2478,12 @@
 # ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % tl_vbar(:,:,Tindex),          &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % tl_vbar(:,:,Tindex))
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -2095,7 +2495,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVbar)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idVbar)), Fmin, Fmax
+# endif
               END IF
             END IF
           ELSE
@@ -2125,8 +2530,14 @@
      &                             InpRec, v2dvar,                      &
      &                             LBij, UBij, Nbrec(ng),               &
      &                             Fscl, Fmin, Fmax,                    &
+#  ifdef CHECKSUM
+     &                             BOUNDARY(ng) % tl_vbar_obc(:,:,:,    &
+     &                                                        Tindex),  &
+     &                             checksum = Fhash)
+#  else
      &                             BOUNDARY(ng) % tl_vbar_obc(:,:,:,    &
      &                                                        Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -2138,7 +2549,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -2172,7 +2588,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % umask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        FORCES(ng) % tl_ustr(:,:,:,Tindex),       &
+     &                        checksum = Fhash)
+#  else
      &                        FORCES(ng) % tl_ustr(:,:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -2184,8 +2605,14 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUsms))//               &
+     &                            ', adjusted tl_ustr', Fmin, Fmax,     &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idUsms))//               &
      &                            ', adjusted tl_ustr', Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -2217,7 +2644,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        FORCES(ng) % tl_vstr(:,:,:,Tindex),       &
+     &                        checksum = Fhash)
+#  else
      &                        FORCES(ng) % tl_vstr(:,:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -2229,8 +2661,14 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVsms))//               &
+     &                            ', adjusted tl_vstr', Fmin, Fmax,     &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idVsms))//               &
      &                            ', adjusted tl_vstr', Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -2264,7 +2702,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % umask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % tl_u(:,:,:,Tindex),           &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % tl_u(:,:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -2276,7 +2719,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUvel)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idUvel)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -2306,8 +2754,14 @@
      &                             InpRec, u3dvar,                      &
      &                             LBij, UBij, 1, N(ng), Nbrec(ng),     &
      &                             Fscl, Fmin, Fmax,                    &
+#  ifdef CHECKSUM
+     &                             BOUNDARY(ng) % tl_u_obc(:,:,:,:,     &
+     &                                                     Tindex),     &
+     &                             checksum = Fhash)
+#  else
      &                             BOUNDARY(ng) % tl_u_obc(:,:,:,:,     &
      &                                                     Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -2319,7 +2773,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -2351,7 +2810,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % tl_v(:,:,:,Tindex),           &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % tl_v(:,:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -2363,7 +2827,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVvel)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idVvel)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -2393,8 +2862,14 @@
      &                             InpRec, v3dvar,                      &
      &                             LBij, UBij, 1, N(ng), Nbrec(ng),     &
      &                             Fscl, Fmin, Fmax,                    &
+#   ifdef CHECKSUM
+     &                             BOUNDARY(ng) % tl_v_obc(:,:,:,:,     &
+     &                                                     Tindex),     &
+     &                             checksum = Fhash)
+#   else
      &                             BOUNDARY(ng) % tl_v_obc(:,:,:,:,     &
      &                                                     Tindex))
+#   endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -2406,7 +2881,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#   ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,    &
+     &                            Fhash
+#   else
                 WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#   endif
               END IF
             END IF
           ELSE
@@ -2439,7 +2919,12 @@
 #  ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #  endif
+#  ifdef CHECKSUM
+     &                          OCEAN(ng) % tl_t(:,:,:,Tindex,itrc),    &
+     &                          checksum = Fhash)
+#  else
      &                          OCEAN(ng) % tl_t(:,:,:,Tindex,itrc))
+#  endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -2451,8 +2936,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
+#   ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idTvar(itrc))),        &
+     &                              Fmin, Fmax, Fhash
+#  else
                   WRITE (stdout,70) TRIM(Vname(2,idTvar(itrc))),        &
      &                              Fmin, Fmax
+#  endif
                 END IF
               END IF
             ELSE
@@ -2484,8 +2974,14 @@
      &                               InpRec, r3dvar,                    &
      &                               LBij, UBij, 1, N(ng), Nbrec(ng),   &
      &                               Fscl, Fmin, Fmax,                  &
+#   ifdef CHECKSUM
      &                               BOUNDARY(ng) % tl_t_obc(:,:,:,:,   &
-     &                                                     Tindex,itrc))
+     &                                                    Tindex,itrc), &
+     &                               checksum = Fhash)
+#   else
+     &                               BOUNDARY(ng) % tl_t_obc(:,:,:,:,   &
+     &                                                    Tindex,itrc))
+#   endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -2497,7 +2993,12 @@
                 RETURN
               ELSE
                 IF (Master) THEN
+#   ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,  &
+     &                              Fhash
+#   else
                   WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#   endif
                 END IF
               END IF
             ELSE
@@ -2534,7 +3035,14 @@
 #   ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #   endif
-     &                          FORCES(ng)% tl_tflux(:,:,:,Tindex,itrc))
+#  ifdef CHECKSUM
+     &                          FORCES(ng)% tl_tflux(:,:,:,             &
+     &                                               Tindex,itrc),      &
+     &                          checksum = Fhash)
+#  else
+     &                          FORCES(ng)% tl_tflux(:,:,:,             &
+     &                                               Tindex,itrc))
+#  endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -2546,8 +3054,14 @@
                 RETURN
               ELSE
                 IF (Master) THEN
+#  ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idTsur(itrc)))//       &
+     &                              ', adjusted tl_tflux', Fmin, Fmax,  &
+     &                              Fhash
+#  else
                   WRITE (stdout,70) TRIM(Vname(2,idTsur(itrc)))//       &
      &                              ', adjusted tl_tflux', Fmin, Fmax
+#  endif
                 END IF
               END IF
             ELSE
@@ -2583,7 +3097,12 @@
 #   ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #   endif
+#  ifdef CHECKSUM
+     &                          SEDBED(ng) % tl_bed_frac(:,:,:,i),      &
+     &                          checksum = Fhash)
+#  else
      &                          SEDBED(ng) % tl_bed_frac(:,:,:,i))
+#  endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -2595,7 +3114,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idfrac(i))), Fmin, Fmax
+#  ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idfrac(i))),           &
+     &                              Fmin, Fmax, Fhash
+#  else
+                  WRITE (stdout,70) TRIM(Vname(2,idfrac(i))),           &
+     &                              Fmin, Fmax
+#  endif
                 END IF
               END IF
             ELSE
@@ -2627,8 +3152,14 @@
 #   ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #   endif
+#   ifdef CHECKSUM
+     &                          SEDBED(ng) % tl_bed_mass(:,:,:,         &
+     &                                                   Tindex,i),     &
+     &                          checksum = Fhash)
+#   else
      &                          SEDBED(ng) % tl_bed_mass(:,:,:,         &
      &                                                   Tindex,i))
+#   endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -2640,7 +3171,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idBmas(i))), Fmin, Fmax
+#   ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idBmas(i))),           &
+     &                              Fmin, Fmax, Fhash
+#   else
+                  WRITE (stdout,70) TRIM(Vname(2,idBmas(i))),           &
+     &                              Fmin, Fmax
+#   endif
                 END IF
               END IF
             ELSE
@@ -2673,7 +3210,12 @@
 #   ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #   endif
+#   ifdef CHECKSUM
+     &                          SEDBED(ng) % tl_bed(:,:,:,i),           &
+     &                          checksum = Fhash)
+#   else
      &                          SEDBED(ng) % tl_bed(:,:,:,i))
+#   endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -2685,7 +3227,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idSbed(i))), Fmin, Fmax
+#   ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idSbed(i))),           &
+     &                              Fmin, Fmax, Fhash
+#   else
+                  WRITE (stdout,70) TRIM(Vname(2,idSbed(i))),           &
+     &                              Fmin, Fmax
+#   endif
                 END IF
               END IF
             ELSE
@@ -2720,7 +3268,12 @@
 #    ifdef MASKING
      &                          GRID(ng) % umask,                       &
 #    endif
+#    ifdef CHECKSUM
+     &                          SEDBED(ng) % tl_bedldu(:,:,i),          &
+     &                          checksum = Fhash)
+#    else
      &                          SEDBED(ng) % tl_bedldu(:,:,i))
+#    endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -2732,7 +3285,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idUbld(i))), Fmin, Fmax
+#    ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idUbld(i))),           &
+     &                              Fmin, Fmax, Fhash
+#    else
+                  WRITE (stdout,70) TRIM(Vname(2,idUbld(i))),           &
+     &                              Fmin, Fmax
+#    endif
                 END IF
               END IF
             ELSE
@@ -2761,7 +3320,12 @@
 #    ifdef MASKING
      &                          GRID(ng) % vmask,                       &
 #    endif
+#    ifdef CHECKSUM
+     &                          SEDBED(ng) % tl_bedldv(:,:,i),          &
+     &                          checksum = Fhash)
+#    else
      &                          SEDBED(ng) % tl_bedldv(:,:,i))
+#    endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -2773,7 +3337,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idVbld(i))), Fmin, Fmax
+#    ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idVbld(i))),           &
+     &                              Fmin, Fmax, Fhash
+#    else
+                  WRITE (stdout,70) TRIM(Vname(2,idVbld(i))),           &
+     &                              Fmin, Fmax
+#    endif
                 END IF
               END IF
             ELSE
@@ -2810,7 +3380,12 @@
 #   ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #   endif
+#   ifdef CHECKSUM
+     &                          SEDBED(ng) % tl_bottom(:,:,i),          &
+     &                          checksum = Fhash)
+#   else
      &                          SEDBED(ng) % tl_bottom(:,:,i))
+#   endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -2822,7 +3397,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idBott(i))), Fmin, Fmax
+#   ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idBott(i))),           &
+     &                              Fmin, Fmax, Fhash
+#   else
+                  WRITE (stdout,70) TRIM(Vname(2,idBott(i))),           &
+     &                              Fmin, Fmax
+#   endif
                 END IF
               END IF
             ELSE
@@ -2866,7 +3447,12 @@
 # ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % ad_zeta(:,:,Tindex),          &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % ad_zeta(:,:,Tindex))
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -2878,7 +3464,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idFsur)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idFsur)), Fmin, Fmax
+# endif
               END IF
             END IF
           ELSE
@@ -2908,8 +3499,14 @@
      &                             InpRec, r2dvar,                      &
      &                             LBij, UBij, Nbrec(ng),               &
      &                             Fscl, Fmin, Fmax,                    &
+#  ifdef CHECKSUM
+     &                             BOUNDARY(ng) % ad_zeta_obc(:,:,:,    &
+     &                                                        Tindex),  &
+     &                             checksum = Fhash)
+#  else
      &                             BOUNDARY(ng) % ad_zeta_obc(:,:,:,    &
      &                                                        Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -2921,7 +3518,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -2953,7 +3555,12 @@
 # ifdef MASKING
      &                        GRID(ng) % umask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % ad_ubar(:,:,Tindex),          &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % ad_ubar(:,:,Tindex))
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -2965,7 +3572,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUbar)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idUbar)), Fmin, Fmax
+# endif
               END IF
             END IF
           ELSE
@@ -2995,8 +3607,14 @@
      &                             InpRec, u2dvar,                      &
      &                             LBij, UBij, Nbrec(ng),               &
      &                             Fscl, Fmin, Fmax,                    &
+#  ifdef CHECKSUM
+     &                             BOUNDARY(ng) % ad_ubar_obc(:,:,:,    &
+     &                                                        Tindex),  &
+     &                             checksum = Fhash)
+#  else
      &                             BOUNDARY(ng) % ad_ubar_obc(:,:,:,    &
      &                                                        Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -3008,7 +3626,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -3040,7 +3663,12 @@
 # ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % ad_vbar(:,:,Tindex),          &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % ad_vbar(:,:,Tindex))
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -3052,7 +3680,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVbar)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idVbar)), Fmin, Fmax
+# endif
               END IF
             END IF
           ELSE
@@ -3082,8 +3715,14 @@
      &                             InpRec, v2dvar,                      &
      &                             LBij, UBij, Nbrec(ng),               &
      &                             Fscl, Fmin, Fmax,                    &
+#  ifdef CHECKSUM
+     &                             BOUNDARY(ng) % ad_vbar_obc(:,:,:,    &
+     &                                                        Tindex),  &
+     &                             checksum = Fhash)
+#  else
      &                             BOUNDARY(ng) % ad_vbar_obc(:,:,:,    &
      &                                                        Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -3095,7 +3734,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#  endif
+
               END IF
             END IF
           ELSE
@@ -3129,7 +3774,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % umask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        FORCES(ng) % ad_ustr(:,:,:,Tindex),       &
+     &                        checksum = Fhash)
+#  else
      &                        FORCES(ng) % ad_ustr(:,:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -3141,8 +3791,14 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUsms))//               &
+     &                            ', adjusted ad_ustr', Fmin, Fmax,     &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idUsms))//               &
      &                            ', adjusted ad_ustr', Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -3174,7 +3830,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        FORCES(ng) % ad_vstr(:,:,:,Tindex),       &
+     &                        checksum = Fhash)
+#  else
      &                        FORCES(ng) % ad_vstr(:,:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -3186,8 +3847,14 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVsms))//               &
+     &                            ', adjusted ad_vstr', Fmin, Fmax,     &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idVsms))//               &
      &                            ', adjusted ad_vstr', Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -3220,7 +3887,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % umask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % ad_u(:,:,:,Tindex),           &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % ad_u(:,:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -3232,7 +3904,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUvel)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idUvel)), Fmin, Fmax
+#  endif
+
               END IF
             END IF
           ELSE
@@ -3262,8 +3940,14 @@
      &                             InpRec, u3dvar,                      &
      &                             LBij, UBij, 1, N(ng), Nbrec(ng),     &
      &                             Fscl, Fmin, Fmax,                    &
+#   ifdef CHECKSUM
+     &                             BOUNDARY(ng) % ad_u_obc(:,:,:,:,     &
+     &                                                     Tindex),     &
+     &                             checksum = Fhash)
+#   else
      &                             BOUNDARY(ng) % ad_u_obc(:,:,:,:,     &
      &                                                     Tindex))
+#   endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -3275,7 +3959,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#   ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,    &
+     &                            Fhash
+#   else
                 WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#   endif
               END IF
             END IF
           ELSE
@@ -3307,7 +3996,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % ad_v(:,:,:,Tindex),           &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % ad_v(:,:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -3319,7 +4013,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVvel)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idVvel)), Fmin, Fmax
+#  endif
+
               END IF
             END IF
           ELSE
@@ -3349,8 +4049,14 @@
      &                             InpRec, v3dvar,                      &
      &                             LBij, UBij, 1, N(ng), Nbrec(ng),     &
      &                             Fscl, Fmin, Fmax,                    &
+#   ifdef CHECKSUM
+     &                             BOUNDARY(ng) % ad_v_obc(:,:,:,:,     &
+     &                                                     Tindex),     &
+     &                             checksum = Fhash)
+#   else
      &                             BOUNDARY(ng) % ad_v_obc(:,:,:,:,     &
      &                                                     Tindex))
+#   endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -3362,7 +4068,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#   ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,    &
+     &                            Fhash
+#   else
                 WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#   endif
               END IF
             END IF
           ELSE
@@ -3395,7 +4106,12 @@
 #  ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #  endif
+#  ifdef CHECKSUM
+     &                          OCEAN(ng) % ad_t(:,:,:,Tindex,itrc),    &
+     &                          checksum = Fhash)
+#  else
      &                          OCEAN(ng) % ad_t(:,:,:,Tindex,itrc))
+#  endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -3407,8 +4123,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
+#  ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idTvar(itrc))),        &
+     &                              Fmin, Fmin, Fhash
+#  else
                   WRITE (stdout,70) TRIM(Vname(2,idTvar(itrc))),        &
      &                              Fmin, Fmax
+#  endif
                 END IF
               END IF
             ELSE
@@ -3440,8 +4161,14 @@
      &                               InpRec, r3dvar,                    &
      &                               LBij, UBij, 1, N(ng), Nbrec(ng),   &
      &                               Fscl, Fmin, Fmax,                  &
+#   ifdef CHECKSUM
      &                               BOUNDARY(ng) % ad_t_obc(:,:,:,:,   &
-     &                                                     Tindex,itrc))
+     &                                                    Tindex,itrc), &
+     &                               checksum = Fhash)
+#   else
+     &                               BOUNDARY(ng) % ad_t_obc(:,:,:,:,   &
+     &                                                    Tindex,itrc))
+#   endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -3453,7 +4180,12 @@
                 RETURN
               ELSE
                 IF (Master) THEN
+#   ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,  &
+     &                              Fhash
+#   else
                   WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#   endif
                 END IF
               END IF
             ELSE
@@ -3489,7 +4221,14 @@
 #   ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #   endif
-     &                          FORCES(ng) % ad_tflux(:,:,:,Tindex,itrc))
+#   ifdef CHECKSUM
+     &                          FORCES(ng) % ad_tflux(:,:,:,            &
+     &                                                Tindex,itrc),     &
+     &                          checksum = Fhash)
+#   else
+     &                          FORCES(ng) % ad_tflux(:,:,:,            &
+     &                                                Tindex,itrc))
+#   endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -3501,8 +4240,14 @@
                 RETURN
               ELSE
                 IF (Master) THEN
+#   ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idTsur(itrc)))//       &
+     &                              ', adjusted ad_tflux', Fmin, Fmax,  &
+     &                              Fhash
+#   else
                   WRITE (stdout,70) TRIM(Vname(2,idTsur(itrc)))//       &
      &                              ', adjusted ad_tflux', Fmin, Fmax
+#   endif
                 END IF
               END IF
             ELSE
@@ -3538,7 +4283,12 @@
 #   ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #   endif
+#   ifdef CHECKSUM
+     &                          SEDBED(ng) % ad_bed_frac(:,:,:,i),      &
+     &                          checksum = Fhash)
+#   else
      &                          SEDBED(ng) % ad_bed_frac(:,:,:,i))
+#   endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -3550,7 +4300,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idfrac(i))), Fmin, Fmax
+#   ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idfrac(i))),           &
+     &                              Fmin, Fmax, Fhash
+#   else
+                  WRITE (stdout,70) TRIM(Vname(2,idfrac(i))),           &
+     &                              Fmin, Fmax
+#   endif
                 END IF
               END IF
             ELSE
@@ -3581,8 +4337,14 @@
 #   ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #   endif
+#   ifdef CHECKSUM
+     &                          SEDBED(ng) % ad_bed_mass(:,:,:,         &
+                                                         Tindex,i),     &
+     &                          checksum = Fhash)
+#   else
      &                          SEDBED(ng) % ad_bed_mass(:,:,:,         &
      &                                                   Tindex,i))
+#   endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -3594,7 +4356,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idBmas(i))), Fmin, Fmax
+#   ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idBmas(i))),           &
+     &                              Fmin, Fmax, Fhash
+#   else
+                  WRITE (stdout,70) TRIM(Vname(2,idBmas(i))),           &
+     &                              Fmin, Fmax
+#   endif
                 END IF
               END IF
             ELSE
@@ -3627,7 +4395,12 @@
 #   ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #   endif
+#   ifdef CHECKSUM
+     &                          SEDBED(ng) % ad_bed(:,:,:,i),           &
+     &                          checksum = Fhash)
+#   else
      &                          SEDBED(ng) % ad_bed(:,:,:,i))
+#   endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -3639,7 +4412,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idSbed(i))), Fmin, Fmax
+#   ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idSbed(i))),           &
+     &                              Fmin, Fmax, Fhash
+#   else
+                  WRITE (stdout,70) TRIM(Vname(2,idSbed(i))),           &
+     &                              Fmin, Fmax
+#   endif
                 END IF
               END IF
             ELSE
@@ -3673,7 +4452,12 @@
 #    ifdef MASKING
      &                          GRID(ng) % umask,                       &
 #    endif
+#    ifdef CHECKSUM
+     &                          SEDBED(ng) % ad_bedldu(:,:,i),          &
+     &                          checksum = Fhash)
+#    else
      &                          SEDBED(ng) % ad_bedldu(:,:,i))
+#    endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -3685,7 +4469,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idUbld(i))), Fmin, Fmax
+#    ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idUbld(i))),           &
+     &                              Fmin, Fmax, Fhash
+#    else
+                  WRITE (stdout,70) TRIM(Vname(2,idUbld(i))),           &
+     &                              Fmin, Fmax
+#    endif
                 END IF
               END IF
             ELSE
@@ -3714,7 +4504,12 @@
 #    ifdef MASKING
      &                          GRID(ng) % vmask,                       &
 #    endif
+#    ifdef CHECKSUM
+     &                          SEDBED(ng) % ad_bedldv(:,:,i),          &
+     &                          checksum = Fhash)
+#    else
      &                          SEDBED(ng) % ad_bedldv(:,:,i))
+#    endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -3726,7 +4521,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idVbld(i))), Fmin, Fmax
+#    ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idVbld(i))),           &
+     &                              Fmin, Fmax, Fhash
+#    else
+                  WRITE (stdout,70) TRIM(Vname(2,idVbld(i))),           &
+     &                              Fmin, Fmax
+#    endif
                 END IF
               END IF
             ELSE
@@ -3762,7 +4563,12 @@
 #   ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #   endif
+#   ifdef CHECKSUM
+     &                          SEDBED(ng) % ad_bottom(:,:,i),          &
+     &                          checksum = Fhash)
+#   else
      &                          SEDBED(ng) % ad_bottom(:,:,i))
+#   endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -3774,7 +4580,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
-                  WRITE (stdout,70) TRIM(Vname(2,idBott(i))), Fmin, Fmax
+#   ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idBott(i))),           &
+     &                              Fmin, Fmax, Fhash
+#   else
+                  WRITE (stdout,70) TRIM(Vname(2,idBott(i))),           &
+     &                              Fmin, Fmax
+#   endif
                 END IF
               END IF
             ELSE
@@ -3821,7 +4633,12 @@
 # ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % b_zeta(:,:,Tindex),           &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % b_zeta(:,:,Tindex))
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -3833,7 +4650,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idFsur)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idFsur)), Fmin, Fmax
+# endif
+
               END IF
             END IF
 # ifdef DISTRIBUTE
@@ -3871,7 +4694,12 @@
 # ifdef MASKING
      &                        GRID(ng) % umask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % b_ubar(:,:,Tindex),           &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % b_ubar(:,:,Tindex))
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -3883,7 +4711,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUbar)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idUbar)), Fmin, Fmax
+# endif
               END IF
             END IF
 # ifdef DISTRIBUTE
@@ -3921,7 +4754,12 @@
 # ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % b_vbar(:,:,Tindex),           &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % b_vbar(:,:,Tindex))
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -3933,7 +4771,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVbar)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idVbar)), Fmin, Fmax
+# endif
               END IF
             END IF
 # ifdef DISTRIBUTE
@@ -3973,7 +4816,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % umask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % b_u(:,:,:,Tindex),            &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % b_u(:,:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -3985,7 +4833,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUvel)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idUvel)), Fmin, Fmax
+#  endif
               END IF
             END IF
 #  ifdef DISTRIBUTE
@@ -4024,7 +4877,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % b_v(:,:,:,Tindex),            &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % b_v(:,:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -4036,7 +4894,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVvel)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idVvel)), Fmin, Fmax
+#  endif
               END IF
             END IF
 #  ifdef DISTRIBUTE
@@ -4077,7 +4940,12 @@
 #  ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #  endif
+#  ifdef CHECKSUM
+     &                          OCEAN(ng) % b_t(:,:,:,Tindex,itrc),     &
+     &                          checksum = Fhash)
+#  else
      &                          OCEAN(ng) % b_t(:,:,:,Tindex,itrc))
+#  endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -4089,8 +4957,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
+#  ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idTvar(itrc))),        &
+     &                              Fmin, Fmax, Fhash
+#  else
                   WRITE (stdout,70) TRIM(Vname(2,idTvar(itrc))),        &
      &                              Fmin, Fmax
+#  endif
                 END IF
               END IF
 #  ifdef DISTRIBUTE
@@ -4130,7 +5003,7 @@
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
           IF (Master) THEN
-            WRITE (stdout,70) TRIM(Vname(1,idSbry(isFsur))),            &
+            WRITE (stdout,75) TRIM(Vname(1,idSbry(isFsur))),            &
      &                        Fmin, Fmax
           END IF
         END IF
@@ -4149,7 +5022,7 @@
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
           IF (Master) THEN
-            WRITE (stdout,70) TRIM(Vname(1,idSbry(isUbar))),            &
+            WRITE (stdout,75) TRIM(Vname(1,idSbry(isUbar))),            &
      &                        Fmin, Fmax
           END IF
         END IF
@@ -4168,7 +5041,7 @@
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
           IF (Master) THEN
-            WRITE (stdout,70) TRIM(Vname(1,idSbry(isVbar))),            &
+            WRITE (stdout,75) TRIM(Vname(1,idSbry(isVbar))),            &
      &                        Fmin, Fmax
           END IF
         END IF
@@ -4188,7 +5061,7 @@
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
           IF (Master) THEN
-            WRITE (stdout,70) TRIM(Vname(1,idSbry(isUvel))),            &
+            WRITE (stdout,75) TRIM(Vname(1,idSbry(isUvel))),            &
      &                        Fmin, Fmax
           END IF
         END IF
@@ -4207,7 +5080,7 @@
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
           IF (Master) THEN
-            WRITE (stdout,70) TRIM(Vname(1,idSbry(isVvel))),            &
+            WRITE (stdout,75) TRIM(Vname(1,idSbry(isVvel))),            &
      &                        Fmin, Fmax
           END IF
         END IF
@@ -4228,7 +5101,7 @@
             IF (FoundError(exit_flag, NoError, __LINE__,                &
      &                     __FILE__)) RETURN
             IF (Master) THEN
-              WRITE (stdout,70) TRIM(Vname(1,idSbry(isTvar(itrc)))),    &
+              WRITE (stdout,75) TRIM(Vname(1,idSbry(isTvar(itrc)))),    &
      &                          Fmin, Fmax
             END IF
           END IF
@@ -4252,7 +5125,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % umask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        FORCES(ng) % b_sustr,                     &
+     &                        checksum = Fhash)
+#  else
      &                        FORCES(ng) % b_sustr)
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -4264,7 +5142,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUsms)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idUsms)), Fmin, Fmax
+#  endif
               END IF
             END IF
 #  ifdef DISTRIBUTE
@@ -4302,7 +5185,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        FORCES(ng) % b_svstr,                     &
+     &                        checksum = Fhash)
+#  else
      &                        FORCES(ng) % b_svstr)
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -4314,7 +5202,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVsms)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idVsms)), Fmin, Fmax
+#  endif
               END IF
             END IF
 #  ifdef DISTRIBUTE
@@ -4357,7 +5250,12 @@
 #  ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #  endif
+#  ifdef CHECKSUM
+     &                          FORCES(ng) % b_stflx(:,:,itrc),         &
+     &                          checksum = Fhash)
+#  else
      &                          FORCES(ng) % b_stflx(:,:,itrc))
+#  endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -4369,8 +5267,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
+#  ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idTsur(itrc))),        &
+     &                              Fmin, Fmax, Fhash
+#  else
                   WRITE (stdout,70) TRIM(Vname(2,idTsur(itrc))),        &
      &                              Fmin, Fmax
+#  endif
                 END IF
               END IF
 #  ifdef DISTRIBUTE
@@ -4423,7 +5326,12 @@
 # ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % e_zeta(:,:,Tindex),           &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % e_zeta(:,:,Tindex))
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -4435,7 +5343,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idFsur)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idFsur)), Fmin, Fmax
+# endif
               END IF
             END IF
 # ifdef DISTRIBUTE
@@ -4474,7 +5387,12 @@
 # ifdef MASKING
      &                        GRID(ng) % umask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % e_ubar(:,:,Tindex),           &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % e_ubar(:,:,Tindex))
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -4486,7 +5404,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUbar)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idUbar)), Fmin, Fmax
+# endif
               END IF
             END IF
 # ifdef DISTRIBUTE
@@ -4524,7 +5447,12 @@
 # ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % e_vbar(:,:,Tindex),           &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % e_vbar(:,:,Tindex))
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -4536,7 +5464,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVbar)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idVbar)), Fmin, Fmax
+# endif
+
               END IF
             END IF
 # ifdef DISTRIBUTE
@@ -4576,7 +5510,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % umask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % e_u(:,:,:,Tindex),            &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % e_u(:,:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -4588,7 +5527,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUvel)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idUvel)), Fmin, Fmax
+#  endif
               END IF
             END IF
 #  ifdef DISTRIBUTE
@@ -4626,7 +5570,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % e_v(:,:,:,Tindex),            &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % e_v(:,:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -4638,7 +5587,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVvel)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idVvel)), Fmin, Fmax
+#  endif
               END IF
             END IF
 #  ifdef DISTRIBUTE
@@ -4679,7 +5633,12 @@
 #  ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #  endif
+#  ifdef CHECKSUM
+     &                          OCEAN(ng) % e_t(:,:,:,Tindex,itrc),     &
+     &                          checksum = Fhash)
+#  else
      &                          OCEAN(ng) % e_t(:,:,:,Tindex,itrc))
+#  endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -4691,8 +5650,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
+#  ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idTvar(itrc))),        &
+     &                              Fmin, Fmax, Fhash
+#  else
                   WRITE (stdout,70) TRIM(Vname(2,idTvar(itrc))),        &
      &                              Fmin, Fmax
+#  endif
                 END IF
               END IF
 #  ifdef DISTRIBUTE
@@ -4732,7 +5696,12 @@
 # ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        MIXING(ng) % Kh,                          &
+     &                        checksum = Fhash)
+# else
      &                        MIXING(ng) % Kh)
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -4744,8 +5713,13 @@
               RETURN
             ELSE
               IF (Master) THEN
-                WRITE (stdout,70) TRIM(Vname(2,idKhor)), KhMin(ng),     &
-     &                            KhMax(ng)
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idKhor)),                &
+     &                            KhMin(ng), Khmax(ng),  Fhash
+# else
+                WRITE (stdout,70) TRIM(Vname(2,idKhor)),                &
+     &                            KhMin(ng), KhMax(ng)
+# endif
               END IF
             END IF
 # ifdef DISTRIBUTE
@@ -4784,7 +5758,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        MIXING(ng) % Kv,                          &
+     &                        checksum = Fhash)
+#  else
      &                        MIXING(ng) % Kv)
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -4796,8 +5775,13 @@
               RETURN
             ELSE
               IF (Master) THEN
-                WRITE (stdout,70) TRIM(Vname(2,idKver)), KvMin(ng),     &
-     &                            KvMax(ng)
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idKver)),                &
+     &                            KvMin(ng), KvMax, Fhash
+#  else
+                WRITE (stdout,70) TRIM(Vname(2,idKver)),                &
+     &                            KvMin(ng), KvMax, Fhash
+#  endif
               END IF
             END IF
 #  ifdef DISTRIBUTE
@@ -4836,7 +5820,7 @@
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
           IF (Master) THEN
-            WRITE (stdout,70) TRIM(Vname(1,idSbry(isFsur))),            &
+            WRITE (stdout,75) TRIM(Vname(1,idSbry(isFsur))),            &
      &                        Fmin, Fmax
           END IF
         END IF
@@ -4855,7 +5839,7 @@
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
           IF (Master) THEN
-            WRITE (stdout,70) TRIM(Vname(1,idSbry(isUbar))),            &
+            WRITE (stdout,75) TRIM(Vname(1,idSbry(isUbar))),            &
      &                        Fmin, Fmax
           END IF
         END IF
@@ -4874,7 +5858,7 @@
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
           IF (Master) THEN
-            WRITE (stdout,70) TRIM(Vname(1,idSbry(isVbar))),            &
+            WRITE (stdout,75) TRIM(Vname(1,idSbry(isVbar))),            &
      &                        Fmin, Fmax
           END IF
         END IF
@@ -4894,7 +5878,7 @@
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
           IF (Master) THEN
-            WRITE (stdout,70) TRIM(Vname(1,idSbry(isUvel))),            &
+            WRITE (stdout,75) TRIM(Vname(1,idSbry(isUvel))),            &
      &                        Fmin, Fmax
           END IF
         END IF
@@ -4913,7 +5897,7 @@
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
           IF (Master) THEN
-            WRITE (stdout,70) TRIM(Vname(1,idSbry(isVvel))),            &
+            WRITE (stdout,75) TRIM(Vname(1,idSbry(isVvel))),            &
      &                        Fmin, Fmax
           END IF
         END IF
@@ -4934,7 +5918,7 @@
             IF (FoundError(exit_flag, NoError, __LINE__,                &
      &                     __FILE__)) RETURN
             IF (Master) THEN
-              WRITE (stdout,70) TRIM(Vname(1,idSbry(isTvar(itrc)))),    &
+              WRITE (stdout,75) TRIM(Vname(1,idSbry(isTvar(itrc)))),    &
      &                          Fmin, Fmax
             END IF
           END IF
@@ -4959,7 +5943,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % umask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        FORCES(ng) % e_sustr,                     &
+     &                        checksum = Fhash)
+#  else
      &                        FORCES(ng) % e_sustr)
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -4971,7 +5960,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUsms)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idUsms)), Fmin, Fmax
+#  endif
               END IF
             END IF
 #  ifdef DISTRIBUTE
@@ -5010,7 +6004,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        FORCES(ng) % e_svstr,                     &
+     &                        checksum = Fhash)
+#  else
      &                        FORCES(ng) % e_svstr)
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -5022,7 +6021,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVsms)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idVsms)), Fmin, Fmax
+#  endif
               END IF
             END IF
 #  ifdef DISTRIBUTE
@@ -5069,7 +6073,12 @@
 #  ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #  endif
+#  ifdef CHECKSUM
+     &                          FORCES(ng) % e_stflx(:,:,itrc),         &
+     &                          checksum = Fhash)
+#  else
      &                          FORCES(ng) % e_stflx(:,:,itrc))
+#  endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -5081,8 +6090,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
+#  ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idTsur(itrc))),        &
+     &                              Fmin, Fmax, Fhash
+#  else
                   WRITE (stdout,70) TRIM(Vname(2,idTsur(itrc))),        &
      &                              Fmin, Fmax
+#  endif
                 END IF
               END IF
 #  ifdef DISTRIBUTE
@@ -5146,7 +6160,12 @@
 # ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % f_zeta,                       &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % f_zeta)
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -5158,7 +6177,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idFsur)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idFsur)), Fmin, Fmax
+# endif
               END IF
             END IF
           ELSE
@@ -5191,7 +6215,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % umask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % f_ubar,                       &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % f_ubar)
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -5203,7 +6232,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUbar)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idUbar)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -5234,7 +6268,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % f_vbar,                       &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % f_vbar)
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -5246,7 +6285,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVbar)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idVbar)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -5279,7 +6323,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % umask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % f_u,                          &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % f_u)
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -5291,7 +6340,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUvel)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idUvel)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -5322,7 +6376,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % f_v,                          &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % f_v)
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -5334,7 +6393,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVvel)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idVvel)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -5366,7 +6430,12 @@
 #  ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #  endif
+#  ifdef CHECKSUM
+     &                          OCEAN(ng) % f_t(:,:,:,itrc),            &
+     &                          checksum = Fhash)
+#  else
      &                          OCEAN(ng) % f_t(:,:,:,itrc))
+#  endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -5378,8 +6447,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
+#  ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idTvar(itrc))),        &
+     &                              Fmin, Fmax, Fhash
+#  else
                   WRITE (stdout,70) TRIM(Vname(2,idTvar(itrc))),        &
      &                              Fmin, Fmax
+#  endif
                 END IF
               END IF
             ELSE
@@ -5433,8 +6507,14 @@
      &                             InpRec, r2dvar,                      &
      &                             LBij, UBij, Nbrec(ng),               &
      &                             Fscl, Fmin, Fmax,                    &
+#  ifdef CHECKSUM
+     &                             BOUNDARY(ng) % tl_zeta_obc(:,:,:,    &
+     &                                                        Tindex),  &
+     &                             checksum = Fhash)
+#  else
      &                             BOUNDARY(ng) % tl_zeta_obc(:,:,:,    &
      &                                                        Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -5446,7 +6526,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -5475,8 +6560,14 @@
      &                             InpRec, u2dvar,                      &
      &                             LBij, UBij, Nbrec(ng),               &
      &                             Fscl, Fmin, Fmax,                    &
+#  ifdef CHECKSUM
+     &                             BOUNDARY(ng) % tl_ubar_obc(:,:,:,    &
+     &                                                      Tindex),    &
+     &                             checksum = Fhash)
+#  else
      &                             BOUNDARY(ng) % tl_ubar_obc(:,:,:,    &
      &                                                      Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -5488,7 +6579,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -5517,8 +6613,14 @@
      &                             InpRec, v2dvar,                      &
      &                             LBij, UBij, Nbrec(ng),               &
      &                             Fscl, Fmin, Fmax,                    &
+#  ifdef CHECKSUM
+     &                             BOUNDARY(ng) % tl_vbar_obc(:,:,:,    &
+     &                                                        Tindex),  &
+     &                             checksum = Fhash)
+#  else
      &                             BOUNDARY(ng) % tl_vbar_obc(:,:,:,    &
      &                                                        Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -5530,7 +6632,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -5561,8 +6668,14 @@
      &                             InpRec, u3dvar,                      &
      &                             LBij, UBij, 1, N(ng), Nbrec(ng),     &
      &                             Fscl, Fmin, Fmax,                    &
+#   ifdef CHECKSUM
+     &                             BOUNDARY(ng) % tl_u_obc(:,:,:,:,     &
+     &                                                     Tindex),     &
+     &                             checksum = Fhash)
+#   else
      &                             BOUNDARY(ng) % tl_u_obc(:,:,:,:,     &
      &                                                     Tindex))
+#   endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -5574,7 +6687,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#   ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,    &
+     &                            Fhash
+#   else
                 WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#   endif
               END IF
             END IF
           ELSE
@@ -5603,8 +6721,14 @@
      &                             InpRec, v3dvar,                      &
      &                             LBij, UBij, 1, N(ng), Nbrec(ng),     &
      &                             Fscl, Fmin, Fmax,                    &
+#   ifdef CHECKSUM
+     &                             BOUNDARY(ng) % tl_v_obc(:,:,:,:,     &
+     &                                                     Tindex),     &
+     &                             checksum = Fhash)
+#   else
      &                             BOUNDARY(ng) % tl_v_obc(:,:,:,:,     &
      &                                                     Tindex))
+#   endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -5616,7 +6740,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+#   ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,    &
+     &                            Fhash
+#   else
                 WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#   endif
+
               END IF
             END IF
           ELSE
@@ -5646,8 +6776,14 @@
      &                               InpRec, r3dvar,                    &
      &                               LBij, UBij, 1, N(ng), Nbrec(ng),   &
      &                               Fscl, Fmin, Fmax,                  &
+#   ifdef CHECKSUM
      &                               BOUNDARY(ng) % tl_t_obc(:,:,:,:,   &
-     &                                                     Tindex,itrc))
+     &                                                    Tindex,itrc), &
+     &                               checksum = Fhash)
+#   else
+     &                               BOUNDARY(ng) % tl_t_obc(:,:,:,:,   &
+     &                                                    Tindex,itrc))
+#   endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -5659,7 +6795,12 @@
                 RETURN
               ELSE
                 IF (Master) THEN
+#   ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax,  &
+     &                            Fhash
+#   else
                   WRITE (stdout,70) TRIM(Vname(2,ifield)), Fmin, Fmax
+#   endif
                 END IF
               END IF
             ELSE
@@ -5695,7 +6836,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % umask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        FORCES(ng) % tl_ustr(:,:,:,Tindex),       &
+     &                        checksum = Fhash)
+#  else
      &                        FORCES(ng) % tl_ustr(:,:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -5707,8 +6853,14 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUsms))//               &
+     &                            ', adjusted tl_ustr', Fmin, Fmax,     &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idUsms))//               &
      &                            ', adjusted tl_ustr', Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -5740,7 +6892,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        FORCES(ng) % tl_vstr(:,:,:,Tindex),       &
+     &                        checksum = Fhash)
+#  else
      &                        FORCES(ng) % tl_vstr(:,:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -5752,8 +6909,14 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVsms))//               &
+     &                            ', adjusted tl_vstr', Fmin, Fmax,     &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idVsms))//               &
      &                            ', adjusted tl_vstr', Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -5789,7 +6952,14 @@
 #  ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #  endif
-     &                          FORCES(ng)% tl_tflux(:,:,:,Tindex,itrc))
+#  ifdef CHECKSUM
+     &                          FORCES(ng)% tl_tflux(:,:,:,             &
+     &                                               Tindex,itrc),      &
+     &                          checksum = Fhash)
+#  else
+     &                          FORCES(ng)% tl_tflux(:,:,:,             &
+     &                                               Tindex,itrc))
+#  endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -5801,8 +6971,14 @@
                 RETURN
               ELSE
                 IF (Master) THEN
+#  ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idTsur(itrc)))//       &
+     &                              ', adjusted tl_tflux', Fmin, Fmax,  &
+     &                              Fhash
+#  else
                   WRITE (stdout,70) TRIM(Vname(2,idTsur(itrc)))//       &
      &                              ', adjusted tl_tflux', Fmin, Fmax
+#  endif
                 END IF
               END IF
             ELSE
@@ -5860,7 +7036,12 @@
 # ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 # endif
+# ifdef CHECKSUM
+     &                        OCEAN(ng) % tl_zeta(:,:,Tindex),          &
+     &                        checksum = Fhash)
+# else
      &                        OCEAN(ng) % tl_zeta(:,:,Tindex))
+# endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -5872,7 +7053,13 @@
               RETURN
             ELSE
               IF (Master) THEN
+# ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idFsur)), Fmin, Fmax,    &
+     &                            Fhash
+# else
                 WRITE (stdout,70) TRIM(Vname(2,idFsur)), Fmin, Fmax
+# endif
+
               END IF
             END IF
           ELSE
@@ -5905,7 +7092,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % umask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % tl_ubar(:,:,Tindex),          &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % tl_ubar(:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -5917,7 +7109,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUbar)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idUbar)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -5948,7 +7145,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % tl_vbar(:,:,Tindex),          &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % tl_vbar(:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -5960,7 +7162,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVbar)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idVbar)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -5993,7 +7200,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % umask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % tl_u(:,:,:,Tindex),           &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % tl_u(:,:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -6005,7 +7217,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idUvel)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idUvel)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -6036,7 +7253,12 @@
 #  ifdef MASKING
      &                        GRID(ng) % vmask,                         &
 #  endif
+#  ifdef CHECKSUM
+     &                        OCEAN(ng) % tl_v(:,:,:,Tindex),           &
+     &                        checksum = Fhash)
+#  else
      &                        OCEAN(ng) % tl_v(:,:,:,Tindex))
+#  endif
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               IF (Master) THEN
@@ -6048,7 +7270,12 @@
               RETURN
             ELSE
               IF (Master) THEN
+#  ifdef CHECKSUM
+                WRITE (stdout,70) TRIM(Vname(2,idVvel)), Fmin, Fmax,    &
+     &                            Fhash
+#  else
                 WRITE (stdout,70) TRIM(Vname(2,idVvel)), Fmin, Fmax
+#  endif
               END IF
             END IF
           ELSE
@@ -6080,7 +7307,12 @@
 #  ifdef MASKING
      &                          GRID(ng) % rmask,                       &
 #  endif
+#  ifdef CHECKSUM
+     &                          OCEAN(ng) % tl_t(:,:,:,Tindex,itrc),    &
+     &                          checksum = Fhash)
+#  else
      &                          OCEAN(ng) % tl_t(:,:,:,Tindex,itrc))
+#  endif
               IF (FoundError(status, nf90_noerr, __LINE__,              &
      &                       __FILE__)) THEN
                 IF (Master) THEN
@@ -6092,8 +7324,13 @@
                 RETURN
               ELSE
                 IF (Master) THEN
+#  ifdef CHECKSUM
+                  WRITE (stdout,70) TRIM(Vname(2,idTvar(itrc))),        &
+     &                              Fmin, Fmax, Fhash
+#  else
                   WRITE (stdout,70) TRIM(Vname(2,idTvar(itrc))),        &
      &                              Fmin, Fmax
+#  endif
                 END IF
               END IF
             ELSE
@@ -6142,7 +7379,14 @@
      &        ', File: ',a,', Rec=',i4.4, ', Index=',i1,')')
   60  FORMAT (/,a,'GET_STATE - error while reading variable: ',a,2x,    &
      &        'at time record = ',i3,/,18x,'in input NetCDF file: ',a)
+#ifdef CHECKSUM
   70  FORMAT (16x,'- ',a,/,19x,'(Min = ',1p,e15.8,                      &
+     &        ' Max = ',1p,e15.8,' CheckSum = ',i0,')')
+#else
+  70  FORMAT (16x,'- ',a,/,19x,'(Min = ',1p,e15.8,                      &
+     &        ' Max = ',1p,e15.8,')')
+#endif
+  75  FORMAT (16x,'- ',a,/,19x,'(Min = ',1p,e15.8,                      &
      &        ' Max = ',1p,e15.8,')')
   80  FORMAT (/,a,'GET_STATE - cannot find variable: ',a,               &
      &        /,18x,'in input NetCDF file: ',a)

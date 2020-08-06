@@ -3,7 +3,8 @@
 
 #if defined NONLINEAR && defined SOLVE3D
 !
-!svn $Id$
+!git $Id$
+!svn $Id: step3d_uv.F 1029 2020-07-11 02:11:09Z arango $
 !=======================================================================
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license           Hernan G. Arango   !

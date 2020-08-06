@@ -1,7 +1,8 @@
 #include "cppdefs.h"
       MODULE state_read_mod
 !
-!svn $Id$
+!git $Id$
+!svn $Id: state_read.F 1026 2020-05-20 02:05:37Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !

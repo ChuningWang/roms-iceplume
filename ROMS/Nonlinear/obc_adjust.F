@@ -3,7 +3,8 @@
 
 #ifdef ADJUST_BOUNDARY
 !
-!svn $Id$
+!git $Id$
+!svn $Id: obc_adjust.F 1031 2020-07-14 01:39:55Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -491,10 +492,10 @@
         END IF
       END DO
 # endif
-
+!
       RETURN
       END SUBROUTINE obc_adjust_tile
-
+!
       SUBROUTINE load_obc (ng, tile, Lout)
 !
 !=======================================================================
@@ -568,7 +569,7 @@
 !  Load nonlinear open boundary fields into storage arrays.
 !-----------------------------------------------------------------------
 !
-      LOAD : IF (MOD(iic(ng)-1,nOBC(ng)).eq.0) THEN
+      LOAD_OBC : IF (MOD(iic(ng)-1,nOBC(ng)).eq.0) THEN
         OBCcount(ng)=OBCcount(ng)+1
         ic=OBCcount(ng)
 !
@@ -828,7 +829,7 @@
           END IF
         END DO
 # endif
-      END IF LOAD
+      END IF LOAD_OBC
 
       RETURN
       END SUBROUTINE load_obc_tile

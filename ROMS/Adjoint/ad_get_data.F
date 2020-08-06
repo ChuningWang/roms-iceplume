@@ -2,7 +2,8 @@
 #ifdef ADJOINT
       SUBROUTINE ad_get_data (ng)
 !
-!svn $Id$
+!git $Id$
+!svn $Id: ad_get_data.F 1023 2020-05-13 04:30:35Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !

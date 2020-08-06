@@ -1,7 +1,8 @@
 #include "cppdefs.h"
       SUBROUTINE checkdefs
 !
-!svn $Id$
+!git $Id$
+!svn $Id: checkdefs.F 1031 2020-07-14 01:39:55Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -627,6 +628,13 @@
      &   'Momentum stresses as body-forces'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+11)=' BODYFORCE,'
+#endif
+#ifdef CHECKSUM
+!
+      IF (Master) WRITE (stdout,20) 'CHECKSUM',                         &
+     &   'Report checksum (hash) values when processing I/O'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+10)=' CHECKSUM,'
 #endif
 #ifdef DISTRIBUTE
 # if defined BOUNDARY_ALLGATHER
@@ -1289,6 +1297,13 @@
      &   'Implicit Vertical Convolution Algorithm'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+16)=' IMPLICIT_VCONV,'
+#endif
+#ifdef INITIALIZE_AUTOMATIC
+!
+      IF (Master) WRITE (stdout,20) 'INITIALIZE_AUTOMATIC',             &
+     &   'Initialize automatic arrays in step2d for debugging'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+22)=' INITIALIZE_AUTOMATIC,'
 #endif
 #if defined LIMIT_BSTRESS && defined SOLVE3D  && !defined BBL_MODEL
 !
@@ -2515,6 +2530,13 @@
      &   'Use surface dissolved oxygen saturation'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+23)=' SURFACE_DO_SATURATION,'
+#endif
+#if defined SUPPRESS_REPORT && defined SPLIT_4DVAR
+!
+      IF (Master) WRITE (stdout,20) 'SUPPRESS_REPORT',                  &
+     &   'Suppress report of repetitive configuration information'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+17)=' SUPPRESS_REPORT,'
 #endif
 #ifdef SWAN_COUPLING
 !

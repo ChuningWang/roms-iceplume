@@ -2,7 +2,8 @@
 #if defined TANGENT || defined TL_IOMS
       SUBROUTINE tl_def_his (ng, ldef)
 !
-!svn $Id$
+!git $Id$
+!svn $Id: tl_def_his.F 1031 2020-07-14 01:39:55Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -1388,8 +1389,9 @@
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idDano))) THEN
             got_var(idDano)=.TRUE.
             TLM(ng)%Vid(idDano)=var_id(i)
-#  if defined FORWARD_MIXING     && \
-     (defined GLS_MIXING_NOT_YET || defined MY25_MIXING_NOT_YET)
+#  if defined FORWARD_MIXING && \
+     (defined BVF_MIXING     || defined GLS_MIXING  || \
+      defined LMD_MIXING     || defined MY25_MIXING)
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idVvis))) THEN
             got_var(idVvis)=.TRUE.
             TLM(ng)%Vid(idVvis)=var_id(i)
@@ -1500,6 +1502,7 @@
         END IF
 # endif
 # ifdef FORWARD_WRITE
+#  ifdef FORWARD_RHS
         IF (.not.got_var(idRzet)) THEN
           IF (Master) WRITE (stdout,70) TRIM(Vname(1,idRzet)),          &
      &                                  TRIM(ncname)
@@ -1518,7 +1521,9 @@
           exit_flag=3
           RETURN
         END IF
+#  endif
 #  ifdef SOLVE3D
+#   ifdef FORWARD_RHS
         IF (.not.got_var(idRuct)) THEN
           IF (Master) WRITE (stdout,70) TRIM(Vname(1,idRuct)),          &
      &                                  TRIM(ncname)
@@ -1531,6 +1536,7 @@
           exit_flag=3
           RETURN
         END IF
+#   endif
         IF (.not.got_var(idUfx1)) THEN
           IF (Master) WRITE (stdout,70) TRIM(Vname(1,idUfx1)),          &
      &                                  TRIM(ncname)
@@ -1555,6 +1561,7 @@
           exit_flag=3
           RETURN
         END IF
+#   ifdef FORWARD_RHS
         IF (.not.got_var(idRu3d)) THEN
           IF (Master) WRITE (stdout,70) TRIM(Vname(1,idRu3d)),          &
      &                                  TRIM(ncname)
@@ -1567,6 +1574,7 @@
           exit_flag=3
           RETURN
         END IF
+#   endif
 #  endif
 # endif
 # ifdef SOLVE3D
@@ -1602,8 +1610,9 @@
           exit_flag=3
           RETURN
         END IF
-#  if defined FORWARD_MIXING     && \
-     (defined GLS_MIXING_NOT_YET || defined MY25_MIXING_NOT_YET)
+#  if defined FORWARD_MIXING && \
+     (defined BVF_MIXING     || defined GLS_MIXING  || \
+      defined LMD_MIXING     || defined MY25_MIXING)
         IF (.not.got_var(idVvis).and.Hout(idVvis,ng)) THEN
           IF (Master) WRITE (stdout,70) TRIM(Vname(1,idVvis)),          &
      &                                  TRIM(ncname)

@@ -1,7 +1,8 @@
 #include "cppdefs.h"
       MODULE bc_bry3d_mod
 !
-!svn $Id$
+!git $Id$
+!svn $Id: bc_bry3d.F 995 2020-01-10 04:01:28Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !

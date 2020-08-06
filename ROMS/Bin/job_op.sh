@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
-# svn $Id$
+# git $Id$
+# svn $Id: job_op.sh 1019 2020-04-30 20:46:51Z arango $
 #######################################################################
 # Copyright (c) 2002-2020 The ROMS/TOMS Group                         #
 #   Licensed under a MIT/X style license                              #

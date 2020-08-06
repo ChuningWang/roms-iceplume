@@ -1,6 +1,7 @@
       MODULE ocean_control_mod
 !
-!svn $Id$
+!git $Id$
+!svn $Id: symmetry.h 1031 2020-07-14 01:39:55Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -48,6 +49,7 @@
       USE mod_iounits
       USE mod_scalars
 !
+      USE inp_par_mod, ONLY : inp_par
       USE strings_mod, ONLY : FoundError
 !
 !  Imported variable declarations.

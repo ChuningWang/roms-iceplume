@@ -3,7 +3,8 @@
 
 #if defined FOUR_DVAR
 !
-!svn $Id$
+!git $Id$
+!svn $Id: normalization.F 1028 2020-06-01 00:24:59Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !

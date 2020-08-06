@@ -1,5 +1,6 @@
 /*
-** svn $Id$
+** git $Id$
+** svn $Id: weddell.h 1001 2020-01-10 22:41:16Z arango $
 *******************************************************************************
 ** Copyright (c) 2002-2020 The ROMS/TOMS Group                               **
 **   Licensed under a MIT/X style license                                    **

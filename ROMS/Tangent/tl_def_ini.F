@@ -2,7 +2,8 @@
 #if (defined TANGENT || defined TL_IOMS) && defined FOUR_DVAR
       SUBROUTINE tl_def_ini (ng)
 !
-!svn $Id$
+!git $Id$
+!svn $Id: tl_def_ini.F 1031 2020-07-14 01:39:55Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -906,19 +907,22 @@
           RETURN
         END IF
 # ifdef ADJUST_BOUNDARY
-        IF (.not.got_var(idSbry(isFsur))) THEN
+        IF (.not.got_var(idSbry(isFsur)).and.                           &
+     &      ANY(Lobc(:,isFsur,ng))) THEN
           IF (Master) WRITE (stdout,70) TRIM(Vname(1,idSbry(isFsur))),  &
      &                                  TRIM(ncname)
           exit_flag=3
           RETURN
         END IF
-        IF (.not.got_var(idSbry(isUbar))) THEN
+        IF (.not.got_var(idSbry(isUbar)).and.                           &
+     &      ANY(Lobc(:,isUbar,ng))) THEN
           IF (Master) WRITE (stdout,70) TRIM(Vname(1,idSbry(isUbar))),  &
      &                                  TRIM(ncname)
           exit_flag=3
           RETURN
         END IF
-        IF (.not.got_var(idSbry(isVbar))) THEN
+        IF (.not.got_var(idSbry(isVbar)).and.                           &
+     &      ANY(Lobc(:,isVbar,ng))) THEN
           IF (Master) WRITE (stdout,70) TRIM(Vname(1,idSbry(isVbar))),  &
      &                                  TRIM(ncname)
           exit_flag=3
@@ -953,13 +957,15 @@
           RETURN
         END IF
 #  ifdef ADJUST_BOUNDARY
-        IF (.not.got_var(idSbry(isUvel))) THEN
+        IF (.not.got_var(idSbry(isUvel)).and.                           &
+     &      ANY(Lobc(:,isUvel,ng))) THEN
           IF (Master) WRITE (stdout,70) TRIM(Vname(1,idSbry(isUvel))),  &
      &                                  TRIM(ncname)
           exit_flag=3
           RETURN
         END IF
-        IF (.not.got_var(idSbry(isVvel))) THEN
+        IF (.not.got_var(idSbry(isVvel)).and.                           &
+     &      ANY(Lobc(:,isVvel,ng))) THEN
           IF (Master) WRITE (stdout,70) TRIM(Vname(1,idSbry(isVvel))),  &
      &                                  TRIM(ncname)
           exit_flag=3
@@ -976,7 +982,8 @@
             RETURN
           END IF
 #  ifdef ADJUST_BOUNDARY
-          IF (.not.got_var(idSbry(isTvar(itrc)))) THEN
+          IF (.not.got_var(idSbry(isTvar(itrc))).and.                   &
+     &        ANY(Lobc(:,isTvar(itrc),ng))) THEN
             IF (Master) WRITE (stdout,70)                               &
      &                        TRIM(Vname(1,idSbry(isTvar(itrc)))),      &
      &                        TRIM(ncname)

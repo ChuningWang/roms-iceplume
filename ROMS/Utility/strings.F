@@ -1,7 +1,8 @@
 #include "cppdefs.h"
       MODULE strings_mod
 !
-!svn $Id$
+!git $Id$
+!svn $Id: strings.F 1017 2020-04-27 22:19:14Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
