@@ -109,20 +109,6 @@ SUBROUTINE ICEPLUME_ENTRAIN(ng, I, iceDepthK,                           &
   Y(9)  = REAL(sgTyp)  ! fake variable to pass in sgTyp
   Y(10) = sgLen        ! fake variable to pass in sgLen
 !
-! Prepare profiles
-!
-  DO K = 0, N(ng)
-    PLUME(ng) % f(I, K)    = 0.0
-    PLUME(ng) % w(I, K)    = 0.0
-    PLUME(ng) % t(I, K)    = 0.0
-    PLUME(ng) % s(I, K)    = 0.0
-    PLUME(ng) % a(I, K)    = 0.0
-    PLUME(ng) % mInt(I, K) = 0.0
-    PLUME(ng) % rho(I, K)  = 0.0
-    PLUME(ng) % lm(I, K)   = 0.0
-    PLUME(ng) % lc(I, K)   = 0.0
-  ENDDO
-!
 ! Start at bottom of ice face
 !
   zIn = PLUME(ng) % zW(I, iceDepthK)

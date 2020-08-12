@@ -282,7 +282,7 @@ SUBROUTINE iceplume_tile (ng, tile)
 !                                                                   !
 ! ==================================================================!
 !
-        IF (NINT(SOURCES(ng) % SGtyp(is)) .NE. 1) THEN
+        IF (NINT(SOURCES(ng) % SGtyp(is)) .NE. 0) THEN
           CALL iceplume_calc(ng, is,                                    &
      &                       ABS(SOURCES(ng) % SGbar(is)),              &
      &                       SOURCES(ng) % SGtrc(is, itemp),            &
