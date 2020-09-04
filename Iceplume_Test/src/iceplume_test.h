@@ -21,9 +21,9 @@
 /* iceplume */
 #define ICEPLUME
 #ifdef ICEPLUME
+# define ICEPLUME_DET_AVERAGE
 # define ICEPLUME_TRACER
 # define ICEPLUME_MELT
-# define ICEPLUME_DET_AVERAGE
 # define ICEPLUME_MELT_TRACER
 # undef ICEPLUME_MIX
 #endif
