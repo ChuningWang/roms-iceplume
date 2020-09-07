@@ -1970,6 +1970,102 @@
 
 !
 !------------------------------------------------------------------------------
+! ICEPLUME variables (Chuning Wang)
+!------------------------------------------------------------------------------
+!
+
+'subglacial_depth'                                 ! Input
+  'subglacial runoff dpeth'
+  'meter'                                          ! [m]
+  'subglacial_depth, scalar'
+  'river'
+  'idSGdep'
+  'nulvar'
+  1.0d0
+
+'subglacial_type'                                  ! Input
+  'subglacial runoff type'
+  'nondimensional'                                 ! [nondimensional]
+  'subglacial_type, scalar'
+  'river'
+  'idSGtyp'
+  'nulvar'
+  1.0d0
+
+'subglacial_length'                                ! Input
+  'subglacial runoff length'
+  'meter'                                          ! [m]
+  'subglacial_length, scalar'
+  'river'
+  'idSGlen'
+  'nulvar'
+  1.0d0
+
+'subglacial_id'                                    ! Input
+  'subglacial runoff id'
+  'nondimensional'                                 ! [nondimensional]
+  'subglacial_id, scalar'
+  'river'
+  'idSGgid'
+  'nulvar'
+  1.0d0
+
+'subglacial_transport'                             ! Input
+  'subglacial runoff mass transport'
+  'meter3 second-1'                                ! [m3/s]
+  'subglacial_transport, scalar, series'
+  'river_time'
+  'idSGtra'
+  'nulvar'
+  1.0d0
+
+'subglacial_temp'                                  ! Input
+  'subglacial runoff potential temperature'
+  'Celsius'                                        ! [Celsius]
+  'subglacial_temp, scalar, series'
+  'river_time'
+  'idSGtrc(itemp)'
+  'nulvar'
+  1.0d0
+
+'subglacial_salt'                                  ! Input
+  'subglacial runoff salinity'
+  'nondimensional'                                 ! [PSU]
+  'subglacial_salt, scalar, series'
+  'river_time'
+  'idSGtrc(isalt)'
+  'nulvar'
+  1.0d0
+
+'subglacial_dye_'                                  ! Input
+  'subglacial runoff dye concentration'
+  'kilogram meter-3'                               ! [kg/m3]
+  'subglacial_dye, scalar, series'
+  'river_time'
+  'idSGtrc(inert(i))'
+  'nulvar'
+  1.0d0
+
+'subglacial_Xrange'                                ! Input
+  'subglacial runoff average indices, XI direction'
+  'nondimensional'                                 ! [nondimensional]
+  'subglacial_Xrange, scalar'
+  'river'
+  'idSGxrange'
+  'nulvar'
+  1.0d0
+
+'subglacial_Erange'                                ! Input
+  'subglacial runoff average indices, ETA direction'
+  'nondimensional'                                 ! [nondimensional]
+  'subglacial_Erange, scalar'
+  'river'
+  'idSGerange'
+  'nulvar'
+  1.0d0
+
+!
+!------------------------------------------------------------------------------
 !  Boundary layer variables.
 !------------------------------------------------------------------------------
 !
