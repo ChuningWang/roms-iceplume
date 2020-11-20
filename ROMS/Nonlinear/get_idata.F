@@ -576,7 +576,7 @@
         CALL get_ngfld (ng, iNLM, idSGxrange, SSF(ng)%ncid,             &
      &                  1, SSF(ng), update(1),                          &
      &                  1, Nsrc(ng), 2, 1, 1, Nsrc(ng), 2,              &
-     &                  SOURCES(ng) % SGIrangeRaw)
+     &                  SOURCES(ng) % SGIrange)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 
@@ -588,12 +588,10 @@
      &                 __FILE__)) RETURN
 
         DO is=1,Nsrc(ng)
-          DO itrc=1,2
-          SOURCES(ng) % SGIrange(is,itrc) =                             &
-     &      NINT(SOURCES(ng) % SGIrangeRaw(is,itrc))
-          SOURCES(ng) % SGJrange(is,itrc) =                             &
-     &      NINT(SOURCES(ng) % SGJrangeRaw(is,itrc))
-          ENDDO
+          SOURCES(ng) % SGIstr(is) = NINT(SOURCES(ng) % SGIrange(is, 1))
+          SOURCES(ng) % SGIend(is) = NINT(SOURCES(ng) % SGIrange(is, 2))
+          SOURCES(ng) % SGJstr(is) = NINT(SOURCES(ng) % SGJrange(is, 1))
+          SOURCES(ng) % SGJend(is) = NINT(SOURCES(ng) % SGJrange(is, 2))
         ENDDO
 #  endif
 # endif

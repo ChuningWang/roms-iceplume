@@ -166,6 +166,8 @@ export     MY_PROJECT_DIR=${PWD}
 #export         which_MPI=mpich2        # compile with MPICH2 library
  export         which_MPI=openmpi       # compile with OpenMPI library
 
+ export         USE_GCC10=on
+
 #export        USE_OpenMP=on            # shared-memory parallelism
 
 #export              FORT=ifort

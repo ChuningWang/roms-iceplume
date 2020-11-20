@@ -67,10 +67,10 @@
 !               sources/sinks belong to the same river/glacier.        !
 # endif
 # ifdef ICEPLUME_DET_AVERAGE
-!  SGIrange   Location indices (Istr, Iend) when spacially average     !
-!               density profiles.                                      !
-!  SGJrange   Location indices (Jstr, Jend) when spacially average     !
-!               density profiles.                                      !
+!  SGIstr     Location indexes (Istr) when averaging density profiles. !
+!  SGIend     Location indexes (Iend) when averaging density profiles. !
+!  SGJstr     Location indexes (Jstr) when averaging density profiles. !
+!  SGJend     Location indexes (Jend) when averaging density profiles. !
 # endif
 #endif
 !                                                                      !
@@ -132,10 +132,14 @@
           real(r8), pointer :: SGgid(:)
 # endif
 # ifdef ICEPLUME_DET_AVERAGE
-          real(r8), pointer :: SGIrangeRaw(:, :)
-          real(r8), pointer :: SGJrangeRaw(:, :)
-          integer, pointer :: SGIrange(:, :)
-          integer, pointer :: SGJrange(:, :)
+#  ifndef ANA_PSOURCE
+          real(r8), pointer :: SGIrange(:, :)
+          real(r8), pointer :: SGJrange(:, :)
+#  endif
+          integer,  pointer :: SGIstr(:)
+          integer,  pointer :: SGIend(:)
+          integer,  pointer :: SGJstr(:)
+          integer,  pointer :: SGJend(:)
 # endif
 #endif
 
@@ -323,17 +327,25 @@
 
 # endif
 # ifdef ICEPLUME_DET_AVERAGE
-      allocate ( SOURCES(ng) % SGIrangeRaw(Nsrc(ng), 2) )
-      Dmem(ng)=Dmem(ng)+2.0_r8*REAL(Nsrc(ng),r8)
-
-      allocate ( SOURCES(ng) % SGJrangeRaw(Nsrc(ng), 2) )
-      Dmem(ng)=Dmem(ng)+2.0_r8*REAL(Nsrc(ng),r8)
-
+#  ifndef ANA_PSOURCE
       allocate ( SOURCES(ng) % SGIrange(Nsrc(ng), 2) )
       Dmem(ng)=Dmem(ng)+2.0_r8*REAL(Nsrc(ng),r8)
 
       allocate ( SOURCES(ng) % SGJrange(Nsrc(ng), 2) )
       Dmem(ng)=Dmem(ng)+2.0_r8*REAL(Nsrc(ng),r8)
+
+#  endif
+      allocate ( SOURCES(ng) % SGIstr(Nsrc(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
+
+      allocate ( SOURCES(ng) % SGIend(Nsrc(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
+
+      allocate ( SOURCES(ng) % SGJstr(Nsrc(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
+
+      allocate ( SOURCES(ng) % SGJend(Nsrc(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
 
 # endif
 #endif
@@ -405,12 +417,16 @@
         SOURCES(ng) % SGgid(is) = IniVal
 # endif
 # ifdef ICEPLUME_DET_AVERAGE
+#  ifndef ANA_PSOURCE
         DO K = 1, 2
-          SOURCES(ng) % SGIrangeRaw(is, K) = IniVal
-          SOURCES(ng) % SGJrangeRaw(is, K) = IniVal
-          SOURCES(ng) % SGIrange(is, K) = 0
-          SOURCES(ng) % SGJrange(is, K) = 0
+          SOURCES(ng) % SGIrange(is, K) = IniVal
+          SOURCES(ng) % SGJrange(is, K) = IniVal
         ENDDO
+#  endif
+          SOURCES(ng) % SGIstr(is) = 0
+          SOURCES(ng) % SGIend(is) = 0
+          SOURCES(ng) % SGJstr(is) = 0
+          SOURCES(ng) % SGJend(is) = 0
 # endif
       END DO
       DO itrc=1,NT(ng)

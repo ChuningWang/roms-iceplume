@@ -156,10 +156,10 @@
             SOURCES(ng)%SGtyp(is)=4.0_r8
             SOURCES(ng)%SGlen(is)=220.0_r8
 #  ifdef ICEPLUME_DET_AVERAGE
-            SOURCES(ng)%SGIrange(is, 1)=2
-            SOURCES(ng)%SGIrange(is, 2)=4
-            SOURCES(ng)%SGJrange(is, 1)=isc-2
-            SOURCES(ng)%SGJrange(is, 2)=isc+2
+            SOURCES(ng)%SGIstr(is)=2
+            SOURCES(ng)%SGIend(is)=8
+            SOURCES(ng)%SGJstr(is)=isc-6
+            SOURCES(ng)%SGJend(is)=isc+6
 #  endif
 # endif
           END DO
@@ -181,6 +181,12 @@
         CALL mp_bcastf (ng, iNLM, SOURCES(ng)%SGdep)
         CALL mp_bcastf (ng, iNLM, SOURCES(ng)%SGtyp)
         CALL mp_bcastf (ng, iNLM, SOURCES(ng)%SGlen)
+#   ifdef ICEPLUME_DET_AVERAGE
+        CALL mp_bcasti (ng, iNLM, SOURCES(ng)%SGIstr)
+        CALL mp_bcasti (ng, iNLM, SOURCES(ng)%SGIend)
+        CALL mp_bcasti (ng, iNLM, SOURCES(ng)%SGJstr)
+        CALL mp_bcasti (ng, iNLM, SOURCES(ng)%SGJend)
+#   endif
 #  endif
 # endif
 #endif

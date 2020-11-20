@@ -654,7 +654,14 @@
 !$OMP MASTER
         CALL get_idata (ng)
 # ifdef ICEPLUME
-        CALL iceplume_init (ng)
+        IF (LuvSrc(ng).or.LwSrc(ng).or.ANY(LtracerSrc(:,ng))) THEN
+          CALL iceplume_init (ng)
+#  ifdef ICEPLUME_DET_AVERAGE
+          DO tile=first_tile(ng),last_tile(ng),+1
+            CALL iceplume_avg_init (ng, tile)
+          END DO
+#  endif
+        END IF
 # endif
         CALL get_data (ng)
 !$OMP END MASTER

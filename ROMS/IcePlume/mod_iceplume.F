@@ -94,6 +94,9 @@ MODULE mod_iceplume
 ! dir           - direction of plume. +1 for positve direction and     !
 !                 -1 for negative direction. 0 for other situation.    !
 ! trs           - depth integrated total transport [m^3 s^-1]          !
+# ifdef ICEPLUME_DET_AVERAGE
+! avgNpts       - number of average points for each plume source.      !
+# endif
 !                                                                      !
 ! Profiles                                                             !
 !                                                                      !
@@ -172,6 +175,9 @@ MODULE mod_iceplume
     real(r8), pointer :: dy(:)
     real(r8), pointer :: dir(:)
     real(r8), pointer :: trs(:)
+# ifdef ICEPLUME_DET_AVERAGE
+    real(r8), pointer :: avgNpts(:)
+# endif
 !
 ! Plume state (omega surface).
 !
@@ -265,12 +271,15 @@ MODULE mod_iceplume
 !
 ! Allocate profiles
 !
-      allocate( PLUME(ng) % Isrc(1:Nsrc(ng)) )
-      allocate( PLUME(ng) % Jsrc(1:Nsrc(ng)) )
-      allocate( PLUME(ng) % dx  (1:Nsrc(ng)) )
-      allocate( PLUME(ng) % dy  (1:Nsrc(ng)) )
-      allocate( PLUME(ng) % dir (1:Nsrc(ng)) )
-      allocate( PLUME(ng) % trs (1:Nsrc(ng)) )
+      allocate( PLUME(ng) % Isrc    (1:Nsrc(ng)) )
+      allocate( PLUME(ng) % Jsrc    (1:Nsrc(ng)) )
+      allocate( PLUME(ng) % dx      (1:Nsrc(ng)) )
+      allocate( PLUME(ng) % dy      (1:Nsrc(ng)) )
+      allocate( PLUME(ng) % dir     (1:Nsrc(ng)) )
+      allocate( PLUME(ng) % trs     (1:Nsrc(ng)) )
+# ifdef ICEPLUME_DET_AVERAGE
+      allocate( PLUME(ng) % avgNpts (1:Nsrc(ng)) )
+# endif
 !
       allocate( PLUME(ng) % zW   (Nsrc(ng), 0:N(ng)) )
       allocate( PLUME(ng) % f    (Nsrc(ng), 0:N(ng)) )
@@ -292,9 +301,9 @@ MODULE mod_iceplume
       allocate( PLUME(ng) % lm (Nsrc(ng), 0:N(ng)) )
       allocate( PLUME(ng) % lc (Nsrc(ng), 0:N(ng)) )
 !
-      allocate( PLUME(ng) % ent  (Nsrc(ng), N(ng)) )
-      allocate( PLUME(ng) % det  (Nsrc(ng), N(ng)) )
-      allocate( PLUME(ng) % detI (Nsrc(ng), N(ng)) )
+      allocate( PLUME(ng) % ent     (Nsrc(ng), N(ng)) )
+      allocate( PLUME(ng) % det     (Nsrc(ng), N(ng)) )
+      allocate( PLUME(ng) % detI    (Nsrc(ng), N(ng)) )
       allocate( PLUME(ng) % detFrac (Nsrc(ng), N(ng)) )
 # ifdef ICEPLUME_DET_NEUTRAL
 !
@@ -303,8 +312,8 @@ MODULE mod_iceplume
       allocate( PLUME(ng) % detTrc  (Nsrc(ng), N(ng), NT(ng)) )
 # endif
 !
-      allocate( PLUME(ng) % m        (Nsrc(ng), N(ng)) )
-      allocate( PLUME(ng) % mB       (Nsrc(ng), N(ng)) )
+      allocate( PLUME(ng) % m  (Nsrc(ng), N(ng)) )
+      allocate( PLUME(ng) % mB (Nsrc(ng), N(ng)) )
 !
       allocate( PLUME(ng) % dz (Nsrc(ng), N(ng)) )
 !

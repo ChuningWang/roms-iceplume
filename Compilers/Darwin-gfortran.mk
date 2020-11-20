@@ -55,6 +55,9 @@
 # Compiling flags for ROMS Applications.
 #--------------------------------------------------------------------------
 
+ifdef USE_GCC10
+           FFLAGS += -fallow-argument-mismatch
+endif
 ifdef USE_ROMS
  ifdef USE_DEBUG
            FFLAGS += -g

@@ -109,6 +109,52 @@ SUBROUTINE iceplume_init (ng)
 #endif
   RETURN
 END SUBROUTINE iceplume_init
+#ifdef ICEPLUME_DET_AVERAGE
+!
+!***********************************************************************
+SUBROUTINE iceplume_avg_init (ng, tile)
+!***********************************************************************
+!
+  USE mod_param
+  USE mod_grid, ONLY : GRID
+  USE mod_scalars, ONLY : LuvSrc, LwSrc
+  USE mod_sources
+  USE mod_iceplume
+!
+!  Imported variable declarations.
+!
+  integer, intent(in) :: ng, tile
+!
+!  Local variable declarations.
+!
+  integer :: is, Isrc, Jsrc, Dsrc
+!
+# include "set_bounds.h"
+!
+  IF ((LuvSrc(ng)) .OR. (LwSrc(ng))) THEN
+    DO is = 1, Nsrc(ng)
+      Isrc = PLUME(ng) % Isrc(is)
+      Jsrc = PLUME(ng) % Jsrc(is)
+      IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.            &
+     &     ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
+!
+! Restrict the averaging area within the target tile
+!
+        SOURCES(ng) % SGIstr(is) = MAX(SOURCES(ng) % SGIstr(is), Istrm2)
+        SOURCES(ng) % SGIend(is) = MIN(SOURCES(ng) % SGIend(is), Iendp2)
+        SOURCES(ng) % SGJstr(is) = MAX(SOURCES(ng) % SGJstr(is), Jstrm2)
+        SOURCES(ng) % SGJend(is) = MIN(SOURCES(ng) % SGJend(is), Jendp2)
+!
+! Calculate number of average points for averaging algorithm
+!
+        PLUME(ng) % avgNpts(is) =                                       &
+     &    REAL((SOURCES(ng) % SGIend(is)-SOURCES(ng) % SGIstr(is)+1) *  &
+     &         (SOURCES(ng) % SGJend(is)-SOURCES(ng) % SGJstr(is)+1)  )
+      ENDIF
+    ENDDO
+  ENDIF
+END SUBROUTINE iceplume_avg_init
+#endif
 !
 !=======================================================================
 !                                                                      !
@@ -149,7 +195,7 @@ SUBROUTINE iceplume_tile (ng, tile)
   USE mod_ocean, ONLY : OCEAN
   USE mod_stepping, ONLY : nstp
   USE mod_sources
-  USE mod_scalars, ONLY : dt, LuvSrc, LwSrc
+  USE mod_scalars, ONLY : dt, LuvSrc, LwSrc, iic
   USE mod_iceplume
 !
 !  Imported variable declarations.
@@ -162,7 +208,7 @@ SUBROUTINE iceplume_tile (ng, tile)
   integer :: K, K2, itrc
   real(r8) :: pr, prRef = 101.d3*1.d-4
   real(r8) :: dx, dy
-  real(r8) :: cff, cff1, cff2, cff3, cff4
+  real(r8) :: cff, cff1, cff2, cff3
   real(r8) :: RHO
 !
 # include "set_bounds.h"
@@ -229,26 +275,19 @@ SUBROUTINE iceplume_tile (ng, tile)
 !
 ! Calculate rho-layer depth, thickness, and ambient density
 !
-# ifdef ICEPLUME_DET_AVERAGE
-        cff4 = REAL(                                                    &
-     &      (SOURCES(ng) % SGIrange(is, 2)-                             &
-     &       SOURCES(ng) % SGIrange(is, 1)+1) *                         &
-     &      (SOURCES(ng) % SGJrange(is, 2)-                             &
-     &       SOURCES(ng) % SGJrange(is, 1)+1))
-# endif
         DO K = 1, N(ng)
 # ifdef ICEPLUME_DET_AVERAGE
 !
 ! Average density profiles in a box to surpress some oscillation
 !
           cff1 = SUM( OCEAN(ng) % t(                                    &
-     & SOURCES(ng) % SGIrange(is, 1):SOURCES(ng) % SGIrange(is, 2),     &
-     & SOURCES(ng) % SGJrange(is, 1):SOURCES(ng) % SGJrange(is, 2),     &
-     & K, nstp(ng), isalt) ) / cff4
+     & SOURCES(ng) % SGIstr(is):SOURCES(ng) % SGIend(is),               &
+     & SOURCES(ng) % SGJstr(is):SOURCES(ng) % SGJend(is),               &
+     & K, nstp(ng), isalt) ) / PLUME(ng) % avgNpts(is)
           cff3 = SUM( OCEAN(ng) % t(                                    &
-     & SOURCES(ng) % SGIrange(is, 1):SOURCES(ng) % SGIrange(is, 2),     &
-     & SOURCES(ng) % SGJrange(is, 1):SOURCES(ng) % SGJrange(is, 2),     &
-     & K, nstp(ng), itemp) ) / cff4
+     & SOURCES(ng) % SGIstr(is):SOURCES(ng) % SGIend(is),               &
+     & SOURCES(ng) % SGJstr(is):SOURCES(ng) % SGJend(is),               &
+     & K, nstp(ng), itemp) ) / PLUME(ng) % avgNpts(is)
           pr = prRef+(ABS(PLUME(ng) % zR(is, K))*rhoRef*g)*1.d-4
           CALL SW_TEMP(cff1, cff3, pr, prRef, cff2)
           cff = RHO(cff2, cff1, PLUME(ng) % zR(is, K))
@@ -259,10 +298,9 @@ SUBROUTINE iceplume_tile (ng, tile)
      &          PLUME(ng) % rhoAm(is, K)*(1.0-avgAlpha) + cff*avgAlpha
           ENDIF
 # else
-          PLUME(ng) % rhoAm(is, K) =                                    &
-     &        RHO(PLUME(ng) % tAm(is, K),                               &
-     &            PLUME(ng) % sAm(is, K),                               &
-     &            PLUME(ng) % zR(is, K))
+          PLUME(ng) % rhoAm(is, K) = RHO(PLUME(ng) % tAm(is, K),        &
+     &                                   PLUME(ng) % sAm(is, K),        &
+     &                                   PLUME(ng) % zR(is, K))
 # endif
         ENDDO
 !
@@ -485,7 +523,7 @@ SUBROUTINE iceplume_mix_tile (ng, tile)
   integer :: is, Isrc, Jsrc, Dsrc, D2src
   integer :: K, K2, itrc
   real(r8) :: area
-  real(r8) :: cff, cff1, cff2, cff3, cff4
+  real(r8) :: cff, cff1, cff2, cff3
 !
 !  From grid construction functions.
 !
