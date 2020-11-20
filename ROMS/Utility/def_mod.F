@@ -3,7 +3,7 @@
       SUBROUTINE def_mod (ng)
 !
 !git $Id$
-!svn $Id: def_mod.F 1035 2020-07-28 00:49:02Z arango $
+!svn $Id: def_mod.F 1043 2020-11-12 04:56:14Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -28,6 +28,7 @@
       USE mod_scalars
       USE mod_strings
 !
+      USE dateclock_mod,  ONLY : time_string
       USE def_var_mod,    ONLY : def_var
 # ifdef DISTRIBUTE
       USE distribute_mod, ONLY : mp_bcasti
@@ -46,7 +47,7 @@
 !
       logical, dimension(NV) :: got_var(NV)
       logical :: foundAtt(2), foundit
-
+!
       integer, parameter :: Natt = 25
 
       integer :: iterDim, datumDim, recordDim
@@ -72,9 +73,11 @@
       integer :: ibuffer(2)
 # endif
       integer :: def_dim
-
+!
+      real(dp) :: Tstart, Tfinal
       real(r8) :: Aval(6)
-
+!
+      character (len=22 )  :: str_date, end_date
       character (len=40 )  :: Aname, AttName(2)
       character (len=80 )  :: string
       character (len=120)  :: Vinfo(Natt)
@@ -110,43 +113,44 @@
         Aval(i)=0.0_r8
       END DO
 !
-!  Open input observations NetCDF.
-!
-      IF (OBS(ng)%ncid.eq.-1) THEN
-        CALL netcdf_open (ng, iNLM, OBS(ng)%name, 0, OBSncid)
-        IF (FoundError(exit_flag, NoError, __LINE__,                    &
-     &                 __FILE__)) THEN
-          WRITE (stdout,30) TRIM(OBS(ng)%name)
-          RETURN
-        END IF
-        OBS(ng)%ncid=OBSncid
-      ELSE
-        OBSncid=OBS(ng)%ncid
-      END IF
-!
-!  Inquire about input observations variables.
-!
-      CALL netcdf_inq_var (ng, iNLM, OBS(ng)%name,                      &
-     &                     ncid = OBSncid)
-      IF (FoundError(exit_flag, NoError, __LINE__,                      &
-     &               __FILE__)) RETURN
-!
-!  Inquire if the 'state_variables' and 'obs_provenance' attributes
-!  are available in the observations file.
-!
-      AttName(1)='state_variables'
-      AttName(2)='obs_provenance'
-!
-      CALL netcdf_get_satt (ng, iNLM, OBS(ng)%name, nf90_global,        &
-     &                      AttName, AttValue, foundAtt,                &
-     &                      ncid = OBSncid)
-!
 !=======================================================================
 !  Create a new model/observation file.
 !=======================================================================
 !
       DEFINE : IF (LdefMOD(ng)) THEN
-
+!
+!  Open input observations NetCDF.
+!
+        IF (OBS(ng)%ncid.eq.-1) THEN
+          CALL netcdf_open (ng, iNLM, OBS(ng)%name, 1, OBSncid)
+          IF (FoundError(exit_flag, NoError, __LINE__,                  &
+     &                   __FILE__)) THEN
+            WRITE (stdout,30) TRIM(OBS(ng)%name)
+            RETURN
+          END IF
+        ELSE
+          OBSncid=OBS(ng)%ncid
+        END IF
+!
+!  Inquire about input observations variables.
+!
+        CALL netcdf_inq_var (ng, iNLM, OBS(ng)%name,                    &
+     &                       ncid = OBSncid)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+!
+!  Inquire if the 'state_variables' and 'obs_provenance' attributes
+!  are available in the observations file.
+!
+        AttName(1)='state_variables'
+        AttName(2)='obs_provenance'
+!
+        CALL netcdf_get_satt (ng, iNLM, OBS(ng)%name, nf90_global,      &
+     &                        AttName, AttValue, foundAtt,              &
+     &                        ncid = OBSncid)
+!
+!  Create model/observation (DAV) file
+!
         CALL netcdf_create (ng, iNLM, TRIM(ncname), DAV(ng)%ncid)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) THEN
@@ -314,6 +318,61 @@
             IF (FoundError(status, nf90_noerr, __LINE__,                &
      &                     __FILE__)) THEN
               WRITE (stdout,50) 'type', TRIM(ncname)
+              exit_flag=3
+              ioerror=status
+            END IF
+          END IF
+!
+!  Set cycle start and final time and dates attributes.
+!
+          IF (INItime(ng).lt.0.0_dp) THEN
+            Tstart=time(ng)+dt(ng)             ! called after 'initial'
+          ELSE
+            Tstart=INItime(ng)
+          END IF
+          Tfinal=Tstart+ntimes(ng)*dt(ng)
+          CALL time_string (Tstart, str_date)
+          CALL time_string (Tfinal, end_date)
+!
+          IF (exit_flag.eq.NoError) THEN
+            status=nf90_put_att(DAV(ng)%ncid, nf90_global,              &
+     &                          'str_day', Tstart*sec2day)
+            IF (FoundError(status, nf90_noerr, __LINE__,                &
+     &                     __FILE__)) THEN
+              WRITE (stdout,50) 'str_day', TRIM(ncname)
+              exit_flag=3
+              ioerror=status
+            END IF
+          END IF
+!
+          IF (exit_flag.eq.NoError) THEN
+            status=nf90_put_att(DAV(ng)%ncid, nf90_global,              &
+     &                          'end_day', Tfinal*sec2day)
+            IF (FoundError(status, nf90_noerr, __LINE__,                &
+     &                     __FILE__)) THEN
+              WRITE (stdout,50) 'end_day', TRIM(ncname)
+              exit_flag=3
+              ioerror=status
+            END IF
+          END IF
+!
+          IF (exit_flag.eq.NoError) THEN
+            status=nf90_put_att(DAV(ng)%ncid, nf90_global,              &
+     &                          'str_date', str_date)
+            IF (FoundError(status, nf90_noerr, __LINE__,                &
+     &                     __FILE__)) THEN
+              WRITE (stdout,50) 'str_date', TRIM(ncname)
+              exit_flag=3
+              ioerror=status
+            END IF
+          END IF
+!
+          IF (exit_flag.eq.NoError) THEN
+            status=nf90_put_att(DAV(ng)%ncid, nf90_global,              &
+     &                          'end_date', end_date)
+            IF (FoundError(status, nf90_noerr, __LINE__,                &
+     &                     __FILE__)) THEN
+              WRITE (stdout,50) 'end_date', TRIM(ncname)
               exit_flag=3
               ioerror=status
             END IF
@@ -1467,8 +1526,6 @@
 !
         Vinfo( 1)=Vname(1,idObsS)
         Vinfo( 2)=Vname(2,idObsS)
-        Vinfo(24)='_FillValue'
-        Aval(6)=0.0_r8
         status=def_var(ng, iNLM, DAV(ng)%ncid, DAV(ng)%Vid(idObsS),     &
      &                 NF_FRST, 1, (/datumDim/), Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -1476,13 +1533,21 @@
 
 # if defined FOUR_DVAR && !defined I4DVAR_ANA_SENSITIVITY
 !
+!  Unvetted prior nonlinear model at observation locations.
+!
+        Vinfo( 1)=Vname(1,idNLmp)
+        Vinfo( 2)=Vname(2,idNLmp)
+        Vinfo( 3)=Vname(3,idNLmp)
+        status=def_var(ng, iNLM, DAV(ng)%ncid, DAV(ng)%Vid(idNLmp),     &
+     &                 NF_FRST, 1, (/datumDim/), Aval, Vinfo, ncname)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+!
 !  Initial nonlinear model at observation locations.
 !
         Vinfo( 1)=Vname(1,idNLmi)
         Vinfo( 2)=Vname(2,idNLmi)
         Vinfo( 3)=Vname(3,idNLmi)
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, DAV(ng)%Vid(idNLmi),     &
      &                 NF_FRST, 1, (/datumDim/), Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -1493,8 +1558,6 @@
         Vinfo( 1)=Vname(1,idNLmf)
         Vinfo( 2)=Vname(2,idNLmf)
         Vinfo( 3)=Vname(3,idNLmf)
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, DAV(ng)%Vid(idNLmf),     &
      &                 NF_FRST, 1, (/datumDim/), Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -1505,8 +1568,6 @@
         Vinfo( 1)=Vname(1,idBgEr)
         Vinfo( 2)=Vname(2,idBgEr)
         Vinfo( 3)=Vname(3,idBgEr)
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, DAV(ng)%Vid(idBgEr),     &
      &                 NF_FRST, 1, (/datumDim/), Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -1517,8 +1578,6 @@
         Vinfo( 1)=Vname(1,idInno)
         Vinfo( 2)=Vname(2,idInno)
         Vinfo( 3)=Vname(3,idInno)
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, DAV(ng)%Vid(idInno),     &
      &                 NF_FRST, 1, (/datumDim/), Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -1529,8 +1588,6 @@
         Vinfo( 1)=Vname(1,idIncr)
         Vinfo( 2)=Vname(2,idIncr)
         Vinfo( 3)=Vname(3,idIncr)
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, DAV(ng)%Vid(idIncr),     &
      &                 NF_FRST, 1, (/datumDim/), Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -1541,8 +1598,6 @@
         Vinfo( 1)=Vname(1,idResi)
         Vinfo( 2)=Vname(2,idResi)
         Vinfo( 3)=Vname(3,idResi)
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, DAV(ng)%Vid(idResi),     &
      &                 NF_FRST, 1, (/datumDim/), Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -1554,14 +1609,29 @@
 !
         Vinfo( 1)=Vname(1,idBgTh)
         Vinfo( 2)=Vname(2,idBgTh)
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, DAV(ng)%Vid(idBgTh),     &
      &                 NF_FRST, 1, (/datumDim/), Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 #  endif
 # endif
+
+# if !defined I4DVAR_ANA_SENSITIVITY && \
+     (defined I4DVAR                 || defined WEAK_CONSTRAINT)
+!
+!  Unvetted nonlinear model at observation points per outer-loop.
+!
+        haveNLmod(ng)=.FALSE.
+        Vinfo( 1)=Vname(1,idNLmu)
+        Vinfo( 2)=Vname(2,idNLmu)
+        Vinfo( 3)=Vname(3,idNLmu)
+        status=def_var(ng, iNLM, DAV(ng)%ncid, DAV(ng)%Vid(idNLmu),     &
+     &                 NF_FRST, 2, (/datumDim,NouterDim/), Aval, Vinfo, &
+     &                 ncname)
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+# endif
+
 # if !defined I4DVAR_ANA_SENSITIVITY && \
      (defined I4DVAR                 || defined VERIFICATION || \
       defined WEAK_CONSTRAINT)
@@ -1572,8 +1642,6 @@
         Vinfo( 1)=Vname(1,idNLmo)
         Vinfo( 2)=Vname(2,idNLmo)
         Vinfo( 3)=Vname(3,idNLmo)
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
 #  ifdef VERIFICATION
         status=def_var(ng, iNLM, DAV(ng)%ncid, DAV(ng)%Vid(idNLmo),     &
      &                 NF_FRST, 1, (/datumDim/), Aval, Vinfo, ncname)
@@ -1587,6 +1655,7 @@
      &                 __FILE__)) RETURN
 #  endif
 # endif
+
 # if defined I4DVAR          || defined I4DVAR_ANA_SENSITIVITY || \
      defined WEAK_CONSTRAINT
 !
@@ -1599,21 +1668,18 @@
 #  else
         Vinfo( 2)=Vname(2,idTLmo)
 #  endif
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, DAV(ng)%Vid(idTLmo),     &
      &                 NF_FRST, 1, (/datumDim/), Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
+
 # if defined I4DVAR || defined WEAK_CONSTRAINT
 !
 !  Initial model-observation misfit (innovation) vector.
 !
         Vinfo( 1)=Vname(1,idMOMi)
         Vinfo( 2)=Vname(2,idMOMi)
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, DAV(ng)%Vid(idMOMi),     &
      &                 NF_FRST, 1, (/datumDim/), Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -1623,13 +1689,12 @@
 !
         Vinfo( 1)=Vname(1,idMOMf)
         Vinfo( 2)=Vname(2,idMOMf)
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, DAV(ng)%Vid(idMOMf),     &
      &                 NF_FRST, 1, (/datumDim/), Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
+
 # if defined I4DVAR
 !
 !  Define model minus observations misfit NLM cost function.
@@ -1651,6 +1716,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
+
 # ifdef BACKGROUND
 !
 !  Define model minus background misfit cost function.
@@ -1663,6 +1729,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
+
 # if defined I4DVAR
 !
 !  Define optimality property that measures the consistency between
@@ -1676,6 +1743,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
+
 # ifdef WEAK_CONSTRAINT
 #  ifndef RPCG
 !
@@ -1685,7 +1753,6 @@
         Vinfo( 2)='representer coefficients estimatate'
         vardim(1)=datumDim
         vardim(2)=NouterDim
-        Vinfo(24)='_FillValue'
         Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
      &                 2, vardim, Aval, Vinfo, ncname)
@@ -1709,6 +1776,7 @@
      &                 2, vardim, Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
+
 #  ifdef RPCG
 !
 !  Define initial gradient for minimization.
@@ -1808,13 +1876,12 @@
         vardim(1)=datumDim
         vardim(2)=NinnerDim
         vardim(3)=NouterDim
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
      &                 3, vardim, Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
+
 # ifdef SP4DVAR
 !
 !  Define saved values of ADmodVal.
@@ -1823,8 +1890,6 @@
         Vinfo( 2)='adjoint model at observation locations'
         vardim(1)=datumDim
         vardim(2)=NinnerDim2
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
      &                 2, vardim, Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -1882,6 +1947,7 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
+
 # if defined R4DVAR    || defined R4DVAR_ANA_SENSITIVITY || \
      defined TL_R4DVAR
 !
@@ -1890,13 +1956,12 @@
         Vinfo( 1)='RPmodel_initial'
         Vinfo( 2)='initial representer model at observation locations'
         vardim(1)=datumDim
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
      &                 1, vardim, Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 # endif
+
 # if defined I4DVAR_ANA_SENSITIVITY   || \
      defined RBL4DVAR_ANA_SENSITIVITY || \
      defined RBL4DVAR_FCT_SENSITIVITY || \
@@ -1910,8 +1975,6 @@
         Vinfo( 2)='total observation impact'
         vardim(1)=datumDim
         vardim(2)=NinnerDim
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
      &                 2, vardim, Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -1920,8 +1983,6 @@
         Vinfo( 1)='ObsImpact_total'
         Vinfo( 2)='total observation impact'
         vardim(1)=datumDim
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
      &                 1, vardim, Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -1934,14 +1995,13 @@
         Vinfo( 1)='ObsSens_total'
         Vinfo( 2)='total observation sensitivity'
         vardim(1)=datumDim
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
      &                 1, vardim, Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 #  endif
 # endif
+
 # if defined OBS_IMPACT_SPLIT          && \
      (defined I4DVAR_ANA_SENSITIVITY   || \
       defined RBL4DVAR_ANA_SENSITIVITY || \
@@ -1955,8 +2015,6 @@
         Vinfo( 2)='observation impact due to initial conditions'
         vardim(1)=datumDim
         vardim(2)=NinnerDim
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
      &                 2, vardim, Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -1965,8 +2023,6 @@
         Vinfo( 1)='ObsImpact_IC'
         Vinfo( 2)='observation impact due to initial conditions'
         vardim(1)=datumDim
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
      &                 1, vardim, Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -1983,8 +2039,6 @@
         Vinfo( 2)='observation impact due to surface forcing'
         vardim(1)=datumDim
         vardim(2)=NinnerDim
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
      &                 2, vardim, Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -1993,14 +2047,13 @@
         Vinfo( 1)='ObsImpact_FC'
         Vinfo( 2)='observation impact due to surface forcing'
         vardim(1)=datumDim
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
      &                 1, vardim, Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 #   endif
 #  endif
+
 #  if defined ADJUST_BOUNDARY
 !
 !  Define observation impact due to boundary condition increments.
@@ -2010,8 +2063,6 @@
         Vinfo( 2)='observation impact due to open boundary conditions'
         vardim(1)=datumDim
         vardim(2)=NinnerDim
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
      &                 2, vardim, Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -2020,8 +2071,6 @@
         Vinfo( 1)='ObsImpact_BC'
         Vinfo( 2)='observation impact due to open boundary conditions'
         vardim(1)=datumDim
-        Vinfo(24)='_FillValue'
-        Aval(6)=spval
         status=def_var(ng, iNLM, DAV(ng)%ncid, varid, nf90_double,      &
      &                 1, vardim, Aval, Vinfo, ncname)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
@@ -2029,6 +2078,7 @@
 #   endif
 #  endif
 # endif
+
 # if defined BALANCE_OPERATOR && defined ZETA_ELLIPTIC
 !
 !  Define reference free-surface used in the balance operator.
@@ -2050,6 +2100,14 @@
         CALL netcdf_enddef (ng, iNLM, ncname, DAV(ng)%ncid)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
+!
+!  Close observations NetCDF.
+!
+        IF (OBS(ng)%ncid.eq.-1) THEN
+          CALL netcdf_close (ng, iNLM, OBSncid, OBS(ng)%name, .FALSE.)
+          IF (FoundError(exit_flag, NoError, __LINE__,                  &
+     &                 __FILE__)) RETURN
+        END IF
       END IF DEFINE
 !
 !=======================================================================
@@ -2132,6 +2190,12 @@
             got_var(idObsS)=.TRUE.
             DAV(ng)%Vid(idObsS)=var_id(i)
 # ifdef FOUR_DVAR
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idNLmp))) THEN
+            got_var(idNLmp)=.TRUE.
+            DAV(ng)%Vid(idNLmp)=var_id(i)
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idNLmu))) THEN
+            got_var(idNLmu)=.TRUE.
+            DAV(ng)%Vid(idNLmu)=var_id(i)
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idNLmi))) THEN
             got_var(idNLmi)=.TRUE.
             DAV(ng)%Vid(idNLmi)=var_id(i)
@@ -2242,6 +2306,20 @@
           RETURN
         END IF
 # ifdef FOUR_DVAR
+        IF (.not.got_var(idNLmp)) THEN
+          IF (Master) WRITE (stdout,90) TRIM(Vname(1,idNLmp)),          &
+     &                                  TRIM(DAV(ng)%name)
+          exit_flag=2
+          RETURN
+        END IF
+
+        IF (.not.got_var(idNLmu)) THEN
+          IF (Master) WRITE (stdout,90) TRIM(Vname(1,idNLmu)),          &
+     &                                  TRIM(DAV(ng)%name)
+          exit_flag=2
+          RETURN
+        END IF
+
         IF (.not.got_var(idNLmi)) THEN
           IF (Master) WRITE (stdout,90) TRIM(Vname(1,idNLmi)),          &
      &                                  TRIM(DAV(ng)%name)

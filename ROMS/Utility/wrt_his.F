@@ -2,7 +2,7 @@
       SUBROUTINE wrt_his (ng, tile)
 !
 !git $Id$
-!svn $Id: wrt_his.F 1028 2020-06-01 00:24:59Z arango $
+!svn $Id: wrt_his.F 1043 2020-11-12 04:56:14Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -312,7 +312,7 @@
         DO k=1,N(ng)
           DO j=JstrV-1,Jend+1
             DO i=Istr-1,Iend+1
-              GRID(ng)%z_v(i,j,k)=0.5_r8*(GRID(ng)%z_r(i,j-1,k)+       &
+              GRID(ng)%z_v(i,j,k)=0.5_r8*(GRID(ng)%z_r(i,j-1,k)+        &
      &                                    GRID(ng)%z_r(i,j  ,k))
             END DO
           END DO
@@ -1573,7 +1573,6 @@
       END IF
 #  endif
 # endif
-# if (defined BULK_FLUXES && defined EMINUSP) || defined ATM_COUPLING
 !
 !  Write out E-P (m/s).
 !
@@ -1583,10 +1582,10 @@
         status=nf_fwrite2d(ng, iNLM, HIS(ng)%ncid, HIS(ng)%Vid(idEmPf), &
      &                     HIS(ng)%Rindex, gtype,                       &
      &                     LBi, UBi, LBj, UBj, scale,                   &
-#  ifdef MASKING
+# ifdef MASKING
      &                     GRID(ng) % rmask,                            &
-#  endif
-     &                     FORCES(ng) % EminusP)
+# endif
+     &                     FORCES(ng) % stflux(:,:,isalt))
         IF (FoundError(status, nf90_noerr, __LINE__,                    &
      &                 __FILE__)) THEN
           IF (Master) THEN
@@ -1597,7 +1596,6 @@
           RETURN
         END IF
       END IF
-# endif
 # ifdef SHORTWAVE
 !
 !  Write out shortwave radiation flux.
