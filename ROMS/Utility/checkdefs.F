@@ -2,7 +2,7 @@
       SUBROUTINE checkdefs
 !
 !git $Id$
-!svn $Id: checkdefs.F 1037 2020-08-15 01:56:27Z arango $
+!svn $Id: checkdefs.F 1045 2020-11-12 16:17:59Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -44,7 +44,7 @@
       Coptions=' '
       IF (Master) WRITE (stdout,10)
   10  FORMAT (/,' Activated C-preprocessing Options:',/)
-  20  FORMAT (1x,a,t26,a)
+  20  FORMAT (1x,a,t27,a)
 !
       IF (Master) THEN
         WRITE (stdout,20) TRIM(ADJUSTL(MyAppCPP)), TRIM(ADJUSTL(title))
@@ -733,7 +733,7 @@
 #endif
 #ifdef COAMPS_COUPLING
 !
-      IF (Master) WRITE (stdout,20) 'COAMPS_COUPLING',                   &
+      IF (Master) WRITE (stdout,20) 'COAMPS_COUPLING',                  &
      &   'Atmosphere coupling with COAMPS'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+17)=' COAMPS_COUPLING,'
@@ -1039,6 +1039,13 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+12)=' FORCING_SV,'
       idriver=idriver+1
+#endif
+#if defined FORWARD_FLUXES
+!
+      IF (Master) WRITE (stdout,20) 'FORWARD_FLUXES',                   &
+     &   'Using nonlinear model Forward fluxes for Tangent/Adjoint'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+16)=' FORWARD_FLUXES,'
 #endif
 #if defined FORWARD_MIXING && defined SOLVE3D
 !
@@ -1555,13 +1562,6 @@
       Coptions(is:is+15)=' NESTING_DEBUG,'
 # endif
 #endif
-#if defined NL_BULK_FLUXES
-!
-      IF (Master) WRITE (stdout,20) 'NL_BULK_FLUXES',                   &
-     &   'Using bulk fluxes computed by nonlinear model'
-      is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+16)=' NL_BULK_FLUXES,'
-#endif
 #if defined NLM_OUTER && defined WEAK_CONSTRAINT
 !
       IF (Master) WRITE (stdout,20) 'NLM_OUTER',                        &
@@ -1742,7 +1742,8 @@
      &   'Add oxygen dynamics'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+8)=' OXYGEN,'
-#elif !defined SURFACE_DO_SATURATION && defined HYPOXIA_SRM
+#endif
+#if defined HYPOXIA_SRM && !defined SURFACE_DO_SATURATION
 # ifdef OCMIP_OXYGEN_SC
 !
       IF (Master) WRITE (stdout,20) 'OCMIP_OXYGEN_SC',                  &
@@ -1763,6 +1764,21 @@
      &   'Parallel I/O processing'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' PARALLEL_IO,'
+#endif
+#if defined CARBON && defined BIO_FENNEL
+# if defined PC02AIR_DATA
+!
+      IF (Master) WRITE (stdout,20) 'PCO2AIR_DATA',                     &
+     &   'CO2 gas exchange from Laurent et al. (2017)'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+14)=' PCO2AIR_DATA,'
+# elif defined PCO2AIR_SECULAR
+!
+      IF (Master) WRITE (stdout,20) 'PCO2AIR_SECULAR',                  &
+     &   'CO2 gas exchange time-dependent evolution'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+17)=' PCO2AIR_SECULAR,'
+# endif
 #endif
 #ifdef PERFECT_RESTART
 !
@@ -1800,13 +1816,28 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+12)=' PJ_GRADPQ4,'
 #endif
-# if defined PRESS_COMPENSATE && defined ATM_PRESS
+#if defined PRESS_COMPENSATE && defined ATM_PRESS
 !
       IF (Master) WRITE (stdout,20) 'PRESS_COMPENSATE',                 &
      &   'Compensate for boundary data without ATM pressure effect'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+18)=' PRESS_COMPENSATE,'
-# endif
+#endif
+#if defined PO4 && defined BIO_FENNEL
+!
+      IF (Master) WRITE (stdout,20) 'PO4',                              &
+     &   'Phytoplanckton growth limited by Phosphorus'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+5)=' P04,'
+#endif
+#if defined PRIOR_BULK_FLUXES && defined BULK_FLUXES && \
+    defined FOUR_DVAR
+!
+      IF (Master) WRITE (stdout,20) 'PRIOR_BULK_FLUXES',                &
+     &   'Impose prior surface fluxes in other outer loops and analysis'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+19)=' PRIOR_BULK_FLUXES,'
+#endif
 #ifdef POSITIVE_ZERO
 !
       IF (Master) WRITE (stdout,20) 'POSITIVE_ZERO',                    &
@@ -1883,6 +1914,27 @@
      &   'Radial observations as an azimuth clockwise from NORTH'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+24)=' !RADIAL_ANGLE_CCW_EAST,'
+# endif
+#endif
+#if defined OXYGEN && defined BIO_FENNEL
+# if defined OCMIP_OXYGEN_SC
+!
+      IF (Master) WRITE (stdout,20) 'OCMIP_OXYGEN_SC',                  &
+     &   'Schmidt number from Keeling et al. (1998)'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+17)=' OCMIP_OXYGEN_SC,'
+# elif defined RW14_OXYGEN_SC
+!
+      IF (Master) WRITE (stdout,20) 'RW14_OXYGEN_SC',                   &
+     &   'O2 Schmidt number from Wanninkhof (2014)'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+16)=' RW14_OXYGEN_SC,'
+# else
+!
+      IF (Master) WRITE (stdout,20) '!RW14_OXYGEN_SC',                  &
+     &   'Schmidt number from Wanninkhof (1992)'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+17)=' !RW14_OXYGEN_SC,'
 # endif
 #endif
 #if defined GLS_MIXING || defined MY25_MIXING
@@ -2016,6 +2068,20 @@
      &   'Regressing start clock by one coupling interval'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+20)=' REGRESS_STARTCLOCK,'
+#endif
+#ifdef REGRID_SHAPIRO
+!
+      IF (Master) WRITE (stdout,20) 'REGRID_SHAPIRO',                   &
+     &   'Applying Shapiro filter to regridded data'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+16)=' REGRID_SHAPIRO,'
+#endif
+#if defined RIVER_DON && defined BIO_FENNEL
+!
+      IF (Master) WRITE (stdout,20) 'RIVER_DON',                        &
+     &   'DON non-skinking source from rivers'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+5)=' RIVER_DON,'
 #endif
 #ifdef ROMS_STDOUT
 !
@@ -2536,6 +2602,13 @@
      &   'Tangent Linear Model Linearization Check'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+11)=' TLM_CHECK,'
+#endif
+#if defined TRACING && defined PROFILE
+!
+      IF (Master) WRITE (stdout,20) 'TRACING',                          &
+     &   'Tracing sequence of routine calls for debugging'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+9)=' TRACING,'
 #endif
 #ifdef SOLVE3D
 # if defined T_PASSIVE
@@ -3123,8 +3196,8 @@
             EXIT
           END IF
         END DO
- 210    FORMAT (/,' CHECKDEFS - cannot activate option: ',a,           &
-     &          /,13x,'in serial with partitions or shared-memory...', &
+ 210    FORMAT (/,' CHECKDEFS - cannot activate option: ',a,            &
+     &          /,13x,'in serial with partitions or shared-memory...',  &
      &          /,13x,'Use distributed-memory (MPI) in parallel runs.')
       END IF
 #endif
@@ -3195,9 +3268,9 @@
             EXIT
           END IF
         END DO
- 260    FORMAT (/,' CHECKDEFS - cannot activate option: ',a,           &
-     &          /,13x,'in serial with partitions or shared-memory...', &
-     &          /,13x,'There bugs in shared-memory that need fixing.', &
+ 260    FORMAT (/,' CHECKDEFS - cannot activate option: ',a,            &
+     &          /,13x,'in serial with partitions or shared-memory...',  &
+     &          /,13x,'There bugs in shared-memory that need fixing.',  &
      &          /,13x,'Use distributed-memory (MPI) in parallel runs.')
       END IF
 #endif

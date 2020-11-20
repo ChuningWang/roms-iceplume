@@ -2,7 +2,7 @@
 ** Include file "cppdefs.h"
 **
 ** git $Id$
-** svn $Id: cppdefs.h 1026 2020-05-20 02:05:37Z arango $
+** svn $Id: cppdefs.h 1041 2020-10-16 00:00:17Z arango $
 ********************************************************** Hernan G. Arango ***
 ** Copyright (c) 2002-2020 The ROMS/TOMS Group                               **
 **   Licensed under a MIT/X style license                                    **
@@ -106,7 +106,6 @@
 **   sea surface temperature; (3) provide net longwave radiation (default).  **
 **                                                                           **
 ** BULK_FLUXES             if bulk fluxes computation                        **
-** NL_BULK_FLUXES          if bulk fluxes computed by nonlinear model        **
 ** COOL_SKIN               if cool skin correction                           **
 ** LONGWAVE                if computing net longwave radiation               **
 ** LONGWAVE_OUT            if computing outgoing longwave radiation          **
@@ -392,6 +391,7 @@
 ** CLIPPING_SPLIT          to separate analysis due to IC, forcing, and OBC  **
 ** DATALESS_LOOPS          if testing convergence of Picard iterations       **
 ** ENKF_RESTART            if writting restart fields for EnKF               **
+** FORWARD_FLUXES          if using NLM trajectory surface fluxes            **
 ** FORWARD_MIXING          if processing forward vertical mixing coefficient **
 ** FORWARD_WRITE           if writing out forward solution, basic state      **
 ** FORWARD_READ            if reading in  forward solution, basic state      **
@@ -408,6 +408,7 @@
 ** POSTERIOR_EOFS          if posterior analysis error covariance EOFS       **
 ** POSTERIOR_ERROR_F       if final posterior analysis error covariance      **
 ** POSTERIOR_ERROR_I       if initial posterior analysis error covariance    **
+** PRIOR_BULK_FLUXES       if imposing prior NLM surface fluxes              **
 ** RECOMPUTE_4DVAR         if recomputing 4DVar in analysis algorithms       **
 ** RPCG                    if Restricted B-preconditioned Lanczos solver     **
 ** RPM_RELAXATION          if Picard iterations, Diffusive Relaxation of RPM **
@@ -433,13 +434,20 @@
 ** BIO_SEDIMENT            to restore fallen material to the nutrient pool   **
 ** CARBON                  to add carbon constituents                        **
 ** DENITRIFICATION         to add denitrification processes                  **
+** OCMIP_OXYGEN_SC         if O2 Schmidt number from Keeling et al. (1998)   **
 ** OXYGEN                  to add oxygen dynamics                            **
-** OCMIP_OXYGEN_SC         if Schmidt number from Keeling et al. (1998)      **
+** PCO2AIR_DATA            if pCO2 climatology from Laurent et al. (2017)    **
+** PCO2AIR_SECULAR         if pCO2 time-depedent evolution                   **
+** RW14_C02_SC             if CO2 Schmidt number from Wanninkhof (2014)      **
+** RW14_OXYGEN_SC          if O2  Schmidt number from Wanninkhof (2014)      **
+** PO4                     if phytoplanckton growth limitef by Phosphorus    **
+** RIVER_DON               if DON non-sinking source from rivers             **
 ** TALK_NONCONSERV         if nonconservative computation of alkalinity      **
 **                                                                           **
 ** Hypoxia ecosysten model OPTIONS:                                          **
 **                                                                           **
 ** HYPOXIA_SRM             if Hypoxia Simple Respiration Model               **
+** OCMIP_OXYGEN_SC         if O2 Schmidt number from Keeling et al. (1998)   **
 **                                                                           **
 ** NPZD biology model OPTIONS:                                               **
 **                                                                           **
@@ -554,6 +562,7 @@
 ** PNETCDF                 if parallel I/O with pnetcdf (classic format)     **
 ** POSITIVE_ZERO           to impose positive zero in ouput data             **
 ** READ_WATER              if only reading water points data                 **
+** REGRID_SHAPIRO          to apply Shapiro Filter to regridded data         **
 ** WRITE_WATER             if only writing water points data                 **
 ** RST_SINGLE              if writing single precision restart fields        **
 ** OUT_DOUBLE              if writing double precision output fields         **

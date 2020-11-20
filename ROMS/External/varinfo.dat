@@ -2,7 +2,7 @@
 !  ROMS/TOMS IO NetCDF variables.
 !
 !git $Id$
-!svn $Id: varinfo.dat 1035 2020-07-28 00:49:02Z arango $
+!svn $Id: varinfo.dat 1043 2020-11-12 04:56:14Z arango $
 !========================================================= Hernan G. Arango ===
 !  Copyright (c) 2002-2020 The ROMS/TOMS Group                                !
 !    Licensed under a MIT/X style license                                     !
@@ -54,11 +54,11 @@
 ! Notice that we use the prefix 'ocean' in the variable name to differentiate
 ! between oceanic and atmospheric time clocks in fully coupled applications.
 !
-! Notice that salinity does not have physical units. A commented [PSU] can
+! Notice that salinity does not have physical units. A commented [PSS] can
 ! be found below to indicate that the practical salinity scale was used to
 ! determine conductivity. See,
 !
-! http://marine.rutgers.edu/po/users/forum/viewtopic.php?t=294
+! https://www.myroms.org/forum/viewtopic.php?t=294
 !
 !------------------------------------------------------------------------------
 !  SVN Repository
@@ -246,7 +246,7 @@
 
 'salt'                                             ! Input/Output
   'salinity'
-  'nondimensional'                                 ! [PSU]
+  'nondimensional'                                 ! [PSS]
   'salinity, scalar, series'
   'ocean_time'
   'idTvar(isalt)'
@@ -264,7 +264,7 @@
 
 'salt_sur'                                         ! Output
   'surface salinity'
-  'nondimensional'                                 ! [PSU]
+  'nondimensional'                                 ! [PSS]
   'salinity, scalar, series'
   'ocean_time'
   'idsurT(isalt)'
@@ -528,7 +528,7 @@
 
 'salt_tide'                                        ! Input/Output
   'time-accumulated salinity tide harmonics'
-  'nondimensional'                                 ! [PSU]
+  'nondimensional'                                 ! [PSS]
   'salt_tide, scalar'
   'ocean_time'
   'idTrcH(isalt)'
@@ -537,7 +537,7 @@
 
 'salt_detided'                                     ! Output
   'detided potential temperature'
-  'nondimensional'                                 ! [PSU]
+  'nondimensional'                                 ! [PSS]
   'salt_detided, scalar, series'
   'ocean_time'
   'idTrcD(isalt)'
@@ -700,8 +700,8 @@
   1.0d0
 
 'ssflux'                                           ! Output
-  'surface net salt flux, (E-P)*SALT'
-  'meter second-1'                                 ! [PSU m/s]
+  'kinematic surface net salt flux, SALT*(E-P)/rhow'
+  'meter second-1'                                 ! [PSS m/s]
   'surface net salt flux, scalar, series'
   'ssf_time'
   'idTsur(isalt)'
@@ -709,20 +709,20 @@
   1.0d0
 
 'swflux'                                           ! Input
-  'surface net freswater flux, (E-P)'
-  'centimeter day-1'                               ! Input:  [m/s]
-  'surface net salt flux, scalar, series'          ! [PSU m/s]
+  'data surface net freshwater flux, (E-P)/rhow'
+  'meter second-1'                                 ! Input:  [m/s]
+  'surface net freshwater flux, scalar, series'    ! [PSS m/s]
   'swf_time'
   'idsfwf'
   'r2dvar'
-  1.157407d-7                                      ! 0.01/86400
+  1.0d0
 
 'EminusP'                                          ! Input/Output
-  'bulk_flux surface net freswater flux, (E-P)'
+  'modeled surface net freshwater flux, (E-P)/rhow'
   'meter second-1'                                 ! computed by NLM ROMS
-  'EminusP, scalar, series'                        ! bulk_flux.F and
-  'ocean_time'                                     ! needed in adjoint-based
-  'idEmPf'                                         ! applications
+  'EminusP, scalar, series'                        ! bulk_flux.F or coupling
+  'ocean_time'
+  'idEmPf'
   'r2dvar'
   1.0d0
 
@@ -737,12 +737,12 @@
 
 'bwflux'                                           ! Input
   'bottom net freshwater flux'
-  'centimeter day-1'                               ! Input:  [m/s]
-  'bottom water flux, scalar, series'              ! [PSU m/s]
+  'meter second-1'                                 ! Input:  [m/s]
+  'bottom water flux, scalar, series'              ! [PSS m/s]
   'bwf_time'
   'idTbot(isalt)'
   'r2dvar'
-  1.157407d-7                                      ! 0.01/86400
+  1.0d0
 
 !
 !------------------------------------------------------------------------------
@@ -1322,7 +1322,7 @@
 
 'salt_west'                                        ! Input
   'salinity western boundary condition'
-  'nondimensional'                                 ! [PSU]
+  'nondimensional'                                 ! [PSS]
   'salt_west, scalar, series'
   'salt_time'
   'idTbry(iwest,isalt)'
@@ -1331,7 +1331,7 @@
 
 'salt_east'                                        ! Input
   'salinity eastern boundary condition'
-  'nondimensional'                                 ! [PSU]
+  'nondimensional'                                 ! [PSS]
   'salt_east, scalar, series'
   'salt_time'
   'idTbry(ieast,isalt)'
@@ -1340,7 +1340,7 @@
 
 'salt_south'                                       ! Input
   'salinity southern boundary condition'
-  'nondimensional'                                 ! [PSU]
+  'nondimensional'                                 ! [PSS]
   'salt_south, scalar, series'
   'salt_time'
   'idTbry(isouth,isalt)'
@@ -1349,7 +1349,7 @@
 
 'salt_north'                                       ! Input
   'salinity northern boundary condition'
-  'nondimensional'                                 ! [PSU]
+  'nondimensional'                                 ! [PSS]
   'salt_north, scalar, series'
   'salt_time'
   'idTbry(inorth,isalt)'
@@ -1835,7 +1835,7 @@
 
 'river_salt'                                       ! Input
   'river runoff salinity'
-  'nondimensional'                                 ! [PSU]
+  'nondimensional'                                 ! [PSS]
   'river_salt, scalar, series'
   'river_time'
   'idRtrc(isalt)'
@@ -1896,6 +1896,15 @@
   'nulvar'
   1.0d0
 
+'river_PO4'                                        ! Input
+  'river runoff PO4'
+  'millimole_PO4 meter-3'                          ! [millimole/m3]
+  'river_PO4, scalar, series'
+  'river_time'
+  'idRtrc(iPO4_)'
+  'nulvar'
+  1.0d0
+
 'river_DON'                                        ! Input
   'river runoff dissolved organic nitrogen'
   'millimole_nitrogen meter-3'                     ! [millimole/m3]
@@ -1932,12 +1941,48 @@
   'nulvar'
   1.0d0
 
+'river_LDeN'                                       ! Input
+  'river runoff LDeN'
+  'millimole_nitrogen meter-3'                     ! [millimole/m3]
+  'river_LDeN, scalar, series'
+  'river_time'
+  'idRtrc(iLDeN)'
+  'nulvar'
+  1.0d0
+
+'river_RDeN'                                       ! Input
+  'river runoff RDeN'
+  'millimole_nitrogen meter-3'                     ! [millimole/m3]
+  'river_RDeN, scalar, series'
+  'river_time'
+  'idRtrc(iRDeN)'
+  'nulvar'
+  1.0d0
+
 'river_SDeC'                                       ! Input
   'river runoff SDeC'
   'millimole meter-3'                              ! [millimole/m3]
   'river_SDeC, scalar, series'
   'river_time'
   'idRtrc(iSDeC)'
+  'nulvar'
+  1.0d0
+
+'river_LDeC'                                       ! Input
+  'river runoff LDeC'
+  'millimole meter-3'                              ! [millimole/m3]
+  'river_LDeC, scalar, series'
+  'river_time'
+  'idRtrc(iLDeC)'
+  'nulvar'
+  1.0d0
+
+'river_RDeC'                                       ! Input
+  'river runoff RDeC'
+  'millimole meter-3'                              ! [millimole/m3]
+  'river_RDeC, scalar, series'
+  'river_time'
+  'idRtrc(iRDeC)'
   'nulvar'
   1.0d0
 
@@ -2046,7 +2091,7 @@
 
 'SSS'                                              ! Input
   'sea surface salinity climatology'
-  'nondimensional'                                 ! [PSU]
+  'nondimensional'                                 ! [PSS]
   'SSS, scalar, series'
   'sss_time'
   'idSSSc'
@@ -2171,7 +2216,7 @@
 
 'salt'                                             ! Input
   'salinity functional'
-  'nondimensional'                                 ! [PSU]
+  'nondimensional'                                 ! [PSS]
   'salt_time, scalar, series'
   'salt_time'
   'idTads(isalt)'
@@ -2245,7 +2290,7 @@
 
 'salt'                                             ! Input
   'salinity impulse forcing'
-  'nondimensional'                                 ! [PSU]
+  'nondimensional'                                 ! [PSS]
   'salt_time, scalar, series'
   'salt_time'
   'idTtlf(isalt)'
@@ -2904,6 +2949,24 @@
   'r3dvar'
   1.0d0
 
+'PO4'                                              ! Input/Output
+  'phosphate concentration'
+  'millimole_PO4 meter-3'                          ! [millimole/m3]
+  'PO4, scalar, series'
+  'ocean_time'
+  'idTvar(iPO4_)'
+  'r3dvar'
+  1.0d0
+
+'PO4'                                              ! Input
+  'phosphate concentration functional'
+  'millimole_PO4 meter-3'                          ! [millimole/m3]
+  'PO4, scalar, series'
+  'ocean_time'
+  'idTads(iPO4_)'
+  'r3dvar'
+  1.0d0
+
 'PON'                                              ! Input/Output
   'particulate organic nitrogen concentration'
   'millimole_nitrogen meter-3'                     ! [millimole/m3]
@@ -3129,6 +3192,42 @@
   'r3dvar'
   1.0d0
 
+'RdetritusN'                                       ! Input/Output
+  'river nitrogen detritus concentration'
+  'millimole_nitrogen meter-3'                     ! [millimole/m3]
+  'RdetritusN, scalar, series'
+  'ocean_time'
+  'idTvar(iRDeN)'
+  'r3dvar'
+  1.0d0
+
+'RdetritusN'                                       ! Input
+  'river nitrogen detritus concentration functional'
+  'millimole_nitrogen meter-3'                     ! [millimole/m3]
+  'RdetritusN, scalar, series'
+  'ocean_time'
+  'idTads(iRDeN)'
+  'r3dvar'
+  1.0d0
+
+'RdetritusC'                                       ! Input/Output
+  'river carbon detritus concentration'
+  'millimole_carbon meter-3'                       ! [millimole/m3]
+  'RdetritusC, scalar, series'
+  'ocean_time'
+  'idTvar(iRDeC)'
+  'r3dvar'
+  1.0d0
+
+'RdetritusC'                                       ! Input
+  'river carbon detritus concentration functional'
+  'millimole_nitrogen meter-3'                     ! [millimole/m3]
+  'RdetritusC, scalar, series'
+  'ocean_time'
+  'idTads(iRDeC)'
+  'r3dvar'
+  1.0d0
+
 'TIC'                                              ! Input/Output
   'total inorganic carbon'
   'millimole_carbon meter-3'                       ! [millimole/m3]
@@ -3286,6 +3385,15 @@
   'r3dvar'
   1.0d0
 
+'Nitrif_flux'                                      ! Input/Output
+  'Nitrification flux'
+  'millimole_nitrogen meter-3 day-1'               ! [millimole/m3/day]
+  'Nitrif_flux, scalar, series'
+  'ocean_time'
+  'iDbio3(iNifx)'
+  'r3dvar'
+  1.0d0
+
 !
 !  Boundary variables.
 !
@@ -3323,6 +3431,42 @@
   'NO3_north, scalar, series'
   'NO3_time'
   'idTbry(inorth,iNO3_)'
+  'nulvar'
+  1.0d0
+
+'PO4_east'                                         ! Input
+  'phosphate eastern boundary condition'
+  'millimole_PO4 meter-3'                          ! [millimole/m3]
+  'PO4_east, scalar, series'
+  'PO4_time'
+  'idTbry(ieast,iPO4_)'
+  'nulvar'
+  1.0d0
+
+'PO4_west'                                         ! Input
+  'phosphate western boundary condition'
+  'millimole_PO4 meter-3'                          ! [millimole/m3]
+  'PO4_west, scalar, series'
+  'PO4_time'
+  'idTbry(iwest,iPO4_)'
+  'nulvar'
+  1.0d0
+
+'PO4_south'                                        ! Input
+  'phosphate southern boundary condition'
+  'millimole_PO4 meter-3'                          ! [millimole/m3]
+  'PO4_south, scalar, series'
+  'PO4_time'
+  'idTbry(isouth,iPO4_)'
+  'nulvar'
+  1.0d0
+
+'PO4_north'                                        ! Input
+  'phosphate northern boundary condition'
+  'millimole_PO4 meter-3'                          ! [millimole/m3]
+  'PO4_north, scalar, series'
+  'PO4_time'
+  'idTbry(inorth,iPO4_)'
   'nulvar'
   1.0d0
 
@@ -3364,7 +3508,7 @@
 
 'oxygen_east'                                      ! Input
   'oxygen eastern boundary condition'
-  'millimole_carbon meter-3'                       ! [millimole/m3]
+  'millimole_oxygen meter-3'                       ! [millimole/m3]
   'oxygen_east, scalar, series'
   'oxygen_time'
   'idTbry(ieast,iOxyg)'
@@ -3373,7 +3517,7 @@
 
 'oxygen_west'                                      ! Input
   'oxygen western boundary condition'
-  'millimole_carbon meter-3'                       ! [millimole/m3]
+  'millimole_oxygen meter-3'                       ! [millimole/m3]
   'oxygen_west, scalar, series'
   'oxygen_time'
   'idTbry(iwest,iOxyg)'
@@ -3382,7 +3526,7 @@
 
 'oxygen_north'                                     ! Input
   'oxygen northern boundary condition'
-  'millimole_carbon meter-3'                       ! [millimole/m3]
+  'millimole_oxygen meter-3'                       ! [millimole/m3]
   'oxygen_north, scalar, series'
   'oxygen_time'
   'idTbry(inorth,iOxyg)'
@@ -3391,7 +3535,7 @@
 
 'oxygen_south'                                     ! Input
   'oxygen southern boundary condition'
-  'millimole_carbon meter-3'                       ! [millimole/m3]
+  'millimole_oxygen meter-3'                       ! [millimole/m3]
   'oxygen_south, scalar, series'
   'oxygen_time'
   'idTbry(isouth,iOxyg)'
@@ -4082,6 +4226,42 @@
   'nulvar'
   1.0d0
 
+'RDeN_east'                                        ! Input
+  'river nitrogen detritus eastern boundary condition'
+  'millimole_nitrogen meter-3'                     ! [millimole/m3]
+  'RDeN_east, scalar, series'
+  'RDeN_time'
+  'idTbry(ieast,iRDeN)'
+  'nulvar'
+  1.0d0
+
+'RDeN_west'                                        ! Input
+  'river nitrogen detritus western boundary condition'
+  'millimole_nitrogen meter-3'                     ! [millimole/m3]
+  'RDeN_west, scalar, series'
+  'RDeN_time'
+  'idTbry(iwest,iRDeN)'
+  'nulvar'
+  1.0d0
+
+'RDeN_north'                                       ! Input
+  'river nitrogen detritus northern boundary condition'
+  'millimole_nitrogen meter-3'                     ! [millimole/m3]
+  'RDeN_north, scalar, series'
+  'RDeN_time'
+  'idTbry(inorth,iRDeN)'
+  'nulvar'
+  1.0d0
+
+'RDeN_south'                                       ! Input
+  'river nitrogen detritus southern boundary condition'
+  'millimole_nitrogen meter-3'                     ! [millimole/m3]
+  'RDeN_south, scalar, series'
+  'RDeN_time'
+  'idTbry(isouth,iRDeN)'
+  'nulvar'
+  1.0d0
+
 'LdeC_east'                                        ! Input
   'large fraction carbon detritus eastern boundary condition'
   'millimole_carbon meter-3'                       ! [millimole/m3]
@@ -4151,6 +4331,42 @@
   'SdeC_north, scalar, series'
   'SdeC_time'
   'idTbry(inorth,iSDeC)'
+  'nulvar'
+  1.0d0
+
+'RDeC_east'                                        ! Input
+  'river carbon detritus eastern boundary condition'
+  'millimole_carbon meter-3'                       ! [millimole/m3]
+  'RDeC_east, scalar, series'
+  'RDeC_time'
+  'idTbry(ieast,iRDeC)'
+  'nulvar'
+  1.0d0
+
+'RDeN_west'                                        ! Input
+  'river carbon detritus western boundary condition'
+  'millimole_carbon meter-3'                       ! [millimole/m3]
+  'RDeC_west, scalar, series'
+  'RDeC_time'
+  'idTbry(iwest,iRDeC)'
+  'nulvar'
+  1.0d0
+
+'RDeN_north'                                       ! Input
+  'river carbon detritus northern boundary condition'
+  'millimole_carbon meter-3'                       ! [millimole/m3]
+  'RDeC_north, scalar, series'
+  'RDeC_time'
+  'idTbry(inorth,iRDeC)'
+  'nulvar'
+  1.0d0
+
+'RDeN_south'                                       ! Input
+  'river carbon detritus southern boundary condition'
+  'millimole_carbon meter-3'                       ! [millimole/m3]
+  'RDeC_south, scalar, series'
+  'RDeC_time'
+  'idTbry(isouth,iRDeC)'
   'nulvar'
   1.0d0
 
@@ -5535,7 +5751,7 @@
   1.0d0
 
 'obs_scale'                                        ! Output
-  'observation screening/normalization scale'
+  'observation screening and quality control scale'
   'nondimensional'
   'nulvar'
   'datum'
@@ -5561,6 +5777,15 @@
   'w3dvar'
   1.0d0
 
+'NLmodel_unvetted'                                  ! Output
+  'initial nonlinear model at observation locations unvetted by quality control'
+  'state variable units'
+  'nulvar'
+  'datum'
+  'idNLmp'
+  'nulvar'
+  1.0d0
+
 'NLmodel_initial'                                  ! Output
   'initial nonlinear model at observation locations'
   'state variable units'
@@ -5579,8 +5804,17 @@
   'nulvar'
   1.0d0
 
+'NLmodel_value_unvetted'                           ! Output
+  'nonlinear model at observation locations unvetted by quality control per outer-loop'
+  'state variable units'
+  'nulvar'
+  'datum'
+  'idNLmu'
+  'nulvar'
+  1.0d0
+
 'NLmodel_value'                                    ! Output
-  'nonlinear model at observation locations'
+  'nonlinear model at observation locations per outer-loop'
   'state variable units'
   'nulvar'
   'datum'
