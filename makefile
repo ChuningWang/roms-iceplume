@@ -413,8 +413,8 @@ endif
 		ROMS/Functionals \
 		ROMS/Utility \
 		ROMS/Drivers \
-		ROMS/Modules \
- 		ROMS/IcePlume
+		ROMS/Modules
+ modules  +=	ROMS/IcePlume
 
  includes :=	ROMS/Include
 ifdef MY_ANALYTICAL

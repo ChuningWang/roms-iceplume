@@ -112,7 +112,7 @@ END SUBROUTINE iceplume_init
 #ifdef ICEPLUME_DET_AVERAGE
 !
 !***********************************************************************
-SUBROUTINE iceplume_avg_init (ng, tile)
+SUBROUTINE iceplume_avg_init (ng, tile, model)
 !***********************************************************************
 !
   USE mod_param
@@ -120,10 +120,14 @@ SUBROUTINE iceplume_avg_init (ng, tile)
   USE mod_scalars, ONLY : LuvSrc, LwSrc
   USE mod_sources
   USE mod_iceplume
+# ifdef DISTRIBUTE
+!
+  USE distribute_mod, ONLY : mp_bcasti
+# endif
 !
 !  Imported variable declarations.
 !
-  integer, intent(in) :: ng, tile
+  integer, intent(in) :: ng, tile, model
 !
 !  Local variable declarations.
 !
@@ -152,6 +156,15 @@ SUBROUTINE iceplume_avg_init (ng, tile)
      &         (SOURCES(ng) % SGJend(is)-SOURCES(ng) % SGJstr(is)+1)  )
       ENDIF
     ENDDO
+# ifdef DISTRIBUTE
+!
+!  Broadcast information to all nodes.
+!
+    CALL mp_bcasti (ng, model, SOURCES(ng)%SGIstr)
+    CALL mp_bcasti (ng, model, SOURCES(ng)%SGIend)
+    CALL mp_bcasti (ng, model, SOURCES(ng)%SGJstr)
+    CALL mp_bcasti (ng, model, SOURCES(ng)%SGJend)
+# endif
   ENDIF
 END SUBROUTINE iceplume_avg_init
 #endif

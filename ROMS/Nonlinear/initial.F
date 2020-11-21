@@ -654,16 +654,15 @@
 !$OMP MASTER
         CALL get_idata (ng)
         CALL get_data (ng)
-!$OMP END MASTER
-#  ifdef ICEPLUME_DET_AVERAGE
+#  ifdef ICEPLUME
+!
+!  If applicable, process iceplume input data.
+!
         IF (LuvSrc(ng).or.LwSrc(ng).or.ANY(LtracerSrc(:,ng))) THEN
           CALL iceplume_init (ng)
-          DO tile=first_tile(ng),last_tile(ng),+1
-            CALL iceplume_avg_init (ng, tile)
-          END DO
-!$OMP BARRIER
         END IF
 #  endif
+!$OMP END MASTER
 #  ifdef DISTRIBUTE
         CALL mp_bcasti (ng, iNLM, exit_flag)
 #  endif
