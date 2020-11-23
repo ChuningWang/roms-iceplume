@@ -144,7 +144,7 @@
 !
 #if defined ICEPLUME_TEST
         IF (Master.and.DOMAIN(ng)%SouthWest_Test(tile)) THEN
-          Nsrc(ng)=Mm(ng)-2
+          Nsrc = 3
           isc=NINT((Mm(ng)+1)/2.0_r8)
           is0=isc-NINT((Nsrc(ng)+1)/2.0_r8)
           DO is=1,Nsrc(ng)
@@ -156,10 +156,10 @@
             SOURCES(ng)%SGtyp(is)=4.0_r8
             SOURCES(ng)%SGlen(is)=220.0_r8
 #  ifdef ICEPLUME_DET_AVERAGE
-            SOURCES(ng)%SGIstr(is)=2
-            SOURCES(ng)%SGIend(is)=8
-            SOURCES(ng)%SGJstr(is)=isc-6
-            SOURCES(ng)%SGJend(is)=isc+6
+            SOURCES(ng)%SGIrange(is,1)=2.0_r8
+            SOURCES(ng)%SGIrange(is,2)=8.0_r8
+            SOURCES(ng)%SGJrange(is,1)=REAL(isc-6)
+            SOURCES(ng)%SGJrange(is,2)=REAL(isc+6)
 #  endif
 # endif
           END DO
@@ -182,10 +182,8 @@
         CALL mp_bcastf (ng, iNLM, SOURCES(ng)%SGtyp)
         CALL mp_bcastf (ng, iNLM, SOURCES(ng)%SGlen)
 #   ifdef ICEPLUME_DET_AVERAGE
-        CALL mp_bcasti (ng, iNLM, SOURCES(ng)%SGIstr)
-        CALL mp_bcasti (ng, iNLM, SOURCES(ng)%SGIend)
-        CALL mp_bcasti (ng, iNLM, SOURCES(ng)%SGJstr)
-        CALL mp_bcasti (ng, iNLM, SOURCES(ng)%SGJend)
+        CALL mp_bcastf (ng, iNLM, SOURCES(ng)%SGIrange)
+        CALL mp_bcastf (ng, iNLM, SOURCES(ng)%SGJrange)
 #   endif
 #  endif
 # endif

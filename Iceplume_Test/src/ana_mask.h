@@ -84,7 +84,7 @@
       logical, save :: first = .TRUE.
 
       integer :: Imin, Imax, Jmin, Jmax
-      integer :: i, j
+      integer :: i, j, isc
       real(r8) :: mask(IminS:ImaxS,JminS:JmaxS)
 
       TYPE (T_STATS), save :: Stats(4)
@@ -114,6 +114,7 @@
 !  computation within a parallel loop.
 !
 #if defined ICEPLUME_TEST
+      isc=NINT((Mm(ng)+1)/2.0_r8)
       DO j=Jstrm2,Jendp2
         DO i=Istrm2,Iendp2
           IF (i.le.1) THEN
@@ -121,6 +122,7 @@
           ELSE
             mask(i,j)=1.0_r8
           END IF
+          IF ((j.gt.isc).and.(i.le.(j-isc))) mask(i,j)=0.0_r8
         END DO
       END DO
 #else

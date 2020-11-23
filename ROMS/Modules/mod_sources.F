@@ -132,10 +132,8 @@
           real(r8), pointer :: SGgid(:)
 # endif
 # ifdef ICEPLUME_DET_AVERAGE
-#  ifndef ANA_PSOURCE
           real(r8), pointer :: SGIrange(:, :)
           real(r8), pointer :: SGJrange(:, :)
-#  endif
           integer,  pointer :: SGIstr(:)
           integer,  pointer :: SGIend(:)
           integer,  pointer :: SGJstr(:)
@@ -330,14 +328,12 @@
 
 # endif
 # ifdef ICEPLUME_DET_AVERAGE
-#  ifndef ANA_PSOURCE
       allocate ( SOURCES(ng) % SGIrange(Nsrc(ng), 2) )
       Dmem(ng)=Dmem(ng)+2.0_r8*REAL(Nsrc(ng),r8)
 
       allocate ( SOURCES(ng) % SGJrange(Nsrc(ng), 2) )
       Dmem(ng)=Dmem(ng)+2.0_r8*REAL(Nsrc(ng),r8)
 
-#  endif
       allocate ( SOURCES(ng) % SGIstr(Nsrc(ng)) )
       Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
 
@@ -420,12 +416,10 @@
         SOURCES(ng) % SGgid(is) = IniVal
 # endif
 # ifdef ICEPLUME_DET_AVERAGE
-#  ifndef ANA_PSOURCE
         DO K = 1, 2
           SOURCES(ng) % SGIrange(is, K) = IniVal
           SOURCES(ng) % SGJrange(is, K) = IniVal
         ENDDO
-#  endif
           SOURCES(ng) % SGIstr(is) = 0
           SOURCES(ng) % SGIend(is) = 0
           SOURCES(ng) % SGJstr(is) = 0

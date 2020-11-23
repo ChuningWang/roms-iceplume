@@ -587,12 +587,6 @@
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 
-        DO is=1,Nsrc(ng)
-          SOURCES(ng) % SGIstr(is) = NINT(SOURCES(ng) % SGIrange(is, 1))
-          SOURCES(ng) % SGIend(is) = NINT(SOURCES(ng) % SGIrange(is, 2))
-          SOURCES(ng) % SGJstr(is) = NINT(SOURCES(ng) % SGJrange(is, 1))
-          SOURCES(ng) % SGJend(is) = NINT(SOURCES(ng) % SGJrange(is, 2))
-        ENDDO
 #  endif
 # endif
       END IF

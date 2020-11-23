@@ -266,19 +266,35 @@ MODULE mod_iceplume
 !
   CONTAINS
     SUBROUTINE allocate_iceplume(ng)
+      USE mod_param
+!
+!  Imported variable declarations.
+!
       integer :: ng
+!
+!  Local variable declarations.
+!
+      integer :: is, itrc, k
+      real(r8), parameter :: IniVal = 0.0_r8
+!
+!-----------------------------------------------------------------------
+!  Allocate module variables.
+!-----------------------------------------------------------------------
+!
       IF (ng .EQ. 1) allocate( PLUME(Ngrids) )
 !
-! Allocate profiles
+!  Allocate iceplume Sources/Sinks variables.
 !
-      allocate( PLUME(ng) % Isrc    (1:Nsrc(ng)) )
-      allocate( PLUME(ng) % Jsrc    (1:Nsrc(ng)) )
-      allocate( PLUME(ng) % dx      (1:Nsrc(ng)) )
-      allocate( PLUME(ng) % dy      (1:Nsrc(ng)) )
-      allocate( PLUME(ng) % dir     (1:Nsrc(ng)) )
-      allocate( PLUME(ng) % trs     (1:Nsrc(ng)) )
+      allocate( PLUME(ng) % Isrc (Nsrc(ng)) )
+      allocate( PLUME(ng) % Jsrc (Nsrc(ng)) )
+      allocate( PLUME(ng) % dx   (Nsrc(ng)) )
+      allocate( PLUME(ng) % dy   (Nsrc(ng)) )
+      allocate( PLUME(ng) % dir  (Nsrc(ng)) )
+      allocate( PLUME(ng) % trs  (Nsrc(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*6,r8)
 # ifdef ICEPLUME_DET_AVERAGE
-      allocate( PLUME(ng) % avgNpts (1:Nsrc(ng)) )
+      allocate( PLUME(ng) % avgNpts (Nsrc(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
 # endif
 !
       allocate( PLUME(ng) % zW   (Nsrc(ng), 0:N(ng)) )
@@ -289,6 +305,7 @@ MODULE mod_iceplume
       allocate( PLUME(ng) % a    (Nsrc(ng), 0:N(ng)) )
       allocate( PLUME(ng) % mInt (Nsrc(ng), 0:N(ng)) )
       allocate( PLUME(ng) % rho  (Nsrc(ng), 0:N(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*(N(ng)+1)*8,r8)
 !
       allocate( PLUME(ng) % zR    (Nsrc(ng), N(ng)  ) )
       allocate( PLUME(ng) % tAm   (Nsrc(ng), N(ng)  ) )
@@ -297,45 +314,168 @@ MODULE mod_iceplume
       allocate( PLUME(ng) % wAm   (Nsrc(ng), N(ng)  ) )
       allocate( PLUME(ng) % tpAm  (Nsrc(ng), N(ng)  ) )
       allocate( PLUME(ng) % rhoAm (Nsrc(ng), N(ng)+1) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*7+1,r8)
 !
       allocate( PLUME(ng) % lm (Nsrc(ng), 0:N(ng)) )
       allocate( PLUME(ng) % lc (Nsrc(ng), 0:N(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*(N(ng)+1)*2,r8)
 !
       allocate( PLUME(ng) % ent     (Nsrc(ng), N(ng)) )
       allocate( PLUME(ng) % det     (Nsrc(ng), N(ng)) )
       allocate( PLUME(ng) % detI    (Nsrc(ng), N(ng)) )
       allocate( PLUME(ng) % detFrac (Nsrc(ng), N(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*4,r8)
 # ifdef ICEPLUME_DET_NEUTRAL
 !
       allocate( PLUME(ng) % detF    (Nsrc(ng), N(ng)) )
       allocate( PLUME(ng) % detE    (Nsrc(ng), N(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*2,r8)
+!
       allocate( PLUME(ng) % detTrc  (Nsrc(ng), N(ng), NT(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*NT(ng),r8)
 # endif
 !
       allocate( PLUME(ng) % m  (Nsrc(ng), N(ng)) )
       allocate( PLUME(ng) % mB (Nsrc(ng), N(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*2,r8)
 !
       allocate( PLUME(ng) % dz (Nsrc(ng), N(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng),r8)
 !
       allocate( PLUME(ng) % trcAm  (Nsrc(ng), N(ng), NT(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*NT(ng),r8)
+!
       allocate( PLUME(ng) % trcB   (Nsrc(ng), NT(ng)) )
       allocate( PLUME(ng) % trc    (Nsrc(ng), NT(ng)) )
       allocate( PLUME(ng) % trcCum (Nsrc(ng), NT(ng)) )
       allocate( PLUME(ng) % trcIni (Nsrc(ng), NT(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*NT(ng)*4,r8)
 # ifdef ICEPLUME_MIX
 !
-      allocate( PLUME(ng) % trsW (1:Nsrc(ng)) )
-      allocate( PLUME(ng) % entW (Nsrc(ng), N(ng)) )
-      allocate( PLUME(ng) % detW (Nsrc(ng), N(ng)) )
-      allocate( PLUME(ng) % mBW  (Nsrc(ng), N(ng)) )
+      allocate( PLUME(ng) % trsW   (Nsrc(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
 !
+      allocate( PLUME(ng) % entW   (Nsrc(ng), N(ng)) )
+      allocate( PLUME(ng) % detW   (Nsrc(ng), N(ng)) )
+      allocate( PLUME(ng) % mBW    (Nsrc(ng), N(ng)) )
       allocate( PLUME(ng) % dzNew  (Nsrc(ng), N(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*4,r8)
+!
       allocate( PLUME(ng) % zWNew  (Nsrc(ng), 0:N(ng)) )
       allocate( PLUME(ng) % zLNew  (Nsrc(ng), 0:N(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*(N(ng)+1)*2,r8)
+!
       allocate( PLUME(ng) % dzWei  (Nsrc(ng), N(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng),r8)
+!
       allocate( PLUME(ng) % trcL   (Nsrc(ng), N(ng), NT(ng)) )
       allocate( PLUME(ng) % trcNew (Nsrc(ng), N(ng), NT(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*NT(ng)*2,r8)
 # endif
+!
+!-----------------------------------------------------------------------
+!  Initialize module variables.
+!-----------------------------------------------------------------------
+!
+      DO is=1,Nsrc(ng)
+        PLUME(ng) % Isrc (is) = 0
+        PLUME(ng) % Jsrc (is) = 0
+        PLUME(ng) % dx   (is) = IniVal
+        PLUME(ng) % dy   (is) = IniVal
+        PLUME(ng) % dir  (is) = IniVal
+        PLUME(ng) % trs  (is) = IniVal
+# ifdef ICEPLUME_DET_AVERAGE
+        PLUME(ng) % avgNpts (is) = IniVal
+# endif
+!
+        DO k=0,N(ng)
+          PLUME(ng) % zW   (is, k) = IniVal
+          PLUME(ng) % f    (is, k) = IniVal
+          PLUME(ng) % w    (is, k) = IniVal
+          PLUME(ng) % t    (is, k) = IniVal
+          PLUME(ng) % s    (is, k) = IniVal
+          PLUME(ng) % a    (is, k) = IniVal
+          PLUME(ng) % mInt (is, k) = IniVal
+          PLUME(ng) % rho  (is, k) = IniVal
+        ENDDO
+!
+        DO k=1,N(ng)
+          PLUME(ng) % zR    (is, k) = IniVal
+          PLUME(ng) % tAm   (is, k) = IniVal
+          PLUME(ng) % sAm   (is, k) = IniVal
+          PLUME(ng) % vAm   (is, k) = IniVal
+          PLUME(ng) % wAm   (is, k) = IniVal
+          PLUME(ng) % tpAm  (is, k) = IniVal
+          PLUME(ng) % rhoAm (is, k) = IniVal
+        ENDDO
+        PLUME(ng) % rhoAm (is, N(ng)+1) = IniVal
+!
+        DO k=0,N(ng)
+          PLUME(ng) % lm (is, k) = IniVal
+          PLUME(ng) % lc (is, k) = IniVal
+        ENDDO
+!
+        DO k=1,N(ng)
+          PLUME(ng) % ent     (is, k) = IniVal
+          PLUME(ng) % det     (is, k) = IniVal
+          PLUME(ng) % detI    (is, k) = 0
+          PLUME(ng) % detFrac (is, k) = IniVal
+        ENDDO
+# ifdef ICEPLUME_DET_NEUTRAL
+!
+        DO k=1,N(ng)
+          PLUME(ng) % detF (is, k) = IniVal
+          PLUME(ng) % detE (is, k) = IniVal
+!
+          DO itrc=1,NT(ng)
+            PLUME(ng) % detTrc (is, k, itrc) = IniVal
+          ENDDO
+        ENDDO
+# endif
+!
+        DO k=1,N(ng)
+          PLUME(ng) % m  (is, k) = IniVal
+          PLUME(ng) % mB (is, k) = IniVal
+!
+          PLUME(ng) % dz (is, k) = IniVal
+!
+          DO itrc=1,NT(ng)
+            PLUME(ng) % trcAm (is, k, itrc) = IniVal
+          ENDDO
+        ENDDO
+!
+        DO itrc=1,NT(ng)
+          PLUME(ng) % trcB   (is, itrc) = IniVal
+          PLUME(ng) % trc    (is, itrc) = IniVal
+          PLUME(ng) % trcCum (is, itrc) = IniVal
+          PLUME(ng) % trcIni (is, itrc) = IniVal
+        ENDDO
+# ifdef ICEPLUME_MIX
+!
+        PLUME(ng) % trsW (is) = IniVal
+!
+        DO k=1,N(ng)
+          PLUME(ng) % entW  (is, k) = IniVal
+          PLUME(ng) % detW  (is, k) = IniVal
+          PLUME(ng) % mBW   (is, k) = IniVal
+          PLUME(ng) % dzNew (is, k) = IniVal
+        ENDDO
+!
+        DO k=0,N(ng)
+          PLUME(ng) % zWNew (is, k) = IniVal
+          PLUME(ng) % zLNew (is, k) = IniVal
+        ENDDO
+!
+        DO k=1,N(ng)
+          PLUME(ng) % dzWei (is, k) = IniVal
+!
+          DO itrc=1,NT(ng)
+            PLUME(ng) % trcL   (is, k, itrc) = IniVal
+            PLUME(ng) % trcNew (is, k, itrc) = IniVal
+          ENDDO
+        ENDDO
+# endif
+      ENDDO
     END SUBROUTINE allocate_iceplume
 #endif
 END
