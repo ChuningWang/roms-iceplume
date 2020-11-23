@@ -235,13 +235,11 @@
 #if defined ICEPLUME_TEST
         DO is=1,Nsrc(ng)
           SOURCES(ng)%Qbar(is)=0.0_r8
-# if defined ICEPLUME
-          SOURCES(ng)%SGbar(is)=0.0_r8
-# endif
         END DO
 # if defined ICEPLUME
-        is=NINT((Nsrc(ng)+1)/2.0_r8)
-        SOURCES(ng)%SGbar(is)=200.0_r8
+        DO is=1,Nsrc(ng)
+          SOURCES(ng)%SGbar(is)=200.0_r8
+        END DO
 # endif
 #else
         ana_psource.h: No values provided for Qbar.

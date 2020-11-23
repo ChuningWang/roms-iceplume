@@ -57,6 +57,7 @@
 
 ifdef USE_GCC10
            FFLAGS += -fallow-argument-mismatch
+           FFLAGS += -std=legacy
 endif
 ifdef USE_ROMS
  ifdef USE_DEBUG
