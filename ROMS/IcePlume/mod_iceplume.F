@@ -95,7 +95,7 @@ MODULE mod_iceplume
 !                 -1 for negative direction. 0 for other situation.    !
 ! trs           - depth integrated total transport [m^3 s^-1]          !
 # ifdef ICEPLUME_DET_AVERAGE
-! avgNpts       - number of average points for each plume source.      !
+! avgArea       - surface area of average span for each plume source.  !
 # endif
 !                                                                      !
 ! Profiles                                                             !
@@ -176,7 +176,7 @@ MODULE mod_iceplume
     real(r8), pointer :: dir(:)
     real(r8), pointer :: trs(:)
 # ifdef ICEPLUME_DET_AVERAGE
-    real(r8), pointer :: avgNpts(:)
+    real(r8), pointer :: avgArea(:)
 # endif
 !
 ! Plume state (omega surface).
@@ -293,7 +293,7 @@ MODULE mod_iceplume
       allocate( PLUME(ng) % trs  (Nsrc(ng)) )
       Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*6,r8)
 # ifdef ICEPLUME_DET_AVERAGE
-      allocate( PLUME(ng) % avgNpts (Nsrc(ng)) )
+      allocate( PLUME(ng) % avgArea (Nsrc(ng)) )
       Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng),r8)
 # endif
 !
@@ -385,7 +385,7 @@ MODULE mod_iceplume
         PLUME(ng) % dir  (is) = IniVal
         PLUME(ng) % trs  (is) = IniVal
 # ifdef ICEPLUME_DET_AVERAGE
-        PLUME(ng) % avgNpts (is) = IniVal
+        PLUME(ng) % avgArea (is) = IniVal
 # endif
 !
         DO k=0,N(ng)

@@ -90,6 +90,50 @@
 !
 # include "set_bounds.h"
 !
+# if defined ICEPLUME_DET_AVERAGE && defined ICEPLUME_CTIL_AVG
+!
+! Aggregate grid and mask data from each tile
+!
+      LBi  = BOUNDS(ng)%LBi(-1)
+      UBi  = BOUNDS(ng)%UBi(-1)
+      LBj  = BOUNDS(ng)%LBj(-1)
+      UBj  = BOUNDS(ng)%UBj(-1)
+      LBiF = BOUNDS(ng)%LBi(tile)
+      UBiF = BOUNDS(ng)%UBi(tile)
+      LBjF = BOUNDS(ng)%LBj(tile)
+      UBjF = BOUNDS(ng)%UBj(tile)
+      IF (.not.allocated(rmask)) THEN
+        allocate ( rmask(LBi:UBi,LBj:UBj) )
+      ENDIF
+      IF (.not.allocated(om_r )) THEN
+        allocate ( om_r (LBi:UBi,LBj:UBj) )
+      ENDIF
+      IF (.not.allocated(on_r )) THEN
+        allocate ( on_r (LBi:UBi,LBj:UBj) )
+      END IF
+#  ifdef DISTRIBUTE
+      CALL mp_aggregate2d (ng, iNLM, 2,                                 &
+     &                     LBiF, UBiF, LBjF, UBjF,                      &
+     &                     LBi,  UBi,  LBj,  UBj,                       &
+     &                     GRID(ng) % rmask, rmask)
+      CALL mp_aggregate2d (ng, iNLM, 2,                                 &
+     &                     LBiF, UBiF, LBjF, UBjF,                      &
+     &                     LBi,  UBi,  LBj,  UBj,                       &
+     &                     GRID(ng) % om_r , om_r )
+      CALL mp_aggregate2d (ng, iNLM, 2,                                 &
+     &                     LBiF, UBiF, LBjF, UBjF,                      &
+     &                     LBi,  UBi,  LBj,  UBj,                       &
+     &                     GRID(ng) % on_r , on_r )
+#  else
+      DO j = LBj, UBj
+        DO i = LBi, UBi
+          rmask(i, j) = GRID(ng) % rmask(i, j)
+          om_r (i, j) = GRID(ng) % om_r (i, j)
+          on_r (i, j) = GRID(ng) % on_r (i, j)
+        ENDDO
+      ENDDO
+#  endif
+# endif
       DO is = 1, Nsrc(ng)
         Isrc = SOURCES(ng) % Isrc(is)
         Jsrc = SOURCES(ng) % Jsrc(is)
@@ -164,77 +208,39 @@
 !
 ! Calculate number of average points for averaging algorithm
 !
-#  ifdef ICEPLUME_CTIL_AVG
-          LBi  = BOUNDS(ng)%LBi(-1)
-          UBi  = BOUNDS(ng)%UBi(-1)
-          LBj  = BOUNDS(ng)%LBj(-1)
-          UBj  = BOUNDS(ng)%UBj(-1)
-          LBiF = BOUNDS(ng)%LBi(tile)
-          UBiF = BOUNDS(ng)%UBi(tile)
-          LBjF = BOUNDS(ng)%LBj(tile)
-          UBjF = BOUNDS(ng)%UBj(tile)
-          IF (.not.allocated(rmask)) THEN
-            allocate ( rmask(LBi:UBi,LBj:UBj) )
-          ENDIF
-          IF (.not.allocated(om_r )) THEN
-            allocate ( om_r (LBi:UBi,LBj:UBj) )
-          ENDIF
-          IF (.not.allocated(on_r )) THEN
-            allocate ( on_r (LBi:UBi,LBj:UBj) )
-          END IF
-#   ifdef DISTRIBUTE
-          CALL mp_aggregate2d (ng, iNLM, 2,                             &
-     &                         LBiF, UBiF, LBjF, UBjF,                  &
-     &                         LBi,  UBi,  LBj,  UBj,                   &
-     &                         GRID(ng) % rmask, rmask)
-          CALL mp_aggregate2d (ng, iNLM, 2,                             &
-     &                         LBiF, UBiF, LBjF, UBjF,                  &
-     &                         LBi,  UBi,  LBj,  UBj,                   &
-     &                         GRID(ng) % om_r , om_r )
-          CALL mp_aggregate2d (ng, iNLM, 2,                             &
-     &                         LBiF, UBiF, LBjF, UBjF,                  &
-     &                         LBi,  UBi,  LBj,  UBj,                   &
-     &                         GRID(ng) % on_r , on_r )
-#   else
-          DO j = LBjF, UBjF
-            DO i = LBiF, UBiF
-              rmask(i, j) = GRID(ng) % rmask(i, j)
-              om_r (i, j) = GRID(ng) % om_r (i, j)
-              on_r (i, j) = GRID(ng) % on_r (i, j)
-            ENDDO
-          ENDDO
-#   endif
-#  endif
-          PLUME(ng) % avgNpts(is) = 0.0_r8
+          PLUME(ng) % avgArea(is) = 0.0_r8
           DO i = SOURCES(ng) % SGIstr(is), SOURCES(ng) % SGIend(is)
             DO j = SOURCES(ng) % SGJstr(is), SOURCES(ng) % SGJend(is)
 #  ifdef ICEPLUME_CTIL_AVG
               IF (rmask(i, j) .GT. 0.5_r8) THEN
-                PLUME(ng) % avgNpts(is) = PLUME(ng) % avgNpts(is) +     &
+                PLUME(ng) % avgArea(is) = PLUME(ng) % avgArea(is) +     &
      &              ABS(om_r(i, j)*on_r(i, j))
               ENDIF
 #  else
               IF (GRID(ng) % rmask(i, j) .GT. 0.5_r8) THEN
-                PLUME(ng) % avgNpts(is) = PLUME(ng) % avgNpts(is) +     &
+                PLUME(ng) % avgArea(is) = PLUME(ng) % avgArea(is) +     &
      &              ABS(GRID(ng) % om_r(i, j)*GRID(ng) % on_r(i, j))
               ENDIF
 #  endif
             ENDDO
           ENDDO
-#  ifdef ICEPLUME_CTIL_AVG
-          IF (allocated(rmask)) THEN
-            deallocate ( rmask )
-          END IF
-          IF (allocated(om_r )) THEN
-            deallocate ( om_r  )
-          END IF
-          IF (allocated(on_r )) THEN
-            deallocate ( on_r  )
-          END IF
-#  endif
 # endif
         ENDIF
       ENDDO
+# if defined ICEPLUME_DET_AVERAGE && defined ICEPLUME_CTIL_AVG
+!
+! Deallocate arrays
+!
+      IF (allocated(rmask)) THEN
+        deallocate ( rmask )
+      END IF
+      IF (allocated(om_r )) THEN
+        deallocate ( om_r  )
+      END IF
+      IF (allocated(on_r )) THEN
+        deallocate ( on_r  )
+      END IF
+# endif
 # ifdef DISTRIBUTE
 !
 !  Exchange data between all parallel nodes
@@ -247,7 +253,7 @@
       CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,PLUME(ng)%dy)
       CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,PLUME(ng)%rhoAm(:,K))
 #  ifdef ICEPLUME_DET_AVERAGE
-      CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,PLUME(ng)%avgNpts)
+      CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,PLUME(ng)%avgArea)
       CALL mp_collect (ng,iNLM,Nsrc(ng),Ispv,SOURCES(ng)%SGIstr)
       CALL mp_collect (ng,iNLM,Nsrc(ng),Ispv,SOURCES(ng)%SGIend)
       CALL mp_collect (ng,iNLM,Nsrc(ng),Ispv,SOURCES(ng)%SGJstr)
@@ -298,7 +304,7 @@
       USE mod_iceplume
 # ifdef DISTRIBUTE
 !
-      USE distribute_mod, ONLY : mp_aggregate2d
+      USE distribute_mod, ONLY : mp_aggregate2d, mp_aggregate3d
 !
 # endif
 !
@@ -314,18 +320,74 @@
       real(r8) :: RHO
 # ifdef ICEPLUME_DET_AVERAGE
       integer  :: i, j
-      real(r8) :: rhoAm, sAm, tpAm, tAm, area
+      real(r8) :: rhoAm
 #  ifdef ICEPLUME_CTIL_AVG
       integer :: LBi, UBi, LBj, UBj
       integer :: LBiF, UBiF, LBjF, UBjF
       real(r8), allocatable :: rmask(:, :), om_r(:, :), on_r(:, :)
-      real(r8), allocatable :: sAmG(:, :), tAmG(:, :)
+      real(r8), allocatable :: rhoG(:, :, :)
 #  endif
 # endif
 !
 # include "set_bounds.h"
 !
       IF ((LuvSrc(ng)) .OR. (LwSrc(ng))) THEN
+# if defined ICEPLUME_DET_AVERAGE && defined ICEPLUME_CTIL_AVG
+!
+! Aggregate grid, mask and density data from each tile
+!
+        LBi = BOUNDS(ng)%LBi(-1)
+        UBi = BOUNDS(ng)%UBi(-1)
+        LBj = BOUNDS(ng)%LBj(-1)
+        UBj = BOUNDS(ng)%UBj(-1)
+        LBiF= BOUNDS(ng)%LBi(tile)
+        UBiF= BOUNDS(ng)%UBi(tile)
+        LBjF= BOUNDS(ng)%LBj(tile)
+        UBjF= BOUNDS(ng)%UBj(tile)
+        IF (.not.allocated(rmask)) THEN
+          allocate ( rmask(LBi:UBi,LBj:UBj) )
+        ENDIF
+        IF (.not.allocated(om_r )) THEN
+          allocate ( om_r (LBi:UBi,LBj:UBj) )
+        ENDIF
+        IF (.not.allocated(on_r )) THEN
+          allocate ( on_r (LBi:UBi,LBj:UBj) )
+        END IF
+        IF (.not.allocated(rhoG )) THEN
+          allocate ( rhoG (LBi:UBi,LBj:UBj,1:N(ng)) )
+        END IF
+#  ifdef DISTRIBUTE
+      CALL mp_aggregate2d (ng, iNLM, 2,                                 &
+     &                     LBiF, UBiF, LBjF, UBjF,                      &
+     &                     LBi,  UBi,  LBj,  UBj,                       &
+     &                     GRID(ng) % rmask, rmask)
+      CALL mp_aggregate2d (ng, iNLM, 2,                                 &
+     &                     LBiF, UBiF, LBjF, UBjF,                      &
+     &                     LBi,  UBi,  LBj,  UBj,                       &
+     &                     GRID(ng) % om_r , om_r )
+      CALL mp_aggregate2d (ng, iNLM, 2,                                 &
+     &                     LBiF, UBiF, LBjF, UBjF,                      &
+     &                     LBi,  UBi,  LBj,  UBj,                       &
+     &                     GRID(ng) % on_r , on_r )
+      CALL mp_aggregate3d (ng, iNLM, 6,                                 &
+     &                     LBiF, UBiF, LBjF, UBjF,                      &
+     &                     LBi,  UBi,  LBj,  UBj,                       &
+     &                     1,    N(ng),                                 &
+     &                     OCEAN(ng) % rho(:,:,:) , rhoG )
+#  else
+        DO j = LBj, UBj
+          DO i = LBi, UBi
+            rmask(i, j) = GRID(ng) % rmask(i, j)
+            om_r (i, j) = GRID(ng) % om_r (i, j)
+            on_r (i, j) = GRID(ng) % on_r (i, j)
+            DO k = 1, N(ng)
+              rhoG (i, j, K) = ocean(ng) % rho(i,j,K)
+            ENDDO
+            ENDDO
+          ENDDO
+        ENDDO
+#  endif
+# endif
         DO is = 1, Nsrc(ng)
           Isrc = PLUME(ng) % Isrc(is)
           Jsrc = PLUME(ng) % Jsrc(is)
@@ -390,110 +452,29 @@
 !
             DO K = 1, N(ng)
 # ifdef ICEPLUME_DET_AVERAGE
-#  ifdef ICEPLUME_CTIL_AVG
-            LBi = BOUNDS(ng)%LBi(-1)
-            UBi = BOUNDS(ng)%UBi(-1)
-            LBj = BOUNDS(ng)%LBj(-1)
-            UBj = BOUNDS(ng)%UBj(-1)
-            LBiF= BOUNDS(ng)%LBi(tile)
-            UBiF= BOUNDS(ng)%UBi(tile)
-            LBjF= BOUNDS(ng)%LBj(tile)
-            UBjF= BOUNDS(ng)%UBj(tile)
-            IF (.not.allocated(rmask)) THEN
-              allocate ( rmask(LBi:UBi,LBj:UBj) )
-            ENDIF
-            IF (.not.allocated(om_r )) THEN
-              allocate ( om_r (LBi:UBi,LBj:UBj) )
-            ENDIF
-            IF (.not.allocated(on_r )) THEN
-              allocate ( on_r (LBi:UBi,LBj:UBj) )
-            END IF
-            IF (.not.allocated(sAmG )) THEN
-              allocate ( sAmG (LBi:UBi,LBj:UBj) )
-            END IF
-            IF (.not.allocated(tAmG )) THEN
-              allocate ( tAmG (LBi:UBi,LBj:UBj) )
-            END IF
-#   ifdef DISTRIBUTE
-      CALL mp_aggregate2d (ng, iNLM, 2,                                 &
-     &                     LBiF, UBiF, LBjF, UBjF,                      &
-     &                     LBi,  UBi,  LBj,  UBj,                       &
-     &                     GRID(ng) % rmask, rmask)
-      CALL mp_aggregate2d (ng, iNLM, 2,                                 &
-     &                     LBiF, UBiF, LBjF, UBjF,                      &
-     &                     LBi,  UBi,  LBj,  UBj,                       &
-     &                     GRID(ng) % om_r , om_r )
-      CALL mp_aggregate2d (ng, iNLM, 2,                                 &
-     &                     LBiF, UBiF, LBjF, UBjF,                      &
-     &                     LBi,  UBi,  LBj,  UBj,                       &
-     &                     GRID(ng) % on_r , on_r )
-      CALL mp_aggregate2d (ng, iNLM, 6,                                 &
-     &                     LBiF, UBiF, LBjF, UBjF,                      &
-     &                     LBi,  UBi,  LBj,  UBj,                       &
-     &                     OCEAN(ng) % t(:,:,k,nstp(ng),isalt) , sAmG )
-      CALL mp_aggregate2d (ng, iNLM, 6,                                 &
-     &                     LBiF, UBiF, LBjF, UBjF,                      &
-     &                     LBi,  UBi,  LBj,  UBj,                       &
-     &                     OCEAN(ng) % t(:,:,k,nstp(ng),itemp) , tAmG )
-#   else
-              DO j = LBjF, UBjF
-                DO i = LBiF, UBiF
-                  rmask(i, j) = GRID(ng) % rmask(i, j)
-                  om_r (i, j) = GRID(ng) % om_r (i, j)
-                  on_r (i, j) = GRID(ng) % on_r (i, j)
-                  sAmG (i, j) = ocean(ng) % (i,j,k,nstp(ng),isalt)
-                  tAmG (i, j) = ocean(ng) % (i,j,k,nstp(ng),itemp)
-                  ENDDO
-                ENDDO
-              ENDDO
-#   endif
-#  endif
 !
 ! Average density profiles in a box to surpress some oscillation
 !
-              sAm = 0.0_r8
-              tpAm = 0.0_r8
+              rhoAm = 0.0_r8
               DO i = SOURCES(ng)%SGIstr(is), SOURCES(ng)%SGIend(is)
                 DO j = SOURCES(ng)%SGJstr(is), SOURCES(ng)%SGJend(is)
 #  ifdef ICEPLUME_CTIL_AVG
                   IF (rmask(i, j) .GT. 0.5_r8) THEN
-                    area = ABS(om_r(i,j)*on_r(i,j))
-                    sAm = sAm + sAmG(i,j)*area
-                    tAm = tAm + tAmG(i,j)*area
+                    rhoAm = rhoAm + rhoG(i,j,K)*ABS(om_r(i,j)*on_r(i,j))
                   ENDIF
 #  else
                   IF (GRID(ng) % rmask(i, j) .GT. 0.5_r8) THEN
-                    area = ABS(GRID(ng)%om_r(i,j)*GRID(ng)%on_r(i,j))
-                    sAm  = sAm  +                                       &
-     &                  OCEAN(ng) % t(i, j, K, nstp(ng), isalt)*area
-                    tpAm = tpAm +                                       &
-     &                  OCEAN(ng) % t(i, j, K, nstp(ng), itemp)*area
+                    rhoAm = rhoAm + OCEAN(ng) % rho(i, j, K)*           &
+     &                  ABS(GRID(ng)%om_r(i,j)*GRID(ng)%on_r(i,j))
                   ENDIF
 #  endif
                 ENDDO
               ENDDO
-#  ifdef ICEPLUME_CTIL_AVG
-              IF (allocated(rmask)) THEN
-                deallocate ( rmask )
-              END IF
-              IF (allocated(om_r )) THEN
-                deallocate ( om_r  )
-              END IF
-              IF (allocated(on_r )) THEN
-                deallocate ( on_r  )
-              END IF
-              IF (allocated(sAmG )) THEN
-                deallocate ( sAmG  )
-              END IF
-              IF (allocated(tAmG )) THEN
-                deallocate ( tAmG  )
-              END IF
-#  endif
-              sAm  = sAm  / PLUME(ng) % avgNpts(is)
-              tpAm = tpAm / PLUME(ng) % avgNpts(is)
-              pr = prRef+(ABS(PLUME(ng) % zR(is, K))*rhoRef*g)*1.d-4
-              CALL SW_TEMP(sAm, tpAm, pr, prRef, tAm)
-              rhoAm = RHO(tAm, sAm, PLUME(ng) % zR(is, K))
+              rhoAm = rhoAm / PLUME(ng) % avgArea(is)
+!
+! Convert from density anomaly to absolute density.
+!
+              rhoAm = rhoAm + 1000.0_r8
               IF (iic(ng) .EQ. ntstart(ng)) THEN
                 PLUME(ng) % rhoAm(is, K) = rhoAm
               ELSE
@@ -502,9 +483,7 @@
      &              rhoAm                   *avgAlpha
               ENDIF
 # else
-              PLUME(ng) % rhoAm(is, K) = RHO(PLUME(ng) % tAm(is, K),    &
-     &                                       PLUME(ng) % sAm(is, K),    &
-     &                                       PLUME(ng) % zR(is, K))
+              PLUME(ng) % rhoAm(is, K) = OCEAN(ng) % rho(Isrc, Jsrc, K)
 # endif
             ENDDO
 !
@@ -536,6 +515,23 @@
             ENDIF
           ENDIF
         ENDDO
+# if defined ICEPLUME_DET_AVERAGE && defined ICEPLUME_CTIL_AVG
+!
+! Deallocate arrays
+!
+        IF (allocated(rmask)) THEN
+          deallocate ( rmask )
+        END IF
+        IF (allocated(om_r )) THEN
+          deallocate ( om_r  )
+        END IF
+        IF (allocated(on_r )) THEN
+          deallocate ( on_r  )
+        END IF
+        IF (allocated(rhoG )) THEN
+          deallocate ( rhoG  )
+        END IF
+# endif
       ENDIF
       RETURN
       END SUBROUTINE iceplume_tile
