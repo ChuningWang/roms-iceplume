@@ -341,9 +341,9 @@ ifndef FORT
 endif
 
 ifneq ($(MAKECMDGOALS),clean)
-  include $(COMPILERS)/$(OS)-$(strip $(FORT)).mk
+  MKFILE := $(COMPILERS)/$(OS)-$(strip $(FORT)).mk
+  include $(MKFILE)
 endif
-
 ifdef USE_MPI
  ifdef USE_OpenMP
   $(error You cannot activate USE_MPI and USE_OpenMP at the same time!)
