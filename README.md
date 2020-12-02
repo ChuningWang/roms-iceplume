@@ -19,6 +19,7 @@ To run this test case, set the right path in the build\_roms.bash file and compi
 Cowton, T., Slater, D., Sole, A., Goldberg, D., & Nienow, P. (2015). Modeling the impact of glacial runoff on fjord circulation and submarine melt rate using a new subgrid‐scale parameterization for glacial plumes. Journal of Geophysical Research: Oceans, 120(2), 796-812.
 
 Chuning Wang
+
 chuning@marine.rutgers.edu
 
 ---
@@ -39,4 +40,5 @@ In this new version, the default averaging method is the the first one, which th
 Another improvement is that the spatial averaging calculation now skips land-masked points, and weight the average with respect to each grid size, which aims to serve realistic topography in future applications. Other modifications include but not limited to data broadcasting, tile exchange, etc.
 
 Chuning Wang
+
 2020-11-24
