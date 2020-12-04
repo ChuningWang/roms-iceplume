@@ -42,3 +42,16 @@ Another improvement is that the spatial averaging calculation now skips land-mas
 Chuning Wang
 
 2020-11-24
+
+---
+
+## Ver 1.1.1
+More optimization on the averaging algorithm. Using ROMS internal function *mp_assemble* to substitute *mp_aggregate* in the coupling function. This is to avoid fetching global arrays of density at each timestep. Instead, each tile calculates the weighted SUM, and *mp_assemble* is used to get and broadcast the reduced sum from and to each tile; then the weighted average is calculated using the reduced sum.
+
+Since this is a better scheme over the method introduced in [Ver 1.1.0](##Ver-1.1.0), I decide to remove the temporarily used CPP flag **ICEPLUME_CTIL_AVG**. From now on only the new default averaging method is available.
+
+Other modifications - Previously **ICEPLUME_DET_AVERAGE** averages density profiles on \sigma surfaces. This is based on the assumption that the depth near glacier grounding is somewhat constant, which is fine for idealized simulation. To generalize for realistic applications, in the current version the density profile is averaged on z surfaces. This is realized by linearly interpolating the density profile from each grid.
+
+Chuning Wang
+
+2020-12-03
