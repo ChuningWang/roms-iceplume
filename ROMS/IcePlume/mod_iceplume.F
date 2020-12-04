@@ -45,6 +45,7 @@ MODULE mod_iceplume
 !                                                                      !
 ! detSigma  - detrainment Gaussian profile standard deviation          !
 # ifdef ICEPLUME_DET_AVERAGE
+! avgExp    - logical switch to activate temporal exponential average  !
 ! avgAlpha  - average weight for exponential smoothing (0 to 1)        !
 # endif
 !                                                                      !
@@ -82,6 +83,7 @@ MODULE mod_iceplume
 !
   real(r8), parameter :: detSigma   = 0.5_r8
 # ifdef ICEPLUME_DET_AVERAGE
+  logical :: avgExp
   real(r8), parameter :: avgAlpha   = 1.0_r8
 # endif
 !
@@ -116,6 +118,9 @@ MODULE mod_iceplume
 ! wAm           - vertical velocity parallel to glacier [m s^-1]       !
 ! tpAm          - ambient potential temperature [degC]                 !
 ! rhoAm         - ambient density [kg m^-3]                            !
+# ifdef ICEPLUME_DET_AVERAGE
+! rhoAm0        - ambient density of the previous step [kg m^-3]       !
+# endif
 !                                                                      !
 ! lm            - plume/glacier contact length [m]                     !
 ! lc            - plume/water contact length [m]                       !
@@ -199,6 +204,9 @@ MODULE mod_iceplume
     real(r8), pointer :: wAm(:, :)
     real(r8), pointer :: tpAm(:, :)
     real(r8), pointer :: rhoAm(:, :)
+# ifdef ICEPLUME_DET_AVERAGE
+    real(r8), pointer :: rhoAm0(:, :)
+# endif
 !
 ! Plume shape parameters.
 !
@@ -315,6 +323,10 @@ MODULE mod_iceplume
       allocate( PLUME(ng) % tpAm  (Nsrc(ng), N(ng)  ) )
       allocate( PLUME(ng) % rhoAm (Nsrc(ng), N(ng)+1) )
       Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*7+1,r8)
+# ifdef ICEPLUME_DET_AVERAGE
+      allocate( PLUME(ng) % rhoAm0 (Nsrc(ng), N(ng)+1) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)+1,r8)
+# endif
 !
       allocate( PLUME(ng) % lm (Nsrc(ng), 0:N(ng)) )
       allocate( PLUME(ng) % lc (Nsrc(ng), 0:N(ng)) )
@@ -409,6 +421,12 @@ MODULE mod_iceplume
           PLUME(ng) % rhoAm (is, k) = IniVal
         ENDDO
         PLUME(ng) % rhoAm (is, N(ng)+1) = IniVal
+# ifdef ICEPLUME_DET_AVERAGE
+        DO k=1,N(ng)
+          PLUME(ng) % rhoAm0 (is, k) = IniVal
+        ENDDO
+        PLUME(ng) % rhoAm0 (is, N(ng)+1) = IniVal
+# endif
 !
         DO k=0,N(ng)
           PLUME(ng) % lm (is, k) = IniVal

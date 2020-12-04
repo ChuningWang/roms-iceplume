@@ -66,7 +66,7 @@
       USE mod_iceplume
 # ifdef DISTRIBUTE
 !
-      USE distribute_mod, ONLY : mp_collect, mp_aggregate2d
+      USE distribute_mod, ONLY : mp_collect
 !
       integer :: Ispv
       real(r8) :: Fspv
@@ -81,58 +81,19 @@
       integer :: is, Isrc, Jsrc, Dsrc, D2src
 # ifdef ICEPLUME_DET_AVERAGE
       integer :: i, j
-#  ifdef ICEPLUME_CTIL_AVG
-      integer :: LBi, UBi, LBj, UBj
-      integer :: LBiF, UBiF, LBjF, UBjF
-      real(r8), allocatable :: rmask(:, :), om_r(:, :), on_r(:, :)
-#  endif
 # endif
 !
 # include "set_bounds.h"
 !
-# if defined ICEPLUME_DET_AVERAGE && defined ICEPLUME_CTIL_AVG
+# ifdef ICEPLUME_DET_AVERAGE
 !
-! Aggregate grid and mask data from each tile
+!  Check if use temporal exponential averaging.
 !
-      LBi  = BOUNDS(ng)%LBi(-1)
-      UBi  = BOUNDS(ng)%UBi(-1)
-      LBj  = BOUNDS(ng)%LBj(-1)
-      UBj  = BOUNDS(ng)%UBj(-1)
-      LBiF = BOUNDS(ng)%LBi(tile)
-      UBiF = BOUNDS(ng)%UBi(tile)
-      LBjF = BOUNDS(ng)%LBj(tile)
-      UBjF = BOUNDS(ng)%UBj(tile)
-      IF (.not.allocated(rmask)) THEN
-        allocate ( rmask(LBi:UBi,LBj:UBj) )
+      IF ((0.0_r8 .LT. avgAlpha) .AND. (avgAlpha .LT. 1.0_r8)) THEN
+        avgExp = .TRUE.
+      ELSE
+        avgExp = .FALSE.
       ENDIF
-      IF (.not.allocated(om_r )) THEN
-        allocate ( om_r (LBi:UBi,LBj:UBj) )
-      ENDIF
-      IF (.not.allocated(on_r )) THEN
-        allocate ( on_r (LBi:UBi,LBj:UBj) )
-      END IF
-#  ifdef DISTRIBUTE
-      CALL mp_aggregate2d (ng, iNLM, 2,                                 &
-     &                     LBiF, UBiF, LBjF, UBjF,                      &
-     &                     LBi,  UBi,  LBj,  UBj,                       &
-     &                     GRID(ng) % rmask, rmask)
-      CALL mp_aggregate2d (ng, iNLM, 2,                                 &
-     &                     LBiF, UBiF, LBjF, UBjF,                      &
-     &                     LBi,  UBi,  LBj,  UBj,                       &
-     &                     GRID(ng) % om_r , om_r )
-      CALL mp_aggregate2d (ng, iNLM, 2,                                 &
-     &                     LBiF, UBiF, LBjF, UBjF,                      &
-     &                     LBi,  UBi,  LBj,  UBj,                       &
-     &                     GRID(ng) % on_r , on_r )
-#  else
-      DO j = LBj, UBj
-        DO i = LBi, UBi
-          rmask(i, j) = GRID(ng) % rmask(i, j)
-          om_r (i, j) = GRID(ng) % om_r (i, j)
-          on_r (i, j) = GRID(ng) % on_r (i, j)
-        ENDDO
-      ENDDO
-#  endif
 # endif
       DO is = 1, Nsrc(ng)
         Isrc = SOURCES(ng) % Isrc(is)
@@ -171,7 +132,7 @@
           PLUME(ng) % Jsrc(is) = Jsrc
           PLUME(ng) % dir(is) = REAL(D2src)
 !
-! Get grid dimensions
+!  Get grid dimensions.
 !
           IF (Dsrc .EQ. 0) THEN
             PLUME(ng) % dx(is) = ABS(GRID(ng) % om_r(Isrc, Jsrc))
@@ -181,83 +142,46 @@
             PLUME(ng) % dy(is) = ABS(GRID(ng) % om_r(Isrc, Jsrc))
           ENDIF
 !
-! Assign surface density (air density)
+!  Assign surface density (air density).
 !
           PLUME(ng) % rhoAm(is, N(ng)+1) = rhoAir
+        ENDIF
 # ifdef ICEPLUME_DET_AVERAGE
 !
-! Read in iceplume averaging span
+!  Read in iceplume averaging span.
 !
-          SOURCES(ng) % SGIstr(is) = NINT(SOURCES(ng) % SGIrange(is, 1))
-          SOURCES(ng) % SGIend(is) = NINT(SOURCES(ng) % SGIrange(is, 2))
-          SOURCES(ng) % SGJstr(is) = NINT(SOURCES(ng) % SGJrange(is, 1))
-          SOURCES(ng) % SGJend(is) = NINT(SOURCES(ng) % SGJrange(is, 2))
-#  ifndef ICEPLUME_CTIL_AVG
+        SOURCES(ng) % SGIstr(is) = NINT(SOURCES(ng) % SGIrange(is, 1))
+        SOURCES(ng) % SGIend(is) = NINT(SOURCES(ng) % SGIrange(is, 2))
+        SOURCES(ng) % SGJstr(is) = NINT(SOURCES(ng) % SGJrange(is, 1))
+        SOURCES(ng) % SGJend(is) = NINT(SOURCES(ng) % SGJrange(is, 2))
 !
-! Restrict the averaging area within the target tile
+!  Calculate area of averaging span for averaging algorithm.
 !
-          SOURCES(ng) % SGIstr(is) =                                    &
-     &        MIN(MAX(SOURCES(ng) % SGIstr(is), Istrm2), Iendp2)
-          SOURCES(ng) % SGIend(is) =                                    &
-     &        MIN(MAX(SOURCES(ng) % SGIend(is), Istrm2), Iendp2)
-          SOURCES(ng) % SGJstr(is) =                                    &
-     &        MIN(MAX(SOURCES(ng) % SGJstr(is), Jstrm2), Jendp2)
-          SOURCES(ng) % SGJend(is) =                                    &
-     &        MIN(MAX(SOURCES(ng) % SGJend(is), Jstrm2), Jendp2)
-#  endif
-!
-! Calculate number of average points for averaging algorithm
-!
-          PLUME(ng) % avgArea(is) = 0.0_r8
-          DO i = SOURCES(ng) % SGIstr(is), SOURCES(ng) % SGIend(is)
-            DO j = SOURCES(ng) % SGJstr(is), SOURCES(ng) % SGJend(is)
-#  ifdef ICEPLUME_CTIL_AVG
-              IF (rmask(i, j) .GT. 0.5_r8) THEN
-                PLUME(ng) % avgArea(is) = PLUME(ng) % avgArea(is) +     &
-     &              ABS(om_r(i, j)*on_r(i, j))
-              ENDIF
-#  else
-              IF (GRID(ng) % rmask(i, j) .GT. 0.5_r8) THEN
-                PLUME(ng) % avgArea(is) = PLUME(ng) % avgArea(is) +     &
-     &              ABS(GRID(ng) % om_r(i, j)*GRID(ng) % on_r(i, j))
-              ENDIF
-#  endif
-            ENDDO
+        DO i = SOURCES(ng) % SGIstr(is), SOURCES(ng) % SGIend(is)
+          DO j = SOURCES(ng) % SGJstr(is), SOURCES(ng) % SGJend(is)
+            IF ( ((IstrR .LE. i) .AND. (i .LE. IendR)) .AND.             &
+     &           ((JstrR .LE. j) .AND. (j .LE. JendR)) .AND.             &
+     &           (GRID(ng) % rmask(i, j) .GT. 0.5_r8) ) THEN
+              PLUME(ng) % avgArea(is) = PLUME(ng) % avgArea(is) +       &
+     &            ABS(GRID(ng) % om_r(i, j)*GRID(ng) % on_r(i, j))
+            ENDIF
           ENDDO
+        ENDDO
 # endif
-        ENDIF
       ENDDO
-# if defined ICEPLUME_DET_AVERAGE && defined ICEPLUME_CTIL_AVG
-!
-! Deallocate arrays
-!
-      IF (allocated(rmask)) THEN
-        deallocate ( rmask )
-      END IF
-      IF (allocated(om_r )) THEN
-        deallocate ( om_r  )
-      END IF
-      IF (allocated(on_r )) THEN
-        deallocate ( on_r  )
-      END IF
-# endif
 # ifdef DISTRIBUTE
 !
-!  Exchange data between all parallel nodes
+!  Exchange data between all parallel nodes.
 !
       K = N(ng)+1
-      CALL mp_collect (ng,iNLM,Nsrc(ng),Ispv,PLUME(ng)%Isrc)
-      CALL mp_collect (ng,iNLM,Nsrc(ng),Ispv,PLUME(ng)%Jsrc)
-      CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,PLUME(ng)%dir)
-      CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,PLUME(ng)%dx)
-      CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,PLUME(ng)%dy)
-      CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,PLUME(ng)%rhoAm(:,K))
+      CALL mp_collect (ng,iNLM,Nsrc(ng),Ispv,PLUME(ng)%Isrc(1:Nsrc(ng)))
+      CALL mp_collect (ng,iNLM,Nsrc(ng),Ispv,PLUME(ng)%Jsrc(1:Nsrc(ng)))
+      CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,PLUME(ng)%dir(1:Nsrc(ng)))
+      CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,PLUME(ng)%dx(1:Nsrc(ng)))
+      CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,PLUME(ng)%dy(1:Nsrc(ng)))
 #  ifdef ICEPLUME_DET_AVERAGE
-      CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,PLUME(ng)%avgArea)
-      CALL mp_collect (ng,iNLM,Nsrc(ng),Ispv,SOURCES(ng)%SGIstr)
-      CALL mp_collect (ng,iNLM,Nsrc(ng),Ispv,SOURCES(ng)%SGIend)
-      CALL mp_collect (ng,iNLM,Nsrc(ng),Ispv,SOURCES(ng)%SGJstr)
-      CALL mp_collect (ng,iNLM,Nsrc(ng),Ispv,SOURCES(ng)%SGJend)
+      CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,                           &
+     &                 PLUME(ng)%avgArea(1:Nsrc(ng)))
 #  endif
 # endif
       RETURN
@@ -300,11 +224,11 @@
       USE mod_ocean, ONLY : OCEAN
       USE mod_stepping, ONLY : nstp
       USE mod_sources
-      USE mod_scalars, ONLY : dt, LuvSrc, LwSrc, iic
+      USE mod_scalars, ONLY : dt, iic
       USE mod_iceplume
 # ifdef DISTRIBUTE
 !
-      USE distribute_mod, ONLY : mp_aggregate2d, mp_aggregate3d
+      USE distribute_mod, ONLY : mp_assemble
 !
 # endif
 !
@@ -315,84 +239,32 @@
 !  Local variable declarations.
 !
       integer :: is, K, itrc, Isrc, Jsrc, Dsrc
-      real(r8) :: pr, prRef = 101.d3*1.d-4
+      real(r8), parameter :: prRef = 101.d3*1.d-4
+      real(r8) :: pr, rhoAm
       real(r8) :: dx, dy
       real(r8) :: RHO
 # ifdef ICEPLUME_DET_AVERAGE
-      integer  :: i, j
-      real(r8) :: rhoAm
-#  ifdef ICEPLUME_CTIL_AVG
-      integer :: LBi, UBi, LBj, UBj
-      integer :: LBiF, UBiF, LBjF, UBjF
-      real(r8), allocatable :: rmask(:, :), om_r(:, :), on_r(:, :)
-      real(r8), allocatable :: rhoG(:, :, :)
+      integer :: i, j
+      real(r8) :: area
+      real(r8), parameter :: spv = 0.0_r8
+#  ifdef DISTRIBUTE
+      integer :: Npts
 #  endif
 # endif
 !
 # include "set_bounds.h"
 !
-      IF ((LuvSrc(ng)) .OR. (LwSrc(ng))) THEN
-# if defined ICEPLUME_DET_AVERAGE && defined ICEPLUME_CTIL_AVG
+# if defined ICEPLUME_DET_AVERAGE && defined DISTRIBUTE
 !
-! Aggregate grid, mask and density data from each tile
+!  Initialize arrays to facilitate collective communications.
 !
-        LBi = BOUNDS(ng)%LBi(-1)
-        UBi = BOUNDS(ng)%UBi(-1)
-        LBj = BOUNDS(ng)%LBj(-1)
-        UBj = BOUNDS(ng)%UBj(-1)
-        LBiF= BOUNDS(ng)%LBi(tile)
-        UBiF= BOUNDS(ng)%UBi(tile)
-        LBjF= BOUNDS(ng)%LBj(tile)
-        UBjF= BOUNDS(ng)%UBj(tile)
-        IF (.not.allocated(rmask)) THEN
-          allocate ( rmask(LBi:UBi,LBj:UBj) )
-        ENDIF
-        IF (.not.allocated(om_r )) THEN
-          allocate ( om_r (LBi:UBi,LBj:UBj) )
-        ENDIF
-        IF (.not.allocated(on_r )) THEN
-          allocate ( on_r (LBi:UBi,LBj:UBj) )
-        END IF
-        IF (.not.allocated(rhoG )) THEN
-          allocate ( rhoG (LBi:UBi,LBj:UBj,1:N(ng)) )
-        END IF
-#  ifdef DISTRIBUTE
-      CALL mp_aggregate2d (ng, iNLM, 2,                                 &
-     &                     LBiF, UBiF, LBjF, UBjF,                      &
-     &                     LBi,  UBi,  LBj,  UBj,                       &
-     &                     GRID(ng) % rmask, rmask)
-      CALL mp_aggregate2d (ng, iNLM, 2,                                 &
-     &                     LBiF, UBiF, LBjF, UBjF,                      &
-     &                     LBi,  UBi,  LBj,  UBj,                       &
-     &                     GRID(ng) % om_r , om_r )
-      CALL mp_aggregate2d (ng, iNLM, 2,                                 &
-     &                     LBiF, UBiF, LBjF, UBjF,                      &
-     &                     LBi,  UBi,  LBj,  UBj,                       &
-     &                     GRID(ng) % on_r , on_r )
-      CALL mp_aggregate3d (ng, iNLM, 6,                                 &
-     &                     LBiF, UBiF, LBjF, UBjF,                      &
-     &                     LBi,  UBi,  LBj,  UBj,                       &
-     &                     1,    N(ng),                                 &
-     &                     OCEAN(ng) % rho(:,:,:) , rhoG )
-#  else
-        DO j = LBj, UBj
-          DO i = LBi, UBi
-            rmask(i, j) = GRID(ng) % rmask(i, j)
-            om_r (i, j) = GRID(ng) % om_r (i, j)
-            on_r (i, j) = GRID(ng) % on_r (i, j)
-            DO k = 1, N(ng)
-              rhoG (i, j, K) = ocean(ng) % rho(i,j,K)
-            ENDDO
-            ENDDO
-          ENDDO
-        ENDDO
-#  endif
+      PLUME(ng) % zR = spv
 # endif
-        DO is = 1, Nsrc(ng)
-          Isrc = PLUME(ng) % Isrc(is)
-          Jsrc = PLUME(ng) % Jsrc(is)
-          IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.        &
-     &         ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
+      DO is = 1, Nsrc(ng)
+        Isrc = PLUME(ng) % Isrc(is)
+        Jsrc = PLUME(ng) % Jsrc(is)
+        IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.          &
+     &       ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
 !
 ! ==================================================================!
 !                                                                   !
@@ -400,103 +272,146 @@
 !                                                                   !
 ! ==================================================================!
 !
-            Dsrc = NINT(SOURCES(ng) % Dsrc(is))
+          Dsrc = NINT(SOURCES(ng) % Dsrc(is))
 !
-            DO K = 0, N(ng)
-              PLUME(ng) % zW(is, K) = GRID(ng) % z_w(Isrc, Jsrc, K)
-            ENDDO
+          DO K = 0, N(ng)
+            PLUME(ng) % zW(is, K) = GRID(ng) % z_w(Isrc, Jsrc, K)
+          ENDDO
 !
-            DO K = 1, N(ng)
-              PLUME(ng) % zR(is, K) = GRID(ng) % z_r(Isrc, Jsrc, K)
-              PLUME(ng) % dz(is, K) =                                   &
-     &            PLUME(ng) % zW(is, K) - PLUME(ng) % zW(is, K-1)
+          DO K = 1, N(ng)
+            PLUME(ng) % zR(is, K) = GRID(ng) % z_r(Isrc, Jsrc, K)
+            PLUME(ng) % dz(is, K) =                                     &
+     &          PLUME(ng) % zW(is, K) - PLUME(ng) % zW(is, K-1)
 !
-! temp, salt and density
+!  Temp, salt.
 !
-              PLUME(ng) % sAm(is, K) =                                  &
-     &            OCEAN(ng) % t(Isrc, Jsrc, K, nstp(ng), isalt)
-              PLUME(ng) % tpAm(is, K) =                                 &
-     &            OCEAN(ng) % t(Isrc, Jsrc, K, nstp(ng), itemp)
+            PLUME(ng) % sAm(is, K) =                                    &
+     &          OCEAN(ng) % t(Isrc, Jsrc, K, nstp(ng), isalt)
+            PLUME(ng) % tpAm(is, K) =                                   &
+     &          OCEAN(ng) % t(Isrc, Jsrc, K, nstp(ng), itemp)
+# ifndef ICEPLUME_DET_AVERAGE
 !
-! convert potential temp to in-situ temp
+!  Density.
 !
-              pr = prRef+(ABS(PLUME(ng) % zR(is, K))*rhoRef*g)*1.d-4
-              CALL SW_TEMP(PLUME(ng) % sAm(is, K),                      &
-     &                     PLUME(ng) % tpAm(is, K),                     &
-     &                     pr, prRef, PLUME(ng) % tAm(is, K))
-!
-! tracers
-!
-              DO itrc = 1, NT(ng)
-                PLUME(ng) % trcAm(is, K, itrc) =                        &
-     &              OCEAN(ng) % t(Isrc, Jsrc, K, nstp(ng), itrc)
-              ENDDO
-!
-! u/v, w
-!
-              IF (Dsrc .EQ. 0) THEN
-                PLUME(ng) % vAm(is, K) = 0.5_r8 * (                     &
-     &              OCEAN(ng) % v(Isrc  , Jsrc, K, nstp(ng)) +          &
-     &              OCEAN(ng) % v(Isrc+1, Jsrc, K, nstp(ng)) )
-              ELSEIF (Dsrc .EQ. 1) THEN
-                PLUME(ng) % vAm(is, K) = 0.5_r8 * (                     &
-     &              OCEAN(ng) % u(Isrc, Jsrc  , K, nstp(ng)) +          &
-     &              OCEAN(ng) % u(Isrc, Jsrc+1, K, nstp(ng)) )
-              ENDIF
-              PLUME(ng) % wAm(is, K) = 0.5_r8 * (                       &
-     &            OCEAN(ng) % wvel(Isrc, Jsrc, K-1) +                   &
-     &            OCEAN(ng) % wvel(Isrc, Jsrc, K  ) )
-            ENDDO
-!
-! Calculate rho-layer depth, thickness, and ambient density
-!
-            DO K = 1, N(ng)
-# ifdef ICEPLUME_DET_AVERAGE
-!
-! Average density profiles in a box to surpress some oscillation
-!
-              rhoAm = 0.0_r8
-              DO i = SOURCES(ng)%SGIstr(is), SOURCES(ng)%SGIend(is)
-                DO j = SOURCES(ng)%SGJstr(is), SOURCES(ng)%SGJend(is)
-#  ifdef ICEPLUME_CTIL_AVG
-                  IF (rmask(i, j) .GT. 0.5_r8) THEN
-                    rhoAm = rhoAm + rhoG(i,j,K)*ABS(om_r(i,j)*on_r(i,j))
-                  ENDIF
-#  else
-                  IF (GRID(ng) % rmask(i, j) .GT. 0.5_r8) THEN
-                    rhoAm = rhoAm + OCEAN(ng) % rho(i, j, K)*           &
-     &                  ABS(GRID(ng)%om_r(i,j)*GRID(ng)%on_r(i,j))
-                  ENDIF
-#  endif
-                ENDDO
-              ENDDO
-              rhoAm = rhoAm / PLUME(ng) % avgArea(is)
-!
-! Convert from density anomaly to absolute density.
-!
-              rhoAm = rhoAm + 1000.0_r8
-              IF (iic(ng) .EQ. ntstart(ng)) THEN
-                PLUME(ng) % rhoAm(is, K) = rhoAm
-              ELSE
-                PLUME(ng) % rhoAm(is, K) =                              &
-     &              PLUME(ng) % rhoAm(is, K)*(1.0-avgAlpha) +           &
-     &              rhoAm                   *avgAlpha
-              ENDIF
-# else
-              PLUME(ng) % rhoAm(is, K) = OCEAN(ng) % rho(Isrc, Jsrc, K)
+            PLUME(ng) % rhoAm(is, K) = OCEAN(ng) % rho(Isrc, Jsrc, K)
 # endif
-            ENDDO
 !
-! Discharge tracer concentration
+!  Convert potential temp to in-situ temp.
+!
+            pr = prRef+(ABS(PLUME(ng) % zR(is, K))*rhoRef*g)*1.d-4
+            CALL SW_TEMP(PLUME(ng) % sAm(is, K),                        &
+     &                   PLUME(ng) % tpAm(is, K),                       &
+     &                   pr, prRef, PLUME(ng) % tAm(is, K))
+!
+!  Tracers.
 !
             DO itrc = 1, NT(ng)
-# ifdef ICEPLUME_TRACER
-              PLUME(ng) % trcIni(is, itrc) =                            &
-     &            SOURCES(ng) % SGtrc(is, itrc)
-# else
-              PLUME(ng) % trcIni(is, itrc) = 0.0_r8
-# endif
+              PLUME(ng) % trcAm(is, K, itrc) =                          &
+     &            OCEAN(ng) % t(Isrc, Jsrc, K, nstp(ng), itrc)
             ENDDO
+!
+!  U/V, W.
+!
+            IF (Dsrc .EQ. 0) THEN
+              PLUME(ng) % vAm(is, K) = 0.5_r8 * (                       &
+     &            OCEAN(ng) % v(Isrc  , Jsrc, K, nstp(ng)) +            &
+     &            OCEAN(ng) % v(Isrc+1, Jsrc, K, nstp(ng)) )
+            ELSEIF (Dsrc .EQ. 1) THEN
+              PLUME(ng) % vAm(is, K) = 0.5_r8 * (                       &
+     &            OCEAN(ng) % u(Isrc, Jsrc  , K, nstp(ng)) +            &
+     &            OCEAN(ng) % u(Isrc, Jsrc+1, K, nstp(ng)) )
+            ENDIF
+            PLUME(ng) % wAm(is, K) = 0.5_r8 * (                         &
+     &          OCEAN(ng) % wvel(Isrc, Jsrc, K-1) +                     &
+     &          OCEAN(ng) % wvel(Isrc, Jsrc, K  ) )
+          ENDDO
+!
+!  Discharge tracer concentration.
+!
+          DO itrc = 1, NT(ng)
+# ifdef ICEPLUME_TRACER
+            PLUME(ng) % trcIni(is, itrc) = SOURCES(ng) % SGtrc(is, itrc)
+# else
+            PLUME(ng) % trcIni(is, itrc) = 0.0_r8
+# endif
+          ENDDO
+# ifdef ICEPLUME_DET_AVERAGE
+        ENDIF
+      ENDDO
+#  ifdef DISTRIBUTE
+!
+!  Exchange data between all parallel nodes.
+!
+      Npts = Nsrc(ng)*N(ng)
+      CALL mp_assemble (ng, iNLM, Npts, spv,                            &
+     &                  PLUME(ng) % zR(1:Nsrc(ng), 1:N(ng)))
+#  endif
+!
+!  Average density profiles in a box to surpress oscillation.
+!
+      DO is = 1, Nsrc(ng)
+        DO K = 1, N(ng)
+          PLUME(ng) % rhoAm0(is, K) = PLUME(ng) % rhoAm(is, K)
+          PLUME(ng) % rhoAm(is, K) = spv
+        ENDDO
+        DO i = SOURCES(ng)%SGIstr(is), SOURCES(ng)%SGIend(is)
+          DO j = SOURCES(ng)%SGJstr(is), SOURCES(ng)%SGJend(is)
+            IF ( ((IstrR .LE. i) .AND. (i .LE. IendR)) .AND.             &
+     &           ((JstrR .LE. j) .AND. (j .LE. JendR)) .AND.             &
+     &           (GRID(ng) % rmask(i, j) .GT. 0.5_r8) ) THEN
+              area = ABS(GRID(ng)%om_r(i,j)*GRID(ng)%on_r(i,j))
+              DO K = 1, N(ng)
+                CALL LININT(N(ng),                                      &
+     &            GRID(ng) % z_r(i, j, :), OCEAN(ng) % rho(i, j, :),    &
+     &            PLUME(ng) % zR(is, K),   rhoAm)
+                PLUME(ng) % rhoAm(is, K) = PLUME(ng) % rhoAm(is, K) +   &
+     &            rhoAm*area
+              ENDDO
+            ENDIF
+          ENDDO
+        ENDDO
+      ENDDO
+#  ifdef DISTRIBUTE
+!
+!  Exchange data between all parallel nodes.
+!
+      CALL mp_assemble (ng, iNLM, Npts, spv,                            &
+     &                  PLUME(ng) % rhoAm(1:Nsrc(ng), 1:N(ng)))
+#  endif
+!
+      DO is = 1, Nsrc(ng)
+        Isrc = PLUME(ng) % Isrc(is)
+        Jsrc = PLUME(ng) % Jsrc(is)
+        IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.          &
+     &       ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
+          DO K = 1, N(ng)
+            PLUME(ng) % rhoAm(is, K) =                                  &
+     &        PLUME(ng) % rhoAm(is, K) / PLUME(ng) % avgArea(is)
+!
+!  Convert from density anomaly to absolute density.
+!
+            PLUME(ng) % rhoAm(is, K) =                                  &
+     &        PLUME(ng) % rhoAm(is, K)+1000.0_r8
+!
+!  Exponentially average over time.
+!
+            IF ( (avgExp) ) THEN
+              IF ( iic(ng) .GT. ntstart(ng) ) THEN
+                PLUME(ng) % rhoAm(is, K) =                              &
+     &            PLUME(ng) % rhoAm0(is, K)*(1.0-avgAlpha) +            &
+     &            PLUME(ng) % rhoAm(is, K) *avgAlpha
+               ENDIF
+            ENDIF
+          ENDDO
+        ENDIF
+      ENDDO
+!
+      DO is = 1, Nsrc(ng)
+        Isrc = PLUME(ng) % Isrc(is)
+        Jsrc = PLUME(ng) % Jsrc(is)
+        IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.          &
+     &       ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
+# endif
 !
 ! ==================================================================!
 !                                                                   !
@@ -504,35 +419,17 @@
 !                                                                   !
 ! ==================================================================!
 !
-            IF (NINT(SOURCES(ng) % SGtyp(is)) .NE. 0) THEN
-              CALL iceplume_calc(ng, is,                                &
-     &                           ABS(SOURCES(ng) % SGbar(is)),          &
-     &                           SOURCES(ng) % SGtrc(is, itemp),        &
-     &                           SOURCES(ng) % SGtrc(is, isalt),        &
-     &                           NINT(SOURCES(ng) % SGtyp(is)),         &
-     &                           SOURCES(ng) % SGdep(is),               &
-     &                           SOURCES(ng) % SGlen(is))
-            ENDIF
+          IF (NINT(SOURCES(ng) % SGtyp(is)) .NE. 0) THEN
+            CALL iceplume_calc(ng, is,                                  &
+     &                         ABS(SOURCES(ng) % SGbar(is)),            &
+     &                         SOURCES(ng) % SGtrc(is, itemp),          &
+     &                         SOURCES(ng) % SGtrc(is, isalt),          &
+     &                         NINT(SOURCES(ng) % SGtyp(is)),           &
+     &                         SOURCES(ng) % SGdep(is),                 &
+     &                         SOURCES(ng) % SGlen(is))
           ENDIF
-        ENDDO
-# if defined ICEPLUME_DET_AVERAGE && defined ICEPLUME_CTIL_AVG
-!
-! Deallocate arrays
-!
-        IF (allocated(rmask)) THEN
-          deallocate ( rmask )
-        END IF
-        IF (allocated(om_r )) THEN
-          deallocate ( om_r  )
-        END IF
-        IF (allocated(on_r )) THEN
-          deallocate ( on_r  )
-        END IF
-        IF (allocated(rhoG )) THEN
-          deallocate ( rhoG  )
-        END IF
-# endif
-      ENDIF
+        ENDIF
+      ENDDO
       RETURN
       END SUBROUTINE iceplume_tile
 # ifdef ICEPLUME_SPREAD
@@ -573,7 +470,6 @@
 !
       USE mod_ocean, ONLY : OCEAN
       USE mod_stepping, ONLY : nstp
-      USE mod_scalars, ONLY : LuvSrc, LwSrc
       USE mod_sources
       USE mod_iceplume
 !
@@ -589,88 +485,87 @@
 !
 # include "set_bounds.h"
 !
-      IF ((LuvSrc(ng)) .OR. (LwSrc(ng))) THEN
-        is  = 2
-        Isrc = PLUME(ng) % Isrc(is)
-        Jsrc = PLUME(ng) % Jsrc(is)
-        IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.          &
-     &       ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
-          is0 = is-1
-          is1 = is+1
-          cff = PLUME(ng) % trs(is)/3.0_r8
-          PLUME(ng) % trs(is0) = cff
-          PLUME(ng) % trs(is1) = cff
-          PLUME(ng) % trs(is ) = cff
-          DO K = 1, N(ng)
-            cff = PLUME(ng) % ent(is, K)/3.0_r8
-            PLUME(ng) % ent(is0, K) = cff
-            PLUME(ng) % ent(is1, K) = cff
-            PLUME(ng) % ent(is , K) = cff
+      is  = 2
+      Isrc = PLUME(ng) % Isrc(is)
+      Jsrc = PLUME(ng) % Jsrc(is)
+      IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.            &
+     &     ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
+        is0 = is-1
+        is1 = is+1
+        cff = PLUME(ng) % trs(is)/3.0_r8
+        PLUME(ng) % trs(is0) = cff
+        PLUME(ng) % trs(is1) = cff
+        PLUME(ng) % trs(is ) = cff
+        DO K = 1, N(ng)
+          cff = PLUME(ng) % ent(is, K)/3.0_r8
+          PLUME(ng) % ent(is0, K) = cff
+          PLUME(ng) % ent(is1, K) = cff
+          PLUME(ng) % ent(is , K) = cff
 !
-            cff = PLUME(ng) % det(is, K)/3.0_r8
-            PLUME(ng) % det(is0, K) = cff
-            PLUME(ng) % det(is1, K) = cff
-            PLUME(ng) % det(is , K) = cff
+          cff = PLUME(ng) % det(is, K)/3.0_r8
+          PLUME(ng) % det(is0, K) = cff
+          PLUME(ng) % det(is1, K) = cff
+          PLUME(ng) % det(is , K) = cff
 !
-            cff = PLUME(ng) % m(is, K)/3.0_r8
-            PLUME(ng) % m(is0, K) = cff
-            PLUME(ng) % m(is1, K) = cff
-            PLUME(ng) % m(is , K) = cff
-          ENDDO
+          cff = PLUME(ng) % m(is, K)/3.0_r8
+          PLUME(ng) % m(is0, K) = cff
+          PLUME(ng) % m(is1, K) = cff
+          PLUME(ng) % m(is , K) = cff
+        ENDDO
 !
-! Tracers
+!  Tracers.
 !
-          fIni = ABS(SOURCES(ng) % SGbar(is))/3.0_r8
-          DO itrc = 1, NT(ng)
-            trcIni = PLUME(ng) % trcIni(is, itrc)
-            IF (itrc .EQ. isalt) THEN
-              trcM = sIce
-            ELSEIF (itrc .EQ. itemp) THEN
-              trcM = tGade
-            ELSE
-              trcM = 0.0_r8
-            ENDIF
+        fIni = ABS(SOURCES(ng) % SGbar(is))/3.0_r8
+        DO itrc = 1, NT(ng)
+          trcIni = PLUME(ng) % trcIni(is, itrc)
+          IF (itrc .EQ. isalt) THEN
+            trcM = sIce
+          ELSEIF (itrc .EQ. itemp) THEN
+            trcM = tGade
+          ELSE
+            trcM = 0.0_r8
+          ENDIF
 # ifdef ICEPLUME_MELT_TRACER
-            IF (itrc .EQ. NT(ng)-1) THEN
-              trcIni = 0.0_r8
-              trcM   = PLUME(ng) % trcIni(is, itrc)
-            ELSEIF (itrc .EQ. NT(ng)) THEN
-              trcIni = 0.0_r8
-              trcM   = 0.0_r8
-            ENDIF
+          IF (itrc .EQ. NT(ng)-1) THEN
+            trcIni = 0.0_r8
+            trcM   = PLUME(ng) % trcIni(is, itrc)
+          ELSEIF (itrc .EQ. NT(ng)) THEN
+            trcIni = 0.0_r8
+            trcM   = 0.0_r8
+          ENDIF
 # endif
-            cff  = fIni
-            cff1 = fIni*trcIni
-            DO K = 1, N(ng)
-              cff  = cff -PLUME(ng) % ent(is, K)+PLUME(ng) % m(is, K)
-              cff1 = cff1-                                              &
-     &          PLUME(ng) % ent(is, K)*PLUME(ng) % trcAm(is, K, itrc)+  &
-     &          PLUME(ng) % m(is, K)*trcM
-            ENDDO
-            PLUME(ng) % trc(is, itrc) = cff1/cff
-!
-            cff  = fIni
-            cff1 = fIni*trcIni
-            DO K = 1, N(ng)
-              cff  = cff -PLUME(ng) % ent(is0, K)+PLUME(ng) % m(is0, K)
-              cff1 = cff1-                                              &
-     &          PLUME(ng) % ent(is0, K)*PLUME(ng) % trcAm(is0, K, itrc)+&
-     &          PLUME(ng) % m(is0, K)*trcM
-            ENDDO
-            PLUME(ng) % trc(is1, itrc) = cff1/cff
-!
-            cff  = fIni
-            cff1 = fIni*trcIni
-            DO K = 1, N(ng)
-              cff  = cff -PLUME(ng) % ent(is1, K)+PLUME(ng) % m(is1, K)
-              cff1 = cff1-                                              &
-     &          PLUME(ng) % ent(is1, K)*PLUME(ng) % trcAm(is1, K, itrc)+&
-     &          PLUME(ng) % m(is1, K)*trcM
-            ENDDO
-            PLUME(ng) % trc(is1, itrc) = cff1/cff
+          cff  = fIni
+          cff1 = fIni*trcIni
+          DO K = 1, N(ng)
+            cff  = cff -PLUME(ng) % ent(is, K)+PLUME(ng) % m(is, K)
+            cff1 = cff1-                                                &
+     &        PLUME(ng) % ent(is, K)*PLUME(ng) % trcAm(is, K, itrc)+    &
+     &        PLUME(ng) % m(is, K)*trcM
           ENDDO
-        ENDIF
+          PLUME(ng) % trc(is, itrc) = cff1/cff
+!
+          cff  = fIni
+          cff1 = fIni*trcIni
+          DO K = 1, N(ng)
+            cff  = cff -PLUME(ng) % ent(is0, K)+PLUME(ng) % m(is0, K)
+            cff1 = cff1-                                                &
+     &        PLUME(ng) % ent(is0, K)*PLUME(ng) % trcAm(is0, K, itrc)+  &
+     &        PLUME(ng) % m(is0, K)*trcM
+          ENDDO
+          PLUME(ng) % trc(is1, itrc) = cff1/cff
+!
+          cff  = fIni
+          cff1 = fIni*trcIni
+          DO K = 1, N(ng)
+            cff  = cff -PLUME(ng) % ent(is1, K)+PLUME(ng) % m(is1, K)
+            cff1 = cff1-                                                &
+     &        PLUME(ng) % ent(is1, K)*PLUME(ng) % trcAm(is1, K, itrc)+  &
+     &        PLUME(ng) % m(is1, K)*trcM
+          ENDDO
+          PLUME(ng) % trc(is1, itrc) = cff1/cff
+        ENDDO
       ENDIF
+      RETURN
       END SUBROUTINE iceplume_spread_tile
 # endif
 # ifdef ICEPLUME_MIX
@@ -712,7 +607,7 @@
       USE mod_ocean, ONLY : OCEAN
       USE mod_stepping, ONLY : nstp, kstp
       USE mod_sources
-      USE mod_scalars, ONLY : dt, LuvSrc, LwSrc, Vtransform, hc, SCALARS
+      USE mod_scalars, ONLY : dt, Vtransform, hc, SCALARS
       USE mod_iceplume
 !
 !  Imported variable declarations.
@@ -734,12 +629,11 @@
 !
 # include "set_bounds.h"
 !
-      IF ((LuvSrc(ng)) .OR. (LwSrc(ng))) THEN
-        DO is = 1, Nsrc(ng)
-          Isrc = PLUME(ng) % Isrc(is)
-          Jsrc = PLUME(ng) % Jsrc(is)
-          IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.        &
-     &         ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
+      DO is = 1, Nsrc(ng)
+        Isrc = PLUME(ng) % Isrc(is)
+        Jsrc = PLUME(ng) % Jsrc(is)
+        IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.          &
+     &       ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
 #  ifdef ICEPLUME_SLOPE
 !
 ! ==================================================================!
@@ -748,21 +642,21 @@
 !                                                                   !
 ! ==================================================================!
 !
-            cff = COS(pi*SOURCES(ng) % SGang(is)/180.0_r8)
+          cff = COS(pi*SOURCES(ng) % SGang(is)/180.0_r8)
 #  else
-            cff = 0.0_r8
+          cff = 0.0_r8
 #  endif
-            cff1 = 1.0_r8 - cff
-            PLUME(ng) % trsW(is) = PLUME(ng) % trs(is)*cff1
-            PLUME(ng) % trs(is)  = PLUME(ng) % trs(is)*cff
-            DO K = 1, N(ng)
-              PLUME(ng) % entW(is, K) = PLUME(ng) % ent(is, K)*cff1
-              PLUME(ng) % detW(is, K) = PLUME(ng) % det(is, K)*cff1
-              PLUME(ng) % mBW(is, K)  = PLUME(ng) % mB(is, K)*cff1
-              PLUME(ng) % ent(is, K)  = PLUME(ng) % ent(is, K)*cff
-              PLUME(ng) % det(is, K)  = PLUME(ng) % det(is, K)*cff
-              PLUME(ng) % mB(is, K)   = PLUME(ng) % mB(is, K)*cff
-            ENDDO
+          cff1 = 1.0_r8 - cff
+          PLUME(ng) % trsW(is) = PLUME(ng) % trs(is)*cff1
+          PLUME(ng) % trs(is)  = PLUME(ng) % trs(is)*cff
+          DO K = 1, N(ng)
+            PLUME(ng) % entW(is, K) = PLUME(ng) % ent(is, K)*cff1
+            PLUME(ng) % detW(is, K) = PLUME(ng) % det(is, K)*cff1
+            PLUME(ng) % mBW(is, K)  = PLUME(ng) % mB(is, K)*cff1
+            PLUME(ng) % ent(is, K)  = PLUME(ng) % ent(is, K)*cff
+            PLUME(ng) % det(is, K)  = PLUME(ng) % det(is, K)*cff
+            PLUME(ng) % mB(is, K)   = PLUME(ng) % mB(is, K)*cff
+          ENDDO
 !
 ! ==================================================================!
 !                                                                   !
@@ -772,134 +666,133 @@
 !
 ! Calculate new box vertical boundary.
 !
-            area = PLUME(ng) % dx(is)*PLUME(ng) % dy(is)
-            PLUME(ng) % zLNew(is, 0) = PLUME(ng) % zW(is, 0)
-            DO K = 1, N(ng)
-              PLUME(ng) % dzNew(is, K) = PLUME(ng) % dz(is, K) +        &
-     &                   (PLUME(ng) % detW(is, K) +                     &
-     &                    PLUME(ng) % entW(is, K) +                     &
-     &                    PLUME(ng) % mBW(is, K))*dt(ng)/area
-              PLUME(ng) % zLNew(is, K) =                                &
-     &            PLUME(ng) % zLNew(is, K-1) +                          &
-     &            PLUME(ng) % dzNew(is, K)
-            ENDDO
+          area = PLUME(ng) % dx(is)*PLUME(ng) % dy(is)
+          PLUME(ng) % zLNew(is, 0) = PLUME(ng) % zW(is, 0)
+          DO K = 1, N(ng)
+            PLUME(ng) % dzNew(is, K) = PLUME(ng) % dz(is, K) +          &
+     &                 (PLUME(ng) % detW(is, K) +                       &
+     &                  PLUME(ng) % entW(is, K) +                       &
+     &                  PLUME(ng) % mBW(is, K))*dt(ng)/area
+            PLUME(ng) % zLNew(is, K) =                                  &
+     &          PLUME(ng) % zLNew(is, K-1) +                            &
+     &          PLUME(ng) % dzNew(is, K)
+          ENDDO
 !
-! Calculate tracer concentration.
+!  Calculate tracer concentration.
 !
-            DO K = 1, N(ng)
-              cff  = area*PLUME(ng) % dz(is, K)
-              cff1 = (PLUME(ng) % detW(is, K) +                         &
-     &                PLUME(ng) % entW(is, K) +                         &
-     &                PLUME(ng) % mBW(is, K))*dt(ng)
-              DO itrc = 1, NT(ng)
-                cff2 = (PLUME(ng) % detW(is, K)*                        &
+          DO K = 1, N(ng)
+            cff  = area*PLUME(ng) % dz(is, K)
+            cff1 = (PLUME(ng) % detW(is, K) +                           &
+     &              PLUME(ng) % entW(is, K) +                           &
+     &              PLUME(ng) % mBW(is, K))*dt(ng)
+            DO itrc = 1, NT(ng)
+              cff2 = (PLUME(ng) % detW(is, K)*                          &
 #  ifdef ICEPLUME_DET_NEUTRAL
-     &                  PLUME(ng) % detTrc(is, K, itrc)+                &
+     &                PLUME(ng) % detTrc(is, K, itrc)+                  &
 #  else
-     &                  PLUME(ng) % trc(is, itrc)+                      &
+     &                PLUME(ng) % trc(is, itrc)+                        &
 #  endif
-     &                  PLUME(ng) % entW(is, K)*                        &
-     &                  PLUME(ng) % trcAm(is, K, itrc)+                 &
-     &                  PLUME(ng) % mBW(is, K)*                         &
-     &                  PLUME(ng) % trcB(is, itrc))*dt(ng)
-                PLUME(ng) % trcL(is, K, itrc) =                         &
-     &              (PLUME(ng) % trcAm(is, K, itrc)*cff + cff2) /       &
-     &              (cff + cff1)
-              ENDDO
+     &                PLUME(ng) % entW(is, K)*                          &
+     &                PLUME(ng) % trcAm(is, K, itrc)+                   &
+     &                PLUME(ng) % mBW(is, K)*                           &
+     &                PLUME(ng) % trcB(is, itrc))*dt(ng)
+              PLUME(ng) % trcL(is, K, itrc) =                           &
+     &            (PLUME(ng) % trcAm(is, K, itrc)*cff + cff2) /         &
+     &            (cff + cff1)
             ENDDO
+          ENDDO
 !
-! Calculate new W-point location. This section is copied from set_depth.
+!  Calculate new W-point location. This is copied from set_depth.
 !
-            cff = OCEAN(ng) % zeta(Isrc, Jsrc, kstp(ng))+               &
-     &            PLUME(ng)%trsW(is)*dt(ng)/area
+          cff = OCEAN(ng) % zeta(Isrc, Jsrc, kstp(ng))+                 &
+     &          PLUME(ng)%trsW(is)*dt(ng)/area
 !
-            IF (Vtransform(ng).eq.3) THEN
-              vert_s0 = 90./120.
-              vert_n1 = 2./3. !3./5.
-              vert_h0 = 60./(vert_s0)**(vert_n1)
-              vert_a = 1./(vert_s0-1)
-            END IF
+          IF (Vtransform(ng).eq.3) THEN
+            vert_s0 = 90./120.
+            vert_n1 = 2./3. !3./5.
+            vert_h0 = 60./(vert_s0)**(vert_n1)
+            vert_a = 1./(vert_s0-1)
+          END IF
 !
-            PLUME(ng) % zWNew(is, 0) = PLUME(ng) % zW(is, 0)
-            hwater = GRID(ng) % h(Isrc, Jsrc)
-            IF (Vtransform(ng).eq.1) THEN
-              hinv = 1.0_r8/hwater
-              DO k=1,N(ng)
-                cff_w=hc(ng)*(SCALARS(ng)%sc_w(k)-SCALARS(ng)%Cs_w(k))
-                cff1_w=SCALARS(ng)%Cs_w(k)
+          PLUME(ng) % zWNew(is, 0) = PLUME(ng) % zW(is, 0)
+          hwater = GRID(ng) % h(Isrc, Jsrc)
+          IF (Vtransform(ng).eq.1) THEN
+            hinv = 1.0_r8/hwater
+            DO k=1,N(ng)
+              cff_w=hc(ng)*(SCALARS(ng)%sc_w(k)-SCALARS(ng)%Cs_w(k))
+              cff1_w=SCALARS(ng)%Cs_w(k)
+              z_w0=cff_w+cff1_w*hwater
+              PLUME(ng) % zWNew(is, k)=z_w0+cff*(1.0_r8+z_w0*hinv)
+            ENDDO
+          ELSE IF (Vtransform(ng).eq.3) THEN
+            hinv=1.0_r8/hwater
+            hh2=(min(vert_h0,hwater))*hinv
+            DO k=1,N(ng)
+              IF (SCALARS(ng)%sc_w(k).gt.-vert_s0) THEN 
+                C2_w=-hh2*(-SCALARS(ng)%sc_w(k))**(vert_n1) 
+                cff_w=hc(ng)*(SCALARS(ng)%sc_w(k)-C2_w)
+                cff1_w=C2_w
                 z_w0=cff_w+cff1_w*hwater
                 PLUME(ng) % zWNew(is, k)=z_w0+cff*(1.0_r8+z_w0*hinv)
-              ENDDO
-            ELSE IF (Vtransform(ng).eq.3) THEN
-              hinv=1.0_r8/hwater
-              hh2=(min(vert_h0,hwater))*hinv
-              DO k=1,N(ng)
-                IF (SCALARS(ng)%sc_w(k).gt.-vert_s0) THEN 
-                  C2_w=-hh2*(-SCALARS(ng)%sc_w(k))**(vert_n1) 
-                  cff_w=hc(ng)*(SCALARS(ng)%sc_w(k)-C2_w)
-                  cff1_w=C2_w
-                  z_w0=cff_w+cff1_w*hwater
-                  PLUME(ng) % zWNew(is, k)=z_w0+cff*(1.0_r8+z_w0*hinv)
-                ELSE
-                  C2_w=-hh2*(-SCALARS(ng)%sc_w(k))**(vert_n1)           &
-     &              -(1-hh2)*(vert_a*(SCALARS(ng)%sc_w(k)+vert_s0))**2
-                  cff_w=hc(ng)*(SCALARS(ng)%sc_w(k)-C2_w)
-                  cff1_w=C2_w
-                  PLUME(ng) % zWNew(is, k)=z_w0+cff*(1.0_r8+z_w0*hinv)
-                ENDIF
-              ENDDO
-            ELSE IF (Vtransform(ng).eq.2) THEN
-              hinv=1.0_r8/(hc(ng)+hwater)
-              DO k=1,N(ng)
-                cff_w=hc(ng)*SCALARS(ng)%sc_w(k)
-                cff1_w=SCALARS(ng)%Cs_w(k)
-                cff2_w=(cff_w+cff1_w*hwater)*hinv
-                PLUME(ng) % zWNew(is, k)=cff+(cff+hwater)*cff2_w
-              ENDDO
-            ENDIF
-!
-! Calculate weight function.
-!
-            DO K = 1, N(ng)
-              cff = PLUME(ng) % zWNew(is, K) -                          &
-     &              PLUME(ng) % zWNew(is, K-1)
-              DO K2 = 1, N(ng)
-                cff1 = PLUME(ng) % zWNew(is, K) -                       &
-     &                 PLUME(ng) % zLNew(is, K2)
-                cff1 = MIN(MAX(cff1, 0.0_r8), cff)
-                cff2 = PLUME(ng) % zWNew(is, K-1) -                     &
-     &                 PLUME(ng) % zLNew(is, K2-1)
-                cff2 = MIN(-MIN(cff2, 0.0_r8), cff)
-                PLUME(ng) % dzWei(is, K2) = (cff-cff1-cff2)/cff
-              ENDDO
-              DO itrc = 1, NT(ng)
-                PLUME(ng) % trcNew(is, K, itrc) = 0.0_r8
-                DO K2 = 1, N(ng)
-                  PLUME(ng) % trcNew(is, K, itrc) =                     &
-     &                PLUME(ng) % trcNew(is, K, itrc) +                 &
-     &                PLUME(ng) % dzWei(is, K2)*                        &
-     &                PLUME(ng) % trcL(is, K2, itrc)
-                ENDDO
-              ENDDO
+              ELSE
+                C2_w=-hh2*(-SCALARS(ng)%sc_w(k))**(vert_n1)             &
+     &            -(1-hh2)*(vert_a*(SCALARS(ng)%sc_w(k)+vert_s0))**2
+                cff_w=hc(ng)*(SCALARS(ng)%sc_w(k)-C2_w)
+                cff1_w=C2_w
+                PLUME(ng) % zWNew(is, k)=z_w0+cff*(1.0_r8+z_w0*hinv)
+              ENDIF
             ENDDO
-!
-! Substitute new zeta values (2-D field) back to OCEAN.
-!
-            OCEAN(ng) % zeta(Isrc, Jsrc, kstp(ng)) =                    &
-     &        OCEAN(ng) % zeta(Isrc, Jsrc, kstp(ng))+                   &
-     &        PLUME(ng)%trsW(is)*dt(ng)/area
-!
-! Substitute new tracer values (3-D field) back to OCEAN.
-!
-            DO K = 1, N(ng)
-              DO itrc = 1, NT(ng)
-                OCEAN(ng) % t(Isrc, Jsrc, K, nstp(ng), itrc) =          &
-     &              PLUME(ng) % trcNew(is, K, itrc)
-              ENDDO
+          ELSE IF (Vtransform(ng).eq.2) THEN
+            hinv=1.0_r8/(hc(ng)+hwater)
+            DO k=1,N(ng)
+              cff_w=hc(ng)*SCALARS(ng)%sc_w(k)
+              cff1_w=SCALARS(ng)%Cs_w(k)
+              cff2_w=(cff_w+cff1_w*hwater)*hinv
+              PLUME(ng) % zWNew(is, k)=cff+(cff+hwater)*cff2_w
             ENDDO
           ENDIF
-        ENDDO
-      ENDIF
+!
+!  Calculate weight function.
+!
+          DO K = 1, N(ng)
+            cff = PLUME(ng) % zWNew(is, K) -                            &
+     &            PLUME(ng) % zWNew(is, K-1)
+            DO K2 = 1, N(ng)
+              cff1 = PLUME(ng) % zWNew(is, K) -                         &
+     &               PLUME(ng) % zLNew(is, K2)
+              cff1 = MIN(MAX(cff1, 0.0_r8), cff)
+              cff2 = PLUME(ng) % zWNew(is, K-1) -                       &
+     &               PLUME(ng) % zLNew(is, K2-1)
+              cff2 = MIN(-MIN(cff2, 0.0_r8), cff)
+              PLUME(ng) % dzWei(is, K2) = (cff-cff1-cff2)/cff
+            ENDDO
+            DO itrc = 1, NT(ng)
+              PLUME(ng) % trcNew(is, K, itrc) = 0.0_r8
+              DO K2 = 1, N(ng)
+                PLUME(ng) % trcNew(is, K, itrc) =                       &
+     &              PLUME(ng) % trcNew(is, K, itrc) +                   &
+     &              PLUME(ng) % dzWei(is, K2)*                          &
+     &              PLUME(ng) % trcL(is, K2, itrc)
+              ENDDO
+            ENDDO
+          ENDDO
+!
+!  Substitute new zeta values (2-D field) back to OCEAN.
+!
+          OCEAN(ng) % zeta(Isrc, Jsrc, kstp(ng)) =                      &
+     &      OCEAN(ng) % zeta(Isrc, Jsrc, kstp(ng))+                     &
+     &      PLUME(ng)%trsW(is)*dt(ng)/area
+!
+!  Substitute new tracer values (3-D field) back to OCEAN.
+!
+          DO K = 1, N(ng)
+            DO itrc = 1, NT(ng)
+              OCEAN(ng) % t(Isrc, Jsrc, K, nstp(ng), itrc) =            &
+     &            PLUME(ng) % trcNew(is, K, itrc)
+            ENDDO
+          ENDDO
+        ENDIF
+      ENDDO
       RETURN
       END SUBROUTINE iceplume_mix_tile
 # endif

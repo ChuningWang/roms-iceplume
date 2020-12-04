@@ -658,7 +658,7 @@
 !
 !  If applicable, process iceplume input data.
 !
-        IF (LuvSrc(ng).or.LwSrc(ng).or.ANY(LtracerSrc(:,ng))) THEN
+        IF (LuvSrc(ng).or.LwSrc(ng)) THEN
           CALL iceplume_init (ng)
         END IF
 #  endif

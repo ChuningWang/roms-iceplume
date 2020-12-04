@@ -265,18 +265,10 @@ SUBROUTINE GENERAL_ENTRAIN_MODEL (NEQ, T, Y, YDOT)
     sgTyp = NINT(Y(9))
     sgLen = Y(10)
 !
-    IF (T .LE. PLUME(ng) % zR(I, 1)) THEN
-      tA = PLUME(ng) % tAm(I, 1)
-      sA = PLUME(ng) % sAm(I, 1)
-    ELSEIF (T .GE. PLUME(ng) % zR(I, N(ng))) THEN
-      tA = PLUME(ng) % tAm(I, N(ng))
-      sA = PLUME(ng) % sAm(I, N(ng))
-    ELSE
-      CALL LININT(N(ng), PLUME(ng) % zR(I, :),                          &
-     &            PLUME(ng) % tAm(I, :), T, tA)
-      CALL LININT(N(ng), PLUME(ng) % zR(I, :),                          &
-     &            PLUME(ng) % sAm(I, :), T, sA)
-    ENDIF
+    CALL LININT(N(ng), PLUME(ng) % zR(I, :),                            &
+     &          PLUME(ng) % tAm(I, :), T, tA)
+    CALL LININT(N(ng), PLUME(ng) % zR(I, :),                            &
+     &          PLUME(ng) % sAm(I, :), T, sA)
 !
 ! Calculate reduced gravity
 !
@@ -462,35 +454,40 @@ END
 !                                                                   !
 ! ==================================================================!
 !
-SUBROUTINE LININT(nx,xtab,ytab,x,y)
+SUBROUTINE LININT(nx, xtab, ytab, x, y)
 !
 ! Given a value of x return a value of y based on interpolation
 ! within a table of y values (ytab) corresponding to the x values
-! contained in the array xtab.  The subroutine assumes that the
+! contained in the array xtab. The subroutine assumes that the
 ! values in xtab increase monotonically
 !
 ! John Mahaffy 2/12/95
-! Modified slightly TRC 2014
+! Modified by CW 2020
 !
-  integer nx
-  double precision xtab(nx), ytab(nx), x, y
+  integer, intent(in) :: nx
+  double precision, intent(in) :: xtab(nx), ytab(nx)
+  double precision, intent(in) :: x
+  double precision, intent(out) :: y
 !
 ! local variables
 !
-  integer i, i1
-  double precision  wx
+  integer :: i
+  double precision :: wx
 !
-  if (x.lt.(xtab(1)).or.x.GT.(xtab(nx))) then
-    write(6, *) 'x = ', x, '  is out of table range'
-    stop
-  endif
-  do 100 i=2,nx
-       if (x.le.xtab(i)) go to 200
-  100 continue
-  200 i1=i-1
+  IF (x .LE. xtab(1)) THEN
+    y = ytab(1)
+  ELSEIF (x .GE. xtab(nx)) THEN
+    y = ytab(nx)
+  ELSE
+    DO i = 2, nx
+      IF (x .LE. xtab(i)) THEN
+        wx = (x-xtab(i-1))/(xtab(i)-xtab(i-1))
+        y  = (1-wx)*ytab(i-1)+wx*ytab(i)
+        EXIT
+      ENDIF
+    ENDDO
+  ENDIF
 !
-  wx=(x-xtab(i1))/(xtab(i1+1)-xtab(i1))
-  y=(1-wx)*ytab(i1)+wx*ytab(i1+1)
 !
 END
 !

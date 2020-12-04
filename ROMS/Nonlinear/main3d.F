@@ -216,13 +216,15 @@
               DO tile=first_tile(ng),last_tile(ng),+1
                 CALL set_data (ng, tile)
 # ifdef ICEPLUME
-                CALL iceplume (ng, tile)
+                IF (LuvSrc(ng).or.LwSrc(ng)) THEN
+                  CALL iceplume (ng, tile)
 #  ifdef ICEPLUME_SPREAD
-                CALL iceplume_spread (ng, tile)
+                  CALL iceplume_spread (ng, tile)
 #  endif
 #  ifdef ICEPLUME_MIX
-                CALL iceplume_mix (ng, tile)
+                  CALL iceplume_mix (ng, tile)
 #  endif
+                END IF
 # endif
               END DO
 !$OMP BARRIER
