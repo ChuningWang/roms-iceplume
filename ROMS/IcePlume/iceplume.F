@@ -150,15 +150,15 @@
 !
 !  Read in iceplume averaging span.
 !
-        SOURCES(ng) % SGIstr(is) = NINT(SOURCES(ng) % SGIrange(is, 1))
-        SOURCES(ng) % SGIend(is) = NINT(SOURCES(ng) % SGIrange(is, 2))
-        SOURCES(ng) % SGJstr(is) = NINT(SOURCES(ng) % SGJrange(is, 1))
-        SOURCES(ng) % SGJend(is) = NINT(SOURCES(ng) % SGJrange(is, 2))
+        PLUME(ng) % avgIstr(is) = NINT(SOURCES(ng) % SGIrange(is, 1))
+        PLUME(ng) % avgIend(is) = NINT(SOURCES(ng) % SGIrange(is, 2))
+        PLUME(ng) % avgJstr(is) = NINT(SOURCES(ng) % SGJrange(is, 1))
+        PLUME(ng) % avgJend(is) = NINT(SOURCES(ng) % SGJrange(is, 2))
 !
 !  Calculate area of averaging span for averaging algorithm.
 !
-        DO i = SOURCES(ng) % SGIstr(is), SOURCES(ng) % SGIend(is)
-          DO j = SOURCES(ng) % SGJstr(is), SOURCES(ng) % SGJend(is)
+        DO i = PLUME(ng) % avgIstr(is), PLUME(ng) % avgIend(is)
+          DO j = PLUME(ng) % avgJstr(is), PLUME(ng) % avgJend(is)
             IF ( ((IstrR .LE. i) .AND. (i .LE. IendR)) .AND.             &
      &           ((JstrR .LE. j) .AND. (j .LE. JendR)) .AND.             &
      &           (GRID(ng) % rmask(i, j) .GT. 0.5_r8) ) THEN
@@ -354,8 +354,8 @@
           PLUME(ng) % rhoAm0(is, K) = PLUME(ng) % rhoAm(is, K)
           PLUME(ng) % rhoAm(is, K) = spv
         ENDDO
-        DO i = SOURCES(ng)%SGIstr(is), SOURCES(ng)%SGIend(is)
-          DO j = SOURCES(ng)%SGJstr(is), SOURCES(ng)%SGJend(is)
+        DO i = PLUME(ng) % avgIstr(is), PLUME(ng) % avgIend(is)
+          DO j = PLUME(ng) % avgJstr(is), PLUME(ng) % avgJend(is)
             IF ( ((IstrR .LE. i) .AND. (i .LE. IendR)) .AND.             &
      &           ((JstrR .LE. j) .AND. (j .LE. JendR)) .AND.             &
      &           (GRID(ng) % rmask(i, j) .GT. 0.5_r8) ) THEN
