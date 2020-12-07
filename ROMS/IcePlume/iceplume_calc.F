@@ -290,6 +290,9 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
 !
     DO itrc = 3, NT(ng)
       PLUME(ng) % trcCum(I, itrc) = PLUME(ng) % trcIni(I, itrc) * fIni
+#  ifdef ICEPLUME_WRT_AVERAGE
+      PLUME(ng) % trcP(I, iceDepthK, itrc) = PLUME(ng) % trcIni(I, itrc)
+#  endif
     ENDDO
 !
 ! Add up total sum of each tracer in plume
@@ -301,6 +304,10 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
      &        PLUME(ng) % trcCum(I, itrc) +                             &
      &        (-PLUME(ng) % ent(I, K) *                                 &
      &          PLUME(ng) % trcAm(I, K, itrc))
+#  ifdef ICEPLUME_WRT_AVERAGE
+          PLUME(ng) % trcP(I, K, itrc) = PLUME(ng) % trcCum(I, itrc) /  &
+     &                                   PLUME(ng) % f(I, K)
+#  endif
         ENDDO
       ENDIF
     ENDDO
@@ -325,6 +332,12 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
       PLUME(ng) % trcCum(I, NT(ng)  ) =                                 &
      &    PLUME(ng) % trcCum(I, NT(ng)  ) +                             &
      &    (-PLUME(ng) % ent(I, K)*PLUME(ng) % trcAm(I, K, NT(ng)  ))
+#  ifdef ICEPLUME_WRT_AVERAGE
+          PLUME(ng) % trcP(I, K, NT(ng)-1) =                            &
+     &      PLUME(ng) % trcCum(I, NT(ng)-1) / PLUME(ng) % f(I, K)
+          PLUME(ng) % trcP(I, K, NT(ng)  ) =                            &
+     &      PLUME(ng) % trcCum(I, NT(ng)  ) / PLUME(ng) % f(I, K)
+#  endif
     ENDDO
 !
 ! Calculate tracer concentration

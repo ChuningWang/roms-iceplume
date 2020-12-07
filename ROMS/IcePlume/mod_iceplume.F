@@ -162,12 +162,31 @@
 ! mBW        - background melt through con/divergence [m^3 s^-1]       !
 !                                                                      !
 ! For calculation of virtual tracer flux                               !
+!                                                                      !
 ! dzNew      - new layer thickness [m]                                 !
 ! zWNew      - new omega surface depth [m]                             !
 ! zLNew      - new box vertical boundary [m]                           !
 ! dzWei      - new layer weight function                               !
 ! trcL       - new box tracer concentration                            !
 ! trcNew     - updated tracer concentration                            !
+# endif
+# ifdef ICEPLUME_WRT_AVERAGE
+!                                                                      !
+! If write plume states into average output files, define average      !
+!   fields                                                             !
+!                                                                      !
+! trcP       - tracer concentration profile                            !
+!                                                                      !
+! avgZw      - average depth                                           !
+! avgF       - average plume vertical volume flux                      !
+! avgW       - average plume vertical velocity                         !
+! avgA       - average plume area integrated                           !
+! avgTrc     - average plume tracer concentration                      !
+! avgEnt     - average plume entrainment volume flux                   !
+! avgDet     - average plume detrainment volume flux                   !
+! avgM       - average plume melt rate                                 !
+! avgMb      - average ambient melt rate                               !
+!                                                                      !
 # endif
 !                                                                      !
 ! =====================================================================!
@@ -270,6 +289,22 @@
           real(r8), pointer :: dzWei(:, :)
           real(r8), pointer :: trcL(:, :, :)
           real(r8), pointer :: trcNew(:, :, :)
+# endif
+# ifdef ICEPLUME_WRT_AVERAGE
+!
+! For storage of model averages.
+!
+          real(r8), pointer :: trcP(:, :, :)
+!
+          real(r8), pointer :: avgZw(:, :)
+          real(r8), pointer :: avgF(:, :)
+          real(r8), pointer :: avgW(:, :)
+          real(r8), pointer :: avgA(:, :)
+          real(r8), pointer :: avgTrc(:, :, :)
+          real(r8), pointer :: avgEnt(:, :)
+          real(r8), pointer :: avgDet(:, :)
+          real(r8), pointer :: avgM(:, :)
+          real(r8), pointer :: avgMb(:, :)
 # endif
         END TYPE T_PLUME
 !
@@ -399,6 +434,24 @@
       allocate ( PLUME(ng) % trcNew (Nsrc(ng), N(ng), NT(ng)) )
       Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*NT(ng)*2,r8)
 # endif
+# ifdef ICEPLUME_WRT_AVERAGE
+!
+      allocate ( PLUME(ng) % trcP   (Nsrc(ng), 0:N(ng), NT(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*(N(ng)+1)*NT(ng),r8)
+!
+      allocate ( PLUME(ng) % avgZw  (Nsrc(ng), 0:N(ng)) )
+      allocate ( PLUME(ng) % avgF   (Nsrc(ng), 0:N(ng)) )
+      allocate ( PLUME(ng) % avgW   (Nsrc(ng), 0:N(ng)) )
+      allocate ( PLUME(ng) % avgA   (Nsrc(ng), 0:N(ng)) )
+      allocate ( PLUME(ng) % avgTrc (Nsrc(ng), 0:N(ng), NT(ng)) )
+      allocate ( PLUME(ng) % avgEnt (Nsrc(ng), 1:N(ng)) )
+      allocate ( PLUME(ng) % avgDet (Nsrc(ng), 1:N(ng)) )
+      allocate ( PLUME(ng) % avgM   (Nsrc(ng), 1:N(ng)) )
+      allocate ( PLUME(ng) % avgMb  (Nsrc(ng), 1:N(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*(N(ng)+1)*4,r8)
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*(N(ng)+1)*NT(ng),r8)
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*4,r8)
+# endif
 !
 !-----------------------------------------------------------------------
 !  Initialize module variables.
@@ -510,6 +563,30 @@
             PLUME(ng) % trcL   (is, k, itrc) = IniVal
             PLUME(ng) % trcNew (is, k, itrc) = IniVal
           ENDDO
+        ENDDO
+# endif
+# ifdef ICEPLUME_WRT_AVERAGE
+!
+        DO k=0,N(ng)
+          DO itrc=1,NT(ng)
+            PLUME(ng) % trcP (is, k, itrc) = IniVal
+          ENDDO
+!
+          PLUME(ng) % avgZw (is, k) = IniVal
+          PLUME(ng) % avgF  (is, k) = IniVal
+          PLUME(ng) % avgW  (is, k) = IniVal
+          PLUME(ng) % avgA  (is, k) = IniVal
+
+          DO itrc=1,NT(ng)
+            PLUME(ng) % avgTrc (is, k) = IniVal
+          ENDDO
+        ENDDO
+!
+        DO k=1,N(ng)
+          PLUME(ng) % avgEnt (is, k) = IniVal
+          PLUME(ng) % avgDet (is, k) = IniVal
+          PLUME(ng) % avgM   (is, k) = IniVal
+          PLUME(ng) % avgMb  (is, k) = IniVal
         ENDDO
 # endif
       ENDDO

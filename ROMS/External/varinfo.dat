@@ -2109,6 +2109,96 @@
   'nulvar'
   1.0d0
 
+'plume_zw'                                         ! Output
+  'subglacial buoyant plume depth'
+  'meter'                                          ! [m]
+  'plume_zw, scalar, series'
+  'ocean_time'
+  'idPLzw'
+  'nulvar'
+  1.0d0
+
+'plume_f'                                          ! Output
+  'subglacial buoyant plume volume flux'
+  'meter3 second-1'                                ! [m3/s]
+  'plume_f, scalar, series'
+  'ocean_time'
+  'idPLf'
+  'nulvar'
+  1.0d0
+
+'plume_w'                                          ! Output
+  'subglacial buoyant plume velocity'
+  'meter second-1'                                 ! [m/s]
+  'plume_w, scalar, series'
+  'ocean_time'
+  'idPLw'
+  'nulvar'
+  1.0d0
+
+'plume_a'                                          ! Output
+  'subglacial buoyant plume area integrated'
+  'meter2'                                         ! [m2]
+  'plume_a, scalar, series'
+  'ocean_time'
+  'idPLa'
+  'nulvar'
+  1.0d0
+
+'plume_temp'                                       ! Input
+  'subglacial buoyant plume temperature'
+  'Celsius'                                        ! [Celsius]
+  'plume_temp, scalar, series'
+  'ocean_time'
+  'idPLtrc(itemp)'
+  'nulvar'
+  1.0d0
+
+'plume_salt'                                       ! Input
+  'subglacial buoyant plume salinity'
+  'nondimensional'                                 ! [PSU]
+  'plume_salt, scalar, series'
+  'ocean_time'
+  'idSGtrc(isalt)'
+  'nulvar'
+  1.0d0
+
+'plume_dye_'                                       ! Output
+  'subglacial buoyant plume dye concentration'
+  'kilogram meter-3'                               ! [kg/m3]
+  'plume_dye, scalar, series'
+  'ocean_time'
+  'idPLtrc(inert(i))'
+  'nulvar'
+  1.0d0
+
+'plume_ent'                                        ! Output
+  'subglacial buoyant plume entrainment rate'
+  'meter3 second-1'                                ! [m3/s]
+  'plume_ent, scalar, series'
+  'ocean_time'
+  'idPLent'
+  'nulvar'
+  1.0d0
+
+'plume_det'                                        ! Output
+  'subglacial buoyant plume detrainment rate'
+  'meter3 second-1'                                ! [m3/s]
+  'plume_det, scalar, series'
+  'ocean_time'
+  'idPLdet'
+  'nulvar'
+  1.0d0
+
+'plume_mb'                                         ! Output
+  'subglacial background melt rate'
+  'meter3 second-1'                                ! [m3/s]
+  'plume_mb, scalar, series'
+  'ocean_time'
+  'idPLmb'
+  'nulvar'
+  1.0d0
+
 !
 !------------------------------------------------------------------------------
 !  Boundary layer variables.

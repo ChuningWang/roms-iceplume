@@ -51,6 +51,9 @@
 !                DimIDs(31) => Number of 2D variables time levels (3). !
 !                DimIDs(32) => Number of sediment tracers.             !
 !                DimIDs(33) => Number of light spectral bands.         !
+#if defined ICEPLUME && defined ICEPLUME_WRT_AVERAGE
+!                DimIDs(34) => Number of iceplume point sources.       !
+#endif
 !                                                                      !
 !  On Output:                                                          !
 !                                                                      !

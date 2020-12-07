@@ -82,7 +82,11 @@
 !  Maximum number of dimension IDs stored in local array DimIDs used to
 !  defined variable dimensions in output NetCDF files.
 !
+#if defined ICEPLUME && defined ICEPLUME_WRT_AVERAGE
+        integer, parameter :: nDimID = 34
+#else
         integer, parameter :: nDimID = 33
+#endif
 !
 !  Input/output grid-type variables.
 !
