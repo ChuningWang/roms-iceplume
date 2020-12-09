@@ -2145,7 +2145,7 @@
   'nulvar'
   1.0d0
 
-'plume_temp'                                       ! Input
+'plume_temp'                                       ! Output
   'subglacial buoyant plume temperature'
   'Celsius'                                        ! [Celsius]
   'plume_temp, scalar, series'
@@ -2154,7 +2154,7 @@
   'nulvar'
   1.0d0
 
-'plume_salt'                                       ! Input
+'plume_salt'                                       ! Output
   'subglacial buoyant plume salinity'
   'nondimensional'                                 ! [PSU]
   'plume_salt, scalar, series'
