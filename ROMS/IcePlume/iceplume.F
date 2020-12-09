@@ -256,7 +256,7 @@
 !
 !  Initialize arrays to facilitate collective communications.
 !
-      PLUME(ng) % zR   = spv
+      PLUME(ng) % zR = spv
 #  endif
 #  ifdef ICEPLUME_WRT_AVERAGE
 !
