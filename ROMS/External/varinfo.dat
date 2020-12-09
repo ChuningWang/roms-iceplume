@@ -2114,7 +2114,7 @@
   'meter'                                          ! [m]
   'plume_zw, scalar, series'
   'ocean_time'
-  'idPLzw'
+  'idPLdep'
   'nulvar'
   1.0d0
 
@@ -2123,7 +2123,7 @@
   'meter3 second-1'                                ! [m3/s]
   'plume_f, scalar, series'
   'ocean_time'
-  'idPLf'
+  'idPLtrs'
   'nulvar'
   1.0d0
 
@@ -2132,7 +2132,7 @@
   'meter second-1'                                 ! [m/s]
   'plume_w, scalar, series'
   'ocean_time'
-  'idPLw'
+  'idPLvel'
   'nulvar'
   1.0d0
 
@@ -2141,7 +2141,7 @@
   'meter2'                                         ! [m2]
   'plume_a, scalar, series'
   'ocean_time'
-  'idPLa'
+  'idPLari'
   'nulvar'
   1.0d0
 
@@ -2159,7 +2159,7 @@
   'nondimensional'                                 ! [PSU]
   'plume_salt, scalar, series'
   'ocean_time'
-  'idSGtrc(isalt)'
+  'idPLtrc(isalt)'
   'nulvar'
   1.0d0
 
@@ -2190,12 +2190,21 @@
   'nulvar'
   1.0d0
 
+'plume_m'                                          ! Output
+  'subglacial buoyant plume melt rate'
+  'meter3 second-1'                                ! [m3/s]
+  'plume_m, scalar, series'
+  'ocean_time'
+  'idPLmlt'
+  'nulvar'
+  1.0d0
+
 'plume_mb'                                         ! Output
   'subglacial background melt rate'
   'meter3 second-1'                                ! [m3/s]
   'plume_mb, scalar, series'
   'ocean_time'
-  'idPLmb'
+  'idPLmlb'
   'nulvar'
   1.0d0
 

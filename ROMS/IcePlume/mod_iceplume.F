@@ -177,15 +177,15 @@
 !                                                                      !
 ! trcP       - tracer concentration profile                            !
 !                                                                      !
-! avgZw      - average depth                                           !
-! avgF       - average plume vertical volume flux                      !
-! avgW       - average plume vertical velocity                         !
-! avgA       - average plume area integrated                           !
-! avgTrc     - average plume tracer concentration                      !
-! avgEnt     - average plume entrainment volume flux                   !
-! avgDet     - average plume detrainment volume flux                   !
-! avgM       - average plume melt rate                                 !
-! avgMb      - average ambient melt rate                               !
+! avgzW      - average depth                                           !
+! avgf       - average plume vertical volume flux                      !
+! avgw       - average plume vertical velocity                         !
+! avga       - average plume area integrated                           !
+! avgtrc     - average plume tracer concentration                      !
+! avgent     - average plume entrainment volume flux                   !
+! avgdet     - average plume detrainment volume flux                   !
+! avgm       - average plume melt rate                                 !
+! avgmB      - average ambient melt rate                               !
 !                                                                      !
 # endif
 !                                                                      !
@@ -296,15 +296,15 @@
 !
           real(r8), pointer :: trcP(:, :, :)
 !
-          real(r8), pointer :: avgZw(:, :)
-          real(r8), pointer :: avgF(:, :)
-          real(r8), pointer :: avgW(:, :)
-          real(r8), pointer :: avgA(:, :)
-          real(r8), pointer :: avgTrc(:, :, :)
-          real(r8), pointer :: avgEnt(:, :)
-          real(r8), pointer :: avgDet(:, :)
-          real(r8), pointer :: avgM(:, :)
-          real(r8), pointer :: avgMb(:, :)
+          real(r8), pointer :: avgzW(:, :)
+          real(r8), pointer :: avgf(:, :)
+          real(r8), pointer :: avgw(:, :)
+          real(r8), pointer :: avga(:, :)
+          real(r8), pointer :: avgtrc(:, :, :)
+          real(r8), pointer :: avgent(:, :)
+          real(r8), pointer :: avgdet(:, :)
+          real(r8), pointer :: avgm(:, :)
+          real(r8), pointer :: avgmB(:, :)
 # endif
         END TYPE T_PLUME
 !
@@ -439,15 +439,15 @@
       allocate ( PLUME(ng) % trcP   (Nsrc(ng), 0:N(ng), NT(ng)) )
       Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*(N(ng)+1)*NT(ng),r8)
 !
-      allocate ( PLUME(ng) % avgZw  (Nsrc(ng), 0:N(ng)) )
-      allocate ( PLUME(ng) % avgF   (Nsrc(ng), 0:N(ng)) )
-      allocate ( PLUME(ng) % avgW   (Nsrc(ng), 0:N(ng)) )
-      allocate ( PLUME(ng) % avgA   (Nsrc(ng), 0:N(ng)) )
-      allocate ( PLUME(ng) % avgTrc (Nsrc(ng), 0:N(ng), NT(ng)) )
-      allocate ( PLUME(ng) % avgEnt (Nsrc(ng), 1:N(ng)) )
-      allocate ( PLUME(ng) % avgDet (Nsrc(ng), 1:N(ng)) )
-      allocate ( PLUME(ng) % avgM   (Nsrc(ng), 1:N(ng)) )
-      allocate ( PLUME(ng) % avgMb  (Nsrc(ng), 1:N(ng)) )
+      allocate ( PLUME(ng) % avgzW  (Nsrc(ng), 0:N(ng)) )
+      allocate ( PLUME(ng) % avgf   (Nsrc(ng), 0:N(ng)) )
+      allocate ( PLUME(ng) % avgw   (Nsrc(ng), 0:N(ng)) )
+      allocate ( PLUME(ng) % avga   (Nsrc(ng), 0:N(ng)) )
+      allocate ( PLUME(ng) % avgtrc (Nsrc(ng), 0:N(ng), NT(ng)) )
+      allocate ( PLUME(ng) % avgent (Nsrc(ng), 1:N(ng)) )
+      allocate ( PLUME(ng) % avgdet (Nsrc(ng), 1:N(ng)) )
+      allocate ( PLUME(ng) % avgm   (Nsrc(ng), 1:N(ng)) )
+      allocate ( PLUME(ng) % avgmB  (Nsrc(ng), 1:N(ng)) )
       Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*(N(ng)+1)*4,r8)
       Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*(N(ng)+1)*NT(ng),r8)
       Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*4,r8)
@@ -572,21 +572,21 @@
             PLUME(ng) % trcP (is, k, itrc) = IniVal
           ENDDO
 !
-          PLUME(ng) % avgZw (is, k) = IniVal
-          PLUME(ng) % avgF  (is, k) = IniVal
-          PLUME(ng) % avgW  (is, k) = IniVal
-          PLUME(ng) % avgA  (is, k) = IniVal
-
+          PLUME(ng) % avgzW (is, k) = IniVal
+          PLUME(ng) % avgf  (is, k) = IniVal
+          PLUME(ng) % avgw  (is, k) = IniVal
+          PLUME(ng) % avga  (is, k) = IniVal
+!
           DO itrc=1,NT(ng)
-            PLUME(ng) % avgTrc (is, k) = IniVal
+            PLUME(ng) % avgtrc (is, k, itrc) = IniVal
           ENDDO
         ENDDO
 !
         DO k=1,N(ng)
-          PLUME(ng) % avgEnt (is, k) = IniVal
-          PLUME(ng) % avgDet (is, k) = IniVal
-          PLUME(ng) % avgM   (is, k) = IniVal
-          PLUME(ng) % avgMb  (is, k) = IniVal
+          PLUME(ng) % avgent (is, k) = IniVal
+          PLUME(ng) % avgdet (is, k) = IniVal
+          PLUME(ng) % avgm   (is, k) = IniVal
+          PLUME(ng) % avgmB  (is, k) = IniVal
         ENDDO
 # endif
       ENDDO

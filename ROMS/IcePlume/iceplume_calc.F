@@ -282,6 +282,12 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
 !
     PLUME(ng) % trc(I, itemp) = PLUME(ng) % t(I, osDepthK)
     PLUME(ng) % trc(I, isalt) = PLUME(ng) % s(I, osDepthK)
+# ifdef ICEPLUME_WRT_AVERAGE
+    DO K = 0, N(ng)
+      PLUME(ng) % trcP(I, K, itemp) = PLUME(ng) % t(I, K)
+      PLUME(ng) % trcP(I, K, isalt) = PLUME(ng) % s(I, K)
+    ENDDO
+# endif
 !
 # ifdef ICEPLUME_TRACER
 !

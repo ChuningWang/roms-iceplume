@@ -837,6 +837,9 @@
               ELSE IF (INT(Aval(5)).eq.l4dvar) THEN
                 text='lon_rho lat_rho s_rho light'
                 location='face'
+              ELSE
+                text='unknown'
+                location='unknown'
               END IF
             ELSE
               IF (INT(Aval(5)).eq.r2dvar) THEN
@@ -881,6 +884,9 @@
               ELSE IF (INT(Aval(5)).eq.l4dvar) THEN
                 text='x_rho y_rho s_rho Nbands'
                 location='face'
+              ELSE
+                text='unknown'
+                location='unknown'
               END IF
             END IF
 

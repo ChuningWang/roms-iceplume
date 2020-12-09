@@ -553,6 +553,18 @@
 # endif
 !
         integer, allocatable :: idSGtrc(:)  ! subglacial runoff for tracers
+# ifdef ICEPLUME_WRT_AVERAGE
+        integer  :: idPLdep        ! sg buoyant plume depth
+        integer  :: idPLtrs        ! sg buoyant plume volume transport
+        integer  :: idPLvel        ! sg buoyant plume velocity
+        integer  :: idPLari        ! sg buoyant plume area integrated
+        integer  :: idPLent        ! sg buoyant plume entrainment rate
+        integer  :: idPLdet        ! sg buoyant plume detrainment rate
+        integer  :: idPLmlt        ! sg buoyant plume meltrate
+        integer  :: idPLmlb        ! sg buoyant plume bkg meltrate 
+!
+        integer, allocatable :: idPLtrc(:)  ! sg buoyant plume for tracers
+# endif
 #endif
       CONTAINS
 !
@@ -769,6 +781,12 @@
         allocate ( idSGtrc(MT) )
         Dmem(1)=Dmem(1)+REAL(MT,r8)
       END IF
+# ifdef ICEPLUME_WRT_AVERAGE
+      IF (.not.allocated(idPLtrc)) THEN
+        allocate ( idPLtrc(MT) )
+        Dmem(1)=Dmem(1)+REAL(MT,r8)
+      END IF
+# endif
 #endif
 
       IF (.not.allocated(iHUTav)) THEN
@@ -1955,6 +1973,32 @@
             CASE ('idSGerange')
               idSGerange=varid
 # endif
+# ifdef ICEPLUME_WRT_AVERAGE
+            CASE ('idPLdep')
+              idPLdep=varid
+            CASE ('idPLtrs')
+              idPLtrs=varid
+            CASE ('idPLvel')
+              idPLvel=varid
+            CASE ('idPLari')
+              idPLari=varid
+            CASE ('idPLent')
+              idPLent=varid
+            CASE ('idPLdet')
+              idPLdet=varid
+            CASE ('idPLmlt')
+              idPLmlt=varid
+            CASE ('idPLmlb')
+              idPLmlb=varid
+            CASE ('idPLtrc(itemp)')
+              idPLtrc(itemp)=varid
+            CASE ('idPLtrc(isalt)')
+              idPLtrc(isalt)=varid
+# ifdef T_PASSIVE
+            CASE ('idPLtrc(inert(i))')
+              load=.TRUE.
+# endif
+# endif
 #endif
 
 #ifdef BIOLOGY
@@ -2205,6 +2249,30 @@
      &                    TRIM(ADJUSTL(Vinfo(5)))
                   END DO
                 END IF
+#  ifdef ICEPLUME_WRT_AVERAGE
+              CASE ('idPLtrc(inert(i))')
+                IF (NPT.gt.0) THEN
+                  varid=varid-1
+                  DO i=1,NPT
+                    varid=varid+1
+                    idPLtrc(inert(i))=varid
+                    DO ng=1,Ngrids
+                      Fscale(varid,ng)=scale
+                      Iinfo(1,varid,ng)=gtype
+                    END DO
+                    WRITE (Vname(1,varid),'(a,i2.2)')                   &
+     &                    TRIM(ADJUSTL(Vinfo(1))), i
+                    WRITE (Vname(2,varid),'(a,a,i2.2)')                 &
+     &                    TRIM(ADJUSTL(Vinfo(2))), ', type ', i
+                    WRITE (Vname(3,varid),'(a)')                        &
+     &                    TRIM(ADJUSTL(Vinfo(3)))
+                    WRITE (Vname(4,varid),'(a,a)')                      &
+     &                    TRIM(Vname(1,varid)), ', scalar, series'
+                    WRITE (Vname(5,varid),'(a)')                        &
+     &                    TRIM(ADJUSTL(Vinfo(5)))
+                  END DO
+                END IF
+#  endif
 # endif
             END SELECT
 #endif
