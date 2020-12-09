@@ -554,12 +554,7 @@
 !
         integer, allocatable :: idSGtrc(:)  ! subglacial runoff for tracers
 # ifdef ICEPLUME_WRT_AVERAGE
-        integer  :: idPLdep        ! sg buoyant plume depth
-        integer  :: idPLtrs        ! sg buoyant plume volume transport
-        integer  :: idPLvel        ! sg buoyant plume velocity
-        integer  :: idPLari        ! sg buoyant plume area integrated
         integer  :: idPLent        ! sg buoyant plume entrainment rate
-        integer  :: idPLdet        ! sg buoyant plume detrainment rate
         integer  :: idPLmlt        ! sg buoyant plume meltrate
         integer  :: idPLmlb        ! sg buoyant plume bkg meltrate 
 !
@@ -1974,18 +1969,8 @@
               idSGerange=varid
 # endif
 # ifdef ICEPLUME_WRT_AVERAGE
-            CASE ('idPLdep')
-              idPLdep=varid
-            CASE ('idPLtrs')
-              idPLtrs=varid
-            CASE ('idPLvel')
-              idPLvel=varid
-            CASE ('idPLari')
-              idPLari=varid
             CASE ('idPLent')
               idPLent=varid
-            CASE ('idPLdet')
-              idPLdet=varid
             CASE ('idPLmlt')
               idPLmlt=varid
             CASE ('idPLmlb')

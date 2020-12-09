@@ -175,17 +175,15 @@
 ! If write plume states into average output files, define average      !
 !   fields                                                             !
 !                                                                      !
-! trcP       - tracer concentration profile                            !
+! sument     - total plume entrainment volume flux                     !
+! summ       - total plume melt rate                                   !
+! summB      - total ambient melt rate                                 !
+! sumtrcEnt  - total plume entrainment tracer flux                     !
 !                                                                      !
-! avgzW      - average depth                                           !
-! avgf       - average plume vertical volume flux                      !
-! avgw       - average plume vertical velocity                         !
-! avga       - average plume area integrated                           !
-! avgtrc     - average plume tracer concentration                      !
 ! avgent     - average plume entrainment volume flux                   !
-! avgdet     - average plume detrainment volume flux                   !
 ! avgm       - average plume melt rate                                 !
 ! avgmB      - average ambient melt rate                               !
+! avgtrcEnt  - average plume entrainment tracer flux                   !
 !                                                                      !
 # endif
 !                                                                      !
@@ -292,19 +290,19 @@
 # endif
 # ifdef ICEPLUME_WRT_AVERAGE
 !
+! For adding up model states.
+!
+          real(r8), pointer :: sument(:)
+          real(r8), pointer :: summ(:)
+          real(r8), pointer :: summB(:)
+          real(r8), pointer :: sumtrcEnt(:, :)
+!
 ! For storage of model averages.
 !
-          real(r8), pointer :: trcP(:, :, :)
-!
-          real(r8), pointer :: avgzW(:, :)
-          real(r8), pointer :: avgf(:, :)
-          real(r8), pointer :: avgw(:, :)
-          real(r8), pointer :: avga(:, :)
-          real(r8), pointer :: avgtrc(:, :, :)
-          real(r8), pointer :: avgent(:, :)
-          real(r8), pointer :: avgdet(:, :)
-          real(r8), pointer :: avgm(:, :)
-          real(r8), pointer :: avgmB(:, :)
+          real(r8), pointer :: avgent(:)
+          real(r8), pointer :: avgm(:)
+          real(r8), pointer :: avgmB(:)
+          real(r8), pointer :: avgtrcEnt(:, :)
 # endif
         END TYPE T_PLUME
 !
@@ -436,21 +434,19 @@
 # endif
 # ifdef ICEPLUME_WRT_AVERAGE
 !
-      allocate ( PLUME(ng) % trcP   (Nsrc(ng), 0:N(ng), NT(ng)) )
-      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*(N(ng)+1)*NT(ng),r8)
+      allocate ( PLUME(ng) % sument    (Nsrc(ng)) )
+      allocate ( PLUME(ng) % summ      (Nsrc(ng)) )
+      allocate ( PLUME(ng) % summB     (Nsrc(ng)) )
+      allocate ( PLUME(ng) % sumtrcEnt (Nsrc(ng), NT(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*3,r8)
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*NT(ng),r8)
 !
-      allocate ( PLUME(ng) % avgzW  (Nsrc(ng), 0:N(ng)) )
-      allocate ( PLUME(ng) % avgf   (Nsrc(ng), 0:N(ng)) )
-      allocate ( PLUME(ng) % avgw   (Nsrc(ng), 0:N(ng)) )
-      allocate ( PLUME(ng) % avga   (Nsrc(ng), 0:N(ng)) )
-      allocate ( PLUME(ng) % avgtrc (Nsrc(ng), 0:N(ng), NT(ng)) )
-      allocate ( PLUME(ng) % avgent (Nsrc(ng), 1:N(ng)) )
-      allocate ( PLUME(ng) % avgdet (Nsrc(ng), 1:N(ng)) )
-      allocate ( PLUME(ng) % avgm   (Nsrc(ng), 1:N(ng)) )
-      allocate ( PLUME(ng) % avgmB  (Nsrc(ng), 1:N(ng)) )
-      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*(N(ng)+1)*4,r8)
-      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*(N(ng)+1)*NT(ng),r8)
-      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*4,r8)
+      allocate ( PLUME(ng) % avgent    (Nsrc(ng)) )
+      allocate ( PLUME(ng) % avgm      (Nsrc(ng)) )
+      allocate ( PLUME(ng) % avgmB     (Nsrc(ng)) )
+      allocate ( PLUME(ng) % avgtrcEnt (Nsrc(ng), NT(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*3,r8)
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*NT(ng),r8)
 # endif
 !
 !-----------------------------------------------------------------------
@@ -567,26 +563,18 @@
 # endif
 # ifdef ICEPLUME_WRT_AVERAGE
 !
-        DO k=0,N(ng)
-          DO itrc=1,NT(ng)
-            PLUME(ng) % trcP (is, k, itrc) = IniVal
-          ENDDO
-!
-          PLUME(ng) % avgzW (is, k) = IniVal
-          PLUME(ng) % avgf  (is, k) = IniVal
-          PLUME(ng) % avgw  (is, k) = IniVal
-          PLUME(ng) % avga  (is, k) = IniVal
-!
-          DO itrc=1,NT(ng)
-            PLUME(ng) % avgtrc (is, k, itrc) = IniVal
-          ENDDO
+        PLUME(ng) % sument (is) = IniVal
+        PLUME(ng) % summ   (is) = IniVal
+        PLUME(ng) % summB  (is) = IniVal
+        DO itrc=1,NT(ng)
+          PLUME(ng) % sumtrcEnt (is, itrc) = IniVal
         ENDDO
 !
-        DO k=1,N(ng)
-          PLUME(ng) % avgent (is, k) = IniVal
-          PLUME(ng) % avgdet (is, k) = IniVal
-          PLUME(ng) % avgm   (is, k) = IniVal
-          PLUME(ng) % avgmB  (is, k) = IniVal
+        PLUME(ng) % avgent (is) = IniVal
+        PLUME(ng) % avgm   (is) = IniVal
+        PLUME(ng) % avgmB  (is) = IniVal
+        DO itrc=1,NT(ng)
+          PLUME(ng) % avgtrcEnt (is, itrc) = IniVal
         ENDDO
 # endif
       ENDDO

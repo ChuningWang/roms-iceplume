@@ -17,13 +17,13 @@
 #define SOLVE3D
 #define SALINITY
 #define NONLIN_EOS
-#undef AVERAGES
+#define AVERAGES
 
 /* iceplume */
 #define ICEPLUME
 #ifdef ICEPLUME
 # define ICEPLUME_DET_AVERAGE
-# undef ICEPLUME_WRT_AVERAGE
+# define ICEPLUME_WRT_AVERAGE
 # define ICEPLUME_TRACER
 # define ICEPLUME_MELT
 # define ICEPLUME_MELT_TRACER

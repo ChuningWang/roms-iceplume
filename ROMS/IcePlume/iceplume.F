@@ -228,7 +228,7 @@
       USE mod_iceplume
 # ifdef DISTRIBUTE
 !
-      USE distribute_mod, ONLY : mp_assemble
+      USE distribute_mod, ONLY : mp_collect, mp_assemble
 !
 # endif
 !
@@ -244,9 +244,6 @@
       real(r8) :: dx, dy
       real(r8) :: RHO
       real(r8), parameter :: spv = 0.0_r8
-# ifdef DISTRIBUTE
-      integer :: Npts
-# endif
 # ifdef ICEPLUME_DET_AVERAGE
       integer :: i, j
       real(r8) :: area
@@ -261,17 +258,12 @@
 !
       PLUME(ng) % zR   = spv
 #  endif
-!
 #  ifdef ICEPLUME_WRT_AVERAGE
-      PLUME(ng) % zW   = spv
-      PLUME(ng) % f    = spv
-      PLUME(ng) % w    = spv
-      PLUME(ng) % a    = spv
-      PLUME(ng) % trcP = spv
-      PLUME(ng) % ent  = spv
-      PLUME(ng) % det  = spv
-      PLUME(ng) % m    = spv
-      PLUME(ng) % mB   = spv
+!
+      PLUME(ng) % sument    = spv
+      PLUME(ng) % summ      = spv
+      PLUME(ng) % summB     = spv
+      PLUME(ng) % sumtrcEnt = spv
 #  endif
 # endif
       DO is = 1, Nsrc(ng)
@@ -356,8 +348,7 @@
 !
 !  Exchange data between all parallel nodes.
 !
-      Npts = Nsrc(ng)*N(ng)
-      CALL mp_assemble (ng, iNLM, Npts, spv,                            &
+      CALL mp_assemble (ng, iNLM, Nsrc(ng)*N(ng), spv,                  &
      &                  PLUME(ng) % zR(1:Nsrc(ng), 1:N(ng)))
 #  endif
 !
@@ -389,7 +380,7 @@
 !
 !  Exchange data between all parallel nodes.
 !
-      CALL mp_assemble (ng, iNLM, Npts, spv,                            &
+      CALL mp_assemble (ng, iNLM, Nsrc(ng)*N(ng), spv,                  &
      &                  PLUME(ng) % rhoAm(1:Nsrc(ng), 1:N(ng)))
 #  endif
 !
@@ -444,28 +435,31 @@
           ENDIF
         ENDIF
       ENDDO
-# if defined DISTRIBUTE && defined ICEPLUME_WRT_AVERAGE
-      Npts = Nsrc(ng)*(N(ng)+1)
-      CALL mp_assemble (ng, iNLM, Npts, spv,                            &
-     &                  PLUME(ng) % zW(1:Nsrc(ng), 0:N(ng)))
-      CALL mp_assemble (ng, iNLM, Npts, spv,                            &
-     &                  PLUME(ng) % f (1:Nsrc(ng), 0:N(ng)))
-      CALL mp_assemble (ng, iNLM, Npts, spv,                            &
-     &                  PLUME(ng) % w (1:Nsrc(ng), 0:N(ng)))
-      CALL mp_assemble (ng, iNLM, Npts, spv,                            &
-     &                  PLUME(ng) % a (1:Nsrc(ng), 0:N(ng)))
-      Npts = Nsrc(ng)*(N(ng)+1)*NT(ng)
-      CALL mp_assemble (ng, iNLM, Npts, spv,                            &
-     &                  PLUME(ng) % trcP(1:Nsrc(ng), 0:N(ng), 1:NT(ng)))
-      Npts = Nsrc(ng)*N(ng)
-      CALL mp_assemble (ng, iNLM, Npts, spv,                            &
-     &                  PLUME(ng) % ent(1:Nsrc(ng), 1:N(ng)))
-      CALL mp_assemble (ng, iNLM, Npts, spv,                            &
-     &                  PLUME(ng) % det(1:Nsrc(ng), 1:N(ng)))
-      CALL mp_assemble (ng, iNLM, Npts, spv,                            &
-     &                  PLUME(ng) % m  (1:Nsrc(ng), 1:N(ng)))
-      CALL mp_assemble (ng, iNLM, Npts, spv,                            &
-     &                  PLUME(ng) % mB (1:Nsrc(ng), 1:N(ng)))
+# ifdef ICEPLUME_WRT_AVERAGE
+      DO is = 1, Nsrc(ng)
+        Isrc = PLUME(ng) % Isrc(is)
+        Jsrc = PLUME(ng) % Jsrc(is)
+        IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.          &
+     &       ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
+          PLUME(ng) % sument(is) = SUM(PLUME(ng) % ent(is, :))
+          PLUME(ng) % summ  (is) = SUM(PLUME(ng) % m  (is, :))
+          PLUME(ng) % summB (is) = SUM(PLUME(ng) % mB (is, :))
+          DO itrc = 1, NT(ng)
+            PLUME(ng) % sumtrcEnt(is, itrc) =                           &
+     &        SUM(PLUME(ng) % ent(is, :)*PLUME(ng) % trcAm(is, :, itrc))
+          ENDDO
+        ENDIF
+      ENDDO
+#  ifdef DISTRIBUTE
+      CALL mp_collect (ng, iNLM, Nsrc(ng), spv,                         &
+     &                 PLUME(ng) % sument(1:Nsrc(ng)))
+      CALL mp_collect (ng, iNLM, Nsrc(ng), spv,                         &
+     &                 PLUME(ng) % summ  (1:Nsrc(ng)))
+      CALL mp_collect (ng, iNLM, Nsrc(ng), spv,                         &
+     &                 PLUME(ng) % summB (1:Nsrc(ng)))
+      CALL mp_assemble (ng, iNLM, Nsrc(ng)*NT(ng), spv,                 &
+     &                  PLUME(ng) % sumtrcEnt(1:Nsrc(ng), 1:NT(ng)))
+#  endif
 # endif
       RETURN
       END SUBROUTINE iceplume_tile

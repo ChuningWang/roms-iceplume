@@ -130,7 +130,7 @@
       USE mod_sediment
 # endif
 # if defined ICEPLUME && defined ICEPLUME_WRT_AVERAGE
-      USE mod_sources, ONLY : SOURCES, Nsrc
+      USE mod_sources, ONLY : Nsrc
       USE mod_iceplume, ONLY : PLUME
 # endif
 !
@@ -457,26 +457,12 @@
 
 #  if defined ICEPLUME && defined ICEPLUME_WRT_AVERAGE
         DO is=1,Nsrc(ng)
-          i = SOURCES(ng) % Isrc(is)
-          j = SOURCES(ng) % Jsrc(is)
-          IF ( ((IstrR .LE. i) .AND. (i .LE. IendR)) .AND.              &
-     &         ((JstrR .LE. j) .AND. (j .LE. JendR)) ) THEN
-            DO k=0,N(ng)
-              PLUME(ng)%avgzW(is,k)      =PLUME(ng)%zW(is,k)
-              PLUME(ng)%avgf(is,k)       =PLUME(ng)%f(is,k)
-              PLUME(ng)%avgw(is,k)       =PLUME(ng)%w(is,k)
-              PLUME(ng)%avga(is,k)       =PLUME(ng)%a(is,k)
-              DO it=1,NT(ng)
-                PLUME(ng)%avgtrc(is,k,it)=PLUME(ng)%trcP(is,k,it)
-              END DO
-            END DO
-            DO k=1,N(ng)
-              PLUME(ng)%avgent(is,k)     =PLUME(ng)%ent(is,k)
-              PLUME(ng)%avgdet(is,k)     =PLUME(ng)%det(is,k)
-              PLUME(ng)%avgm(is,k)       =PLUME(ng)%m(is,k)
-              PLUME(ng)%avgmB(is,k)      =PLUME(ng)%mB(is,k)
-            END DO
-          END IF
+          PLUME(ng)%avgent(is)=PLUME(ng)%sument(is)
+          PLUME(ng)%avgm(is)  =PLUME(ng)%summ(is)
+          PLUME(ng)%avgmB(is) =PLUME(ng)%summB(is)
+          DO it=1,NT(ng)
+            PLUME(ng)%avgtrcEnt(is,it)=PLUME(ng)%sumtrcEnt(is,it)
+          END DO
         END DO
 #  endif
 
@@ -1507,35 +1493,13 @@
 
 #  if defined ICEPLUME && defined ICEPLUME_WRT_AVERAGE
         DO is=1,Nsrc(ng)
-          i = SOURCES(ng) % Isrc(is)
-          j = SOURCES(ng) % Jsrc(is)
-          IF ( ((IstrR .LE. i) .AND. (i .LE. IendR)) .AND.              &
-     &         ((JstrR .LE. j) .AND. (j .LE. JendR)) ) THEN
-            DO k=0,N(ng)
-              PLUME(ng)%avgzW(is,k)      =PLUME(ng)%avgzW(is,k)+        &
-     &                                    PLUME(ng)%zW(is,k)
-              PLUME(ng)%avgf(is,k)       =PLUME(ng)%avgf(is,k)+         &
-     &                                    PLUME(ng)%f(is,k)
-              PLUME(ng)%avgw(is,k)       =PLUME(ng)%avgw(is,k)+         &
-     &                                    PLUME(ng)%w(is,k)
-              PLUME(ng)%avga(is,k)       =PLUME(ng)%avga(is,k)+         &
-     &                                     PLUME(ng)%a(is,k)
-              DO it=1,NT(ng)
-                PLUME(ng)%avgtrc(is,k,it)=PLUME(ng)%avgtrc(is,k,it)+    &
-     &                                    PLUME(ng)%trc(is,it)
-              END DO
-            END DO
-            DO k=1,N(ng)
-              PLUME(ng)%avgent(is,k)     =PLUME(ng)%avgent(is,k)+       &
-     &                                    PLUME(ng)%ent(is,k)
-              PLUME(ng)%avgdet(is,k)     =PLUME(ng)%avgdet(is,k)+       &
-     &                                    PLUME(ng)%det(is,k)
-              PLUME(ng)%avgm(is,k)       =PLUME(ng)%avgm(is,k)+         &
-     &                                    PLUME(ng)%m(is,k)
-              PLUME(ng)%avgmB(is,k)      =PLUME(ng)%avgmB(is,k)+        &
-     &                                     PLUME(ng)%mB(is,k)
-            END DO
-          END IF
+          PLUME(ng)%avgent(is)=PLUME(ng)%avgent(is)+PLUME(ng)%sument(is)
+          PLUME(ng)%avgm(is)  =PLUME(ng)%avgm(is)  +PLUME(ng)%summ(is)
+          PLUME(ng)%avgmB(is) =PLUME(ng)%avgmB(is) +PLUME(ng)%summB(is)
+          DO it=1,NT(ng)
+            PLUME(ng)%avgtrcEnt(is,it)=PLUME(ng)%avgtrcEnt(is,it)+      &
+     &                                 PLUME(ng)%sumtrcEnt(is,it)
+          END DO
         END DO
 #  endif
 
@@ -2697,26 +2661,12 @@
 
 #  if defined ICEPLUME && defined ICEPLUME_WRT_AVERAGE
         DO is=1,Nsrc(ng)
-          i = SOURCES(ng) % Isrc(is)
-          j = SOURCES(ng) % Jsrc(is)
-          IF ( ((IstrR .LE. i) .AND. (i .LE. IendR)) .AND.              &
-     &         ((JstrR .LE. j) .AND. (j .LE. JendR)) ) THEN
-            DO k=0,N(ng)
-            PLUME(ng)%avgzW(is,k)      =fac*PLUME(ng)%avgzW(is,k)
-            PLUME(ng)%avgf(is,k)       =fac*PLUME(ng)%avgf(is,k)
-            PLUME(ng)%avgw(is,k)       =fac*PLUME(ng)%avgw(is,k)
-            PLUME(ng)%avga(is,k)       =fac*PLUME(ng)%avga(is,k)
-            DO it=1,NT(ng)
-              PLUME(ng)%avgtrc(is,k,it)=fac*PLUME(ng)%avgtrc(is,k,it)
-            END DO
+          PLUME(ng)%avgent(is)=fac*PLUME(ng)%avgent(is)
+          PLUME(ng)%avgm(is)  =fac*PLUME(ng)%avgm(is)
+          PLUME(ng)%avgmB(is) =fac*PLUME(ng)%avgmB(is)
+          DO it=1,NT(ng)
+            PLUME(ng)%avgtrcEnt(is,it)=fac*PLUME(ng)%avgtrcEnt(is,it)
           END DO
-          DO k=1,N(ng)
-            PLUME(ng)%avgent(is,k)     =fac*PLUME(ng)%avgent(is,k)
-            PLUME(ng)%avgdet(is,k)     =fac*PLUME(ng)%avgdet(is,k)
-            PLUME(ng)%avgm(is,k)       =fac*PLUME(ng)%avgm(is,k)
-            PLUME(ng)%avgmB(is,k)      =fac*PLUME(ng)%avgmB(is,k)
-            END DO
-          END IF
         END DO
 #  endif
 

@@ -71,7 +71,7 @@
       integer :: b3dgrd(4)
 #  endif
 #  if defined ICEPLUME && defined ICEPLUME_WRT_AVERAGE
-      integer :: iw2dgrd(3), ir2dgrd(3)
+      integer :: pl1dgrd(2)
 #  endif
       integer :: p3dgrd(4), t3dgrd(4), u3dgrd(4), v3dgrd(4), w3dgrd(4)
 # endif
@@ -431,13 +431,8 @@
 !
 !  Define dimension vector for iceplume type variables.
 !
-        iw2dgrd(1)=DimIDs(10)
-        iw2dgrd(2)=DimIDs(34)
-        iw2dgrd(3)=DimIDs(12)
-!
-        ir2dgrd(1)=DimIDs( 9)
-        ir2dgrd(2)=DimIDs(34)
-        ir2dgrd(3)=DimIDs(12)
+        pl1dgrd(1)=DimIDs(34)
+        pl1dgrd(2)=DimIDs(12)
 #  endif
 # endif
 !
@@ -1778,54 +1773,41 @@
 !
 !  Define iceplume type outputs.
 !
-        Vinfo( 1)=Vname(1,idPLdep)
-        WRITE (Vinfo( 2),'(a,1x,a)') Prefix, TRIM(Vname(2,idPLdep))
-        Vinfo( 3)=Vname(3,idPLdep)
-        Vinfo(14)=Vname(4,idPLdep)
+        Vinfo( 1)=Vname(1,idPLent)
+        WRITE (Vinfo( 2),'(a,1x,a)') Prefix, TRIM(Vname(2,idPLent))
+        Vinfo( 3)=Vname(3,idPLent)
+        Vinfo(14)=Vname(4,idPLent)
         Vinfo(16)=Vname(1,idtime)
         Vinfo(22)='coordinates'
-        Aval(5)=REAL(Iinfo(1,idPLdep,ng),r8)
-        status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idPLdep),   &
-     &                 NF_FOUT, 3, iw2dgrd, Aval, Vinfo, ncname,        &
+        Aval(5)=REAL(Iinfo(1,idPLent,ng),r8)
+        status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idPLent),   &
+     &                 NF_FOUT, 2, pl1dgrd, Aval, Vinfo, ncname,        &
      &                 SetFillVal = .FALSE., SetParAccess = .TRUE.)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 !
-        Vinfo( 1)=Vname(1,idPLtrs)
-        WRITE (Vinfo( 2),'(a,1x,a)') Prefix, TRIM(Vname(2,idPLtrs))
-        Vinfo( 3)=Vname(3,idPLtrs)
-        Vinfo(14)=Vname(4,idPLtrs)
+        Vinfo( 1)=Vname(1,idPLmlt)
+        WRITE (Vinfo( 2),'(a,1x,a)') Prefix, TRIM(Vname(2,idPLmlt))
+        Vinfo( 3)=Vname(3,idPLmlt)
+        Vinfo(14)=Vname(4,idPLmlt)
         Vinfo(16)=Vname(1,idtime)
         Vinfo(22)='coordinates'
-        Aval(5)=REAL(Iinfo(1,idPLtrs,ng),r8)
-        status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idPLtrs),   &
-     &                 NF_FOUT, 3, iw2dgrd, Aval, Vinfo, ncname,        &
+        Aval(5)=REAL(Iinfo(1,idPLmlt,ng),r8)
+        status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idPLmlt),   &
+     &                 NF_FOUT, 2, pl1dgrd, Aval, Vinfo, ncname,        &
      &                 SetFillVal = .FALSE., SetParAccess = .TRUE.)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 !
-        Vinfo( 1)=Vname(1,idPLvel)
-        WRITE (Vinfo( 2),'(a,1x,a)') Prefix, TRIM(Vname(2,idPLvel))
-        Vinfo( 3)=Vname(3,idPLvel)
-        Vinfo(14)=Vname(4,idPLvel)
+        Vinfo( 1)=Vname(1,idPLmlb)
+        WRITE (Vinfo( 2),'(a,1x,a)') Prefix, TRIM(Vname(2,idPLmlb))
+        Vinfo( 3)=Vname(3,idPLmlb)
+        Vinfo(14)=Vname(4,idPLmlb)
         Vinfo(16)=Vname(1,idtime)
         Vinfo(22)='coordinates'
-        Aval(5)=REAL(Iinfo(1,idPLvel,ng),r8)
-        status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idPLvel),   &
-     &                 NF_FOUT, 3, iw2dgrd, Aval, Vinfo, ncname,        &
-     &                 SetFillVal = .FALSE., SetParAccess = .TRUE.)
-        IF (FoundError(exit_flag, NoError, __LINE__,                    &
-     &                 __FILE__)) RETURN
-!
-        Vinfo( 1)=Vname(1,idPLari)
-        WRITE (Vinfo( 2),'(a,1x,a)') Prefix, TRIM(Vname(2,idPLari))
-        Vinfo( 3)=Vname(3,idPLari)
-        Vinfo(14)=Vname(4,idPLari)
-        Vinfo(16)=Vname(1,idtime)
-        Vinfo(22)='coordinates'
-        Aval(5)=REAL(Iinfo(1,idPLari,ng),r8)
-        status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idPLari),   &
-     &                 NF_FOUT, 3, iw2dgrd, Aval, Vinfo, ncname,        &
+        Aval(5)=REAL(Iinfo(1,idPLmlb,ng),r8)
+        status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idPLmlb),   &
+     &                 NF_FOUT, 2, pl1dgrd, Aval, Vinfo, ncname,        &
      &                 SetFillVal = .FALSE., SetParAccess = .TRUE.)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
@@ -1841,63 +1823,11 @@
           Aval(5)=REAL(Iinfo(1,idPLtrc(itrc),ng),r8)
           status=def_var(ng, model, AVG(ng)%ncid,                       &
      &                   AVG(ng)%Vid(idPLtrc(itrc)),                    &
-     &                   NF_FOUT, 3, iw2dgrd, Aval, Vinfo, ncname,      &
+     &                   NF_FOUT, 2, pl1dgrd, Aval, Vinfo, ncname,      &
      &                   SetFillVal = .FALSE., SetParAccess = .TRUE.)
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
      &                   __FILE__)) RETURN
         END DO
-!
-        Vinfo( 1)=Vname(1,idPLent)
-        WRITE (Vinfo( 2),'(a,1x,a)') Prefix, TRIM(Vname(2,idPLent))
-        Vinfo( 3)=Vname(3,idPLent)
-        Vinfo(14)=Vname(4,idPLent)
-        Vinfo(16)=Vname(1,idtime)
-        Vinfo(22)='coordinates'
-        Aval(5)=REAL(Iinfo(1,idPLent,ng),r8)
-        status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idPLent),   &
-     &                 NF_FOUT, 3, ir2dgrd, Aval, Vinfo, ncname,        &
-     &                 SetFillVal = .FALSE., SetParAccess = .TRUE.)
-        IF (FoundError(exit_flag, NoError, __LINE__,                    &
-     &                 __FILE__)) RETURN
-!
-        Vinfo( 1)=Vname(1,idPLdet)
-        WRITE (Vinfo( 2),'(a,1x,a)') Prefix, TRIM(Vname(2,idPLdet))
-        Vinfo( 3)=Vname(3,idPLdet)
-        Vinfo(14)=Vname(4,idPLdet)
-        Vinfo(16)=Vname(1,idtime)
-        Vinfo(22)='coordinates'
-        Aval(5)=REAL(Iinfo(1,idPLdet,ng),r8)
-        status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idPLdet),   &
-     &                 NF_FOUT, 3, ir2dgrd, Aval, Vinfo, ncname,        &
-     &                 SetFillVal = .FALSE., SetParAccess = .TRUE.)
-        IF (FoundError(exit_flag, NoError, __LINE__,                    &
-     &                 __FILE__)) RETURN
-!
-        Vinfo( 1)=Vname(1,idPLmlt)
-        WRITE (Vinfo( 2),'(a,1x,a)') Prefix, TRIM(Vname(2,idPLmlt))
-        Vinfo( 3)=Vname(3,idPLmlt)
-        Vinfo(14)=Vname(4,idPLmlt)
-        Vinfo(16)=Vname(1,idtime)
-        Vinfo(22)='coordinates'
-        Aval(5)=REAL(Iinfo(1,idPLmlt,ng),r8)
-        status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idPLmlt),   &
-     &                 NF_FOUT, 3, ir2dgrd, Aval, Vinfo, ncname,        &
-     &                 SetFillVal = .FALSE., SetParAccess = .TRUE.)
-        IF (FoundError(exit_flag, NoError, __LINE__,                    &
-     &                 __FILE__)) RETURN
-!
-        Vinfo( 1)=Vname(1,idPLmlb)
-        WRITE (Vinfo( 2),'(a,1x,a)') Prefix, TRIM(Vname(2,idPLmlb))
-        Vinfo( 3)=Vname(3,idPLmlb)
-        Vinfo(14)=Vname(4,idPLmlb)
-        Vinfo(16)=Vname(1,idtime)
-        Vinfo(22)='coordinates'
-        Aval(5)=REAL(Iinfo(1,idPLmlb,ng),r8)
-        status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idPLmlb),   &
-     &                 NF_FOUT, 3, ir2dgrd, Aval, Vinfo, ncname,        &
-     &                 SetFillVal = .FALSE., SetParAccess = .TRUE.)
-        IF (FoundError(exit_flag, NoError, __LINE__,                    &
-     &                 __FILE__)) RETURN
 # endif
 # ifdef NEARSHORE_MELLOR
 !

@@ -2052,75 +2052,18 @@
 !  Write out iceplume terms.
 !
       CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                     &
-     &                      TRIM(Vname(1,idPLdep)), PLUME(ng)%avgzW,    &
-     &                      (/1,1,AVG(ng)%Rindex/),                     &
-     &                      (/N(ng)+1,Nsrc(ng),1/),                     &
-     &                      ncid = AVG(ng)%ncid,                        &
-     &                      varid = AVG(ng)%Vid(idPLdep))
-      IF (FoundError(exit_flag, NoError, __LINE__,                      &
-     &               __FILE__)) RETURN
-!
-      CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                     &
-     &                      TRIM(Vname(1,idPLtrs)), PLUME(ng)%avgf,     &
-     &                      (/1,1,AVG(ng)%Rindex/),                     &
-     &                      (/N(ng)+1,Nsrc(ng),1/),                     &
-     &                      ncid = AVG(ng)%ncid,                        &
-     &                      varid = AVG(ng)%Vid(idPLtrs))
-      IF (FoundError(exit_flag, NoError, __LINE__,                      &
-     &               __FILE__)) RETURN
-!
-      CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                     &
-     &                      TRIM(Vname(1,idPLvel)), PLUME(ng)%avgw,     &
-     &                      (/1,1,AVG(ng)%Rindex/),                     &
-     &                      (/N(ng)+1,Nsrc(ng),1/),                     &
-     &                      ncid = AVG(ng)%ncid,                        &
-     &                      varid = AVG(ng)%Vid(idPLvel))
-      IF (FoundError(exit_flag, NoError, __LINE__,                      &
-     &               __FILE__)) RETURN
-!
-      CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                     &
-     &                      TRIM(Vname(1,idPLari)), PLUME(ng)%avga,     &
-     &                      (/1,1,AVG(ng)%Rindex/),                     &
-     &                      (/N(ng)+1,Nsrc(ng),1/),                     &
-     &                      ncid = AVG(ng)%ncid,                        &
-     &                      varid = AVG(ng)%Vid(idPLari))
-      IF (FoundError(exit_flag, NoError, __LINE__,                      &
-     &               __FILE__)) RETURN
-!
-      DO i=1,NT(ng)
-        CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                   &
-     &                        TRIM(Vname(1,idPLtrc(i))),                &
-     &                        PLUME(ng)%avgtrc(:,:,i),                  &
-     &                        (/1,1,AVG(ng)%Rindex/),                   &
-     &                        (/N(ng)+1,Nsrc(ng),1/),                   &
-     &                        ncid = AVG(ng)%ncid,                      &
-     &                        varid = AVG(ng)%Vid(idPLtrc(i)))
-        IF (FoundError(exit_flag, NoError, __LINE__,                    &
-     &                 __FILE__)) RETURN
-      END DO
-!
-      CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                     &
      &                      TRIM(Vname(1,idPLent)), PLUME(ng)%avgent,   &
-     &                      (/1,1,AVG(ng)%Rindex/),                     &
-     &                      (/N(ng),Nsrc(ng),1/),                       &
+     &                      (/1,AVG(ng)%Rindex/),                       &
+     &                      (/Nsrc(ng),1/),                             &
      &                      ncid = AVG(ng)%ncid,                        &
      &                      varid = AVG(ng)%Vid(idPLent))
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 !
       CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                     &
-     &                      TRIM(Vname(1,idPLdet)), PLUME(ng)%avgdet,   &
-     &                      (/1,1,AVG(ng)%Rindex/),                     &
-     &                      (/N(ng),Nsrc(ng),1/),                       &
-     &                      ncid = AVG(ng)%ncid,                        &
-     &                      varid = AVG(ng)%Vid(idPLdet))
-      IF (FoundError(exit_flag, NoError, __LINE__,                      &
-     &               __FILE__)) RETURN
-!
-      CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                     &
      &                      TRIM(Vname(1,idPLmlt)), PLUME(ng)%avgm,     &
-     &                      (/1,1,AVG(ng)%Rindex/),                     &
-     &                      (/N(ng),Nsrc(ng),1/),                       &
+     &                      (/1,AVG(ng)%Rindex/),                       &
+     &                      (/Nsrc(ng),1/),                             &
      &                      ncid = AVG(ng)%ncid,                        &
      &                      varid = AVG(ng)%Vid(idPLmlt))
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
@@ -2128,12 +2071,24 @@
 !
       CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                     &
      &                      TRIM(Vname(1,idPLmlb)), PLUME(ng)%avgmB,    &
-     &                      (/1,1,AVG(ng)%Rindex/),                     &
-     &                      (/N(ng),Nsrc(ng),1/),                       &
+     &                      (/1,AVG(ng)%Rindex/),                       &
+     &                      (/Nsrc(ng),1/),                             &
      &                      ncid = AVG(ng)%ncid,                        &
-     &                      varid = AVG(ng)%Vid(idPLmlB))
+     &                      varid = AVG(ng)%Vid(idPLmlb))
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
+!
+      DO i=1,NT(ng)
+        CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                   &
+     &                        TRIM(Vname(1,idPLtrc(i))),                &
+     &                        PLUME(ng)%avgtrcEnt(:,i),                 &
+     &                        (/1,AVG(ng)%Rindex/),                     &
+     &                        (/Nsrc(ng),1/),                           &
+     &                        ncid = AVG(ng)%ncid,                      &
+     &                        varid = AVG(ng)%Vid(idPLtrc(i)))
+        IF (FoundError(exit_flag, NoError, __LINE__,                    &
+     &                 __FILE__)) RETURN
+      END DO
 # endif
 !
 !-----------------------------------------------------------------------
