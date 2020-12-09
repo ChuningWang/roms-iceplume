@@ -157,8 +157,8 @@
 !
 !  Calculate area of averaging span for averaging algorithm.
 !
-        DO i = PLUME(ng) % avgIstr(is), PLUME(ng) % avgIend(is)
-          DO j = PLUME(ng) % avgJstr(is), PLUME(ng) % avgJend(is)
+        DO j = PLUME(ng) % avgJstr(is), PLUME(ng) % avgJend(is)
+          DO i = PLUME(ng) % avgIstr(is), PLUME(ng) % avgIend(is)
             IF ( ((IstrR .LE. i) .AND. (i .LE. IendR)) .AND.             &
      &           ((JstrR .LE. j) .AND. (j .LE. JendR)) .AND.             &
      &           (GRID(ng) % rmask(i, j) .GT. 0.5_r8) ) THEN
@@ -243,10 +243,10 @@
       real(r8) :: pr, rhoAm
       real(r8) :: dx, dy
       real(r8) :: RHO
+      real(r8), parameter :: spv = 0.0_r8
 # ifdef ICEPLUME_DET_AVERAGE
       integer :: i, j
       real(r8) :: area
-      real(r8), parameter :: spv = 0.0_r8
 #  ifdef DISTRIBUTE
       integer :: Npts
 #  endif
@@ -354,8 +354,8 @@
           PLUME(ng) % rhoAm0(is, K) = PLUME(ng) % rhoAm(is, K)
           PLUME(ng) % rhoAm(is, K) = spv
         ENDDO
-        DO i = PLUME(ng) % avgIstr(is), PLUME(ng) % avgIend(is)
-          DO j = PLUME(ng) % avgJstr(is), PLUME(ng) % avgJend(is)
+        DO j = PLUME(ng) % avgJstr(is), PLUME(ng) % avgJend(is)
+          DO i = PLUME(ng) % avgIstr(is), PLUME(ng) % avgIend(is)
             IF ( ((IstrR .LE. i) .AND. (i .LE. IendR)) .AND.             &
      &           ((JstrR .LE. j) .AND. (j .LE. JendR)) .AND.             &
      &           (GRID(ng) % rmask(i, j) .GT. 0.5_r8) ) THEN

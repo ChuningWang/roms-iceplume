@@ -17,6 +17,7 @@
 #define SOLVE3D
 #define SALINITY
 #define NONLIN_EOS
+#define AVERAGES
 
 /* iceplume */
 #define ICEPLUME
