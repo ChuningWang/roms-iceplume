@@ -583,7 +583,7 @@
         CALL get_ngfld (ng, iNLM, idSGerange, SSF(ng)%ncid,             &
      &                  1, SSF(ng), update(1),                          &
      &                  1, Nsrc(ng), 2, 1, 1, Nsrc(ng), 2,              &
-     &                  SOURCES(ng) % SGJrangeRaw)
+     &                  SOURCES(ng) % SGJrange)
         IF (FoundError(exit_flag, NoError, __LINE__,                    &
      &                 __FILE__)) RETURN
 
