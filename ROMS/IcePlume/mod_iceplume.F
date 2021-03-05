@@ -190,7 +190,7 @@
           integer,  pointer :: avgIend(:)
           integer,  pointer :: avgJstr(:)
           integer,  pointer :: avgJend(:)
-          real(r8), pointer :: avgArea(:)
+          real(r8), pointer :: avgArea(:, :)
 # endif
 !
 ! Plume state (omega surface).
@@ -316,8 +316,8 @@
       allocate ( PLUME(ng) % avgIend (Nsrc(ng)) )
       allocate ( PLUME(ng) % avgJstr (Nsrc(ng)) )
       allocate ( PLUME(ng) % avgJend (Nsrc(ng)) )
-      allocate ( PLUME(ng) % avgArea (Nsrc(ng)) )
-      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*5,r8)
+      allocate ( PLUME(ng) % avgArea (Nsrc(ng), N(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*4+Nsrc(ng)*N(ng),r8)
 # endif
 !
       allocate ( PLUME(ng) % zW   (Nsrc(ng), 0:N(ng)) )
@@ -416,7 +416,9 @@
         PLUME(ng) % avgIend (is) = 0
         PLUME(ng) % avgJstr (is) = 0
         PLUME(ng) % avgJend (is) = 0
-        PLUME(ng) % avgArea (is) = IniVal
+        DO k=1,N(ng)
+          PLUME(ng) % avgArea (is, k) = IniVal
+        ENDDO
 # endif
 !
         DO k=0,N(ng)

@@ -154,19 +154,6 @@
         PLUME(ng) % avgIend(is) = NINT(SOURCES(ng) % SGIrange(is, 2))
         PLUME(ng) % avgJstr(is) = NINT(SOURCES(ng) % SGJrange(is, 1))
         PLUME(ng) % avgJend(is) = NINT(SOURCES(ng) % SGJrange(is, 2))
-!
-!  Calculate area of averaging span for averaging algorithm.
-!
-        DO j = PLUME(ng) % avgJstr(is), PLUME(ng) % avgJend(is)
-          DO i = PLUME(ng) % avgIstr(is), PLUME(ng) % avgIend(is)
-            IF ( ((IstrR .LE. i) .AND. (i .LE. IendR)) .AND.             &
-     &           ((JstrR .LE. j) .AND. (j .LE. JendR)) .AND.             &
-     &           (GRID(ng) % rmask(i, j) .GT. 0.5_r8) ) THEN
-              PLUME(ng) % avgArea(is) = PLUME(ng) % avgArea(is) +       &
-     &            ABS(GRID(ng) % om_r(i, j)*GRID(ng) % on_r(i, j))
-            ENDIF
-          ENDDO
-        ENDDO
 # endif
       ENDDO
 # ifdef DISTRIBUTE
@@ -179,10 +166,6 @@
       CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,PLUME(ng)%dir(1:Nsrc(ng)))
       CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,PLUME(ng)%dx(1:Nsrc(ng)))
       CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,PLUME(ng)%dy(1:Nsrc(ng)))
-#  ifdef ICEPLUME_DET_AVERAGE
-      CALL mp_collect (ng,iNLM,Nsrc(ng),Fspv,                           &
-     &                 PLUME(ng)%avgArea(1:Nsrc(ng)))
-#  endif
 # endif
       RETURN
       END SUBROUTINE iceplume_init_tile
@@ -260,18 +243,18 @@
 !
       PLUME(ng) % zR = spv
 # endif
+!
+! ==================================================================!
+!                                                                   !
+! Read in and prepare profiles from OCEAN.                          !
+!                                                                   !
+! ==================================================================!
+!
       DO is = 1, Nsrc(ng)
         Isrc = PLUME(ng) % Isrc(is)
         Jsrc = PLUME(ng) % Jsrc(is)
         IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.          &
      &       ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
-!
-! ==================================================================!
-!                                                                   !
-! Read in profiles from OCEAN.                                      !
-!                                                                   !
-! ==================================================================!
-!
           Dsrc = NINT(SOURCES(ng) % Dsrc(is))
 !
           DO K = 0, N(ng)
@@ -335,37 +318,54 @@
             PLUME(ng) % trcIni(is, itrc) = 0.0_r8
 # endif
           ENDDO
-# ifdef ICEPLUME_DET_AVERAGE
         ENDIF
       ENDDO
+# ifdef ICEPLUME_DET_AVERAGE
+!
+! ==================================================================!
+!                                                                   !
+! Average density profiles in a box to surpress oscillation.        !
+!                                                                   !
+! ==================================================================!
+!
 #  ifdef DISTRIBUTE
+      Npts = Nsrc(ng)*N(ng)
 !
 !  Exchange data between all parallel nodes.
 !
-      Npts = Nsrc(ng)*N(ng)
       CALL mp_assemble (ng, iNLM, Npts, spv,                            &
      &                  PLUME(ng) % zR(1:Nsrc(ng), 1:N(ng)))
 #  endif
-!
-!  Average density profiles in a box to surpress oscillation.
 !
       DO is = 1, Nsrc(ng)
         DO K = 1, N(ng)
           PLUME(ng) % rhoAm0(is, K) = PLUME(ng) % rhoAm(is, K)
           PLUME(ng) % rhoAm(is, K) = spv
+          PLUME(ng) % avgArea(is, K) = spv
         ENDDO
         DO j = PLUME(ng) % avgJstr(is), PLUME(ng) % avgJend(is)
           DO i = PLUME(ng) % avgIstr(is), PLUME(ng) % avgIend(is)
-            IF ( ((IstrR .LE. i) .AND. (i .LE. IendR)) .AND.             &
-     &           ((JstrR .LE. j) .AND. (j .LE. JendR)) .AND.             &
+            IF ( ((IstrR .LE. i) .AND. (i .LE. IendR)) .AND.            &
+     &           ((JstrR .LE. j) .AND. (j .LE. JendR)) .AND.            &
      &           (GRID(ng) % rmask(i, j) .GT. 0.5_r8) ) THEN
               area = ABS(GRID(ng)%om_r(i,j)*GRID(ng)%on_r(i,j))
               DO K = 1, N(ng)
-                CALL LININT(N(ng),                                      &
-     &            GRID(ng) % z_r(i, j, :), OCEAN(ng) % rho(i, j, :),    &
-     &            PLUME(ng) % zR(is, K),   rhoAm)
-                PLUME(ng) % rhoAm(is, K) = PLUME(ng) % rhoAm(is, K) +   &
-     &            rhoAm*area
+                IF ( (PLUME(ng) % zR(is, K) .GT.                        &
+     &                GRID(ng) % z_r(i, j, 1)) ) THEN
+!
+!  Interpolate density to the right depth.
+!
+                  CALL LININT(N(ng),                                    &
+     &              GRID(ng) % z_r(i, j, :), OCEAN(ng) % rho(i, j, :),  &
+     &              PLUME(ng) % zR(is, K),   rhoAm)
+!
+!  Integrate density and averaging area.
+!
+                  PLUME(ng) % avgArea(is, K) =                          &
+     &              PLUME(ng) % avgArea(is, K) + area
+                  PLUME(ng) % rhoAm(is, K) =                            &
+     &              PLUME(ng) % rhoAm(is, K) + rhoAm*area
+                ENDIF
               ENDDO
             ENDIF
           ENDDO
@@ -377,6 +377,8 @@
 !
       CALL mp_assemble (ng, iNLM, Npts, spv,                            &
      &                  PLUME(ng) % rhoAm(1:Nsrc(ng), 1:N(ng)))
+      CALL mp_assemble (ng, iNLM, Npts, spv,                            &
+     &                  PLUME(ng) % avgArea(1:Nsrc(ng), 1:N(ng)))
 #  endif
 !
       DO is = 1, Nsrc(ng)
@@ -386,7 +388,7 @@
      &       ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
           DO K = 1, N(ng)
             PLUME(ng) % rhoAm(is, K) =                                  &
-     &        PLUME(ng) % rhoAm(is, K) / PLUME(ng) % avgArea(is)
+     &        PLUME(ng) % rhoAm(is, K) / PLUME(ng) % avgArea(is, K)
 !
 !  Convert from density anomaly to absolute density.
 !
@@ -405,12 +407,6 @@
           ENDDO
         ENDIF
       ENDDO
-!
-      DO is = 1, Nsrc(ng)
-        Isrc = PLUME(ng) % Isrc(is)
-        Jsrc = PLUME(ng) % Jsrc(is)
-        IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.          &
-     &       ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
 # endif
 !
 ! ==================================================================!
@@ -419,6 +415,11 @@
 !                                                                   !
 ! ==================================================================!
 !
+      DO is = 1, Nsrc(ng)
+        Isrc = PLUME(ng) % Isrc(is)
+        Jsrc = PLUME(ng) % Jsrc(is)
+        IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.          &
+     &       ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
           IF (NINT(SOURCES(ng) % SGtyp(is)) .NE. 0) THEN
             CALL iceplume_calc(ng, is,                                  &
      &                         ABS(SOURCES(ng) % SGbar(is)),            &
