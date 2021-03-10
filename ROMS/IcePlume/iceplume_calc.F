@@ -187,7 +187,28 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
       ENDIF
     ENDDO
 # endif
+!
+! ==================================================================!
+!                                                                   !
+! Use a detrainment model to distribute the detrainment plume in    !
+! several layers. Details in iceplume_detrain.F.                    !
+!                                                                   !
+! *** This part is completely rewritten since Feb 20, 2019.         !
+!                                                                   !
+! ==================================================================!
+!
+# ifdef ICEPLUME_DET_NO
+    PLUME(ng) % det(I, plumeDepthK) = det
+    PLUME(ng) % detI(I, plumeDepthK) = 1
+    PLUME(ng) % detFrac(I, plumeDepthK) = 1.0
+# else
+    CALL ICEPLUME_DETRAIN(ng, I,                                        &
+     &                    iceDepthK, plumeDepthK, osDepthK,             &
+     &                    PLUME(ng) % lc(I, osDepthK),                  &
+     &                    det)
+# endif
   ENDIF
+# ifdef ICEPLUME_MELT
 !
 ! ==================================================================!
 !                                                                   !
@@ -223,7 +244,6 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
       PLUME(ng) % m(I, K) = PLUME(ng) % mInt(I, K) -                    &
      &                      PLUME(ng) % mInt(I, K-1)
     ENDIF
-# ifdef ICEPLUME_MELT
 !
 ! ==================================================================!
 !                                                                   !
@@ -274,7 +294,7 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
     PLUME(ng) % trcB(I, itrc)   = 0.0
   ENDDO
 !
-  IF (fIni .GT. 0.0) THEN
+  IF (fIni .GT. 0.0) .AND. (sgTyp .NE. 1) THEN
 !
 ! Write the active tracer (T & S) concentration to PLUME (ng) % trc
 !
@@ -345,29 +365,6 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
   PLUME(ng) % trcB(I, NT(ng)) = PLUME(ng) % trcIni(I, NT(ng))
 #  endif
 # endif
-!
-! ==================================================================!
-!                                                                   !
-! Use a detrainment model to distribute the detrainment plume in    !
-! several layers. Details in iceplume_detrain.F.                    !
-!                                                                   !
-! *** This part is completely rewritten since Feb 20, 2019.         !
-!                                                                   !
-! ==================================================================!
-!
-  IF (fIni .GT. 0) .AND. (sgTyp .NE. 1) THEN
-!
-# ifdef ICEPLUME_DET_NO
-    PLUME(ng) % det(I, plumeDepthK) = det
-    PLUME(ng) % detI(I, plumeDepthK) = 1
-    PLUME(ng) % detFrac(I, plumeDepthK) = 1.0
-# else
-    CALL ICEPLUME_DETRAIN(ng, I,                                        &
-     &                    iceDepthK, plumeDepthK, osDepthK,             &
-     &                    PLUME(ng) % lc(I, osDepthK),                  &
-     &                    det)
-# endif
-  ENDIF  ! fini .GT. 0.0
 !
 ! Calculate depth integrated volume transport [m3 s-1]
 !
