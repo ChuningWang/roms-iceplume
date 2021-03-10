@@ -238,7 +238,7 @@
         END DO
 # if defined ICEPLUME
         DO is=1,Nsrc(ng)
-          SOURCES(ng)%SGbar(is)=200.0_r8
+          SOURCES(ng)%SGbar(is)=100.0_r8
         END DO
 # endif
 #else

@@ -91,9 +91,9 @@ GridsInLayer =  1
 ! Grid dimension parameters. See notes below in the Glossary for how to set
 ! these parameters correctly.
 
-          Lm == 21            ! Number of I-direction INTERIOR RHO-points
-          Mm == 21            ! Number of J-direction INTERIOR RHO-points
-           N == 40            ! Number of vertical levels
+          Lm == 100           ! Number of I-direction INTERIOR RHO-points
+          Mm == 51            ! Number of J-direction INTERIOR RHO-points
+           N == 20            ! Number of vertical levels
 
         Nbed =  0             ! Number of sediment bed layers
 
@@ -223,9 +223,9 @@ ad_VolCons(north) ==  F                            ! northern boundary
 
 ! Time-Stepping parameters.
 
-      NTIMES == 8640
-          DT == 10.0d0
-     NDTFAST == 5
+      NTIMES == 2880
+          DT == 60.0d0
+     NDTFAST == 30
 
 ! Number of timesteps for computing observation impacts during the
 ! analysis-forecast cycle.
@@ -253,23 +253,23 @@ ad_VolCons(north) ==  F                            ! northern boundary
 
        NRREC == 0
    LcycleRST == T
-        NRST == 360
+        NRST == 1440
         NSTA == 1
         NFLT == 1
-       NINFO == 360
+       NINFO == 1440
 
 ! Output history, quicksave, average, and diagnostic files parameters.
 
      LDEFOUT == T
-        NHIS == 360
+        NHIS == 60
      NDEFHIS == 0
         NQCK == 0
      NDEFQCK == 0
       NTSAVG == 1
-        NAVG == 360
+        NAVG == 1440
      NDEFAVG == 0
       NTSDIA == 1
-        NDIA == 360
+        NDIA == 1440
      NDEFDIA == 0
 
 ! Output tangent linear and adjoint models parameters.
