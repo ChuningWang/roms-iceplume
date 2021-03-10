@@ -121,7 +121,7 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
     PLUME(ng) % detFrac(I, K) = 0.0
   ENDDO
 !
-  IF (fIni .GT. 0.0) .AND. (sgTyp .NE. 1) THEN
+  IF ( (fIni .GT. 0.0) .AND. (sgTyp .NE. 1) ) THEN
 !
 ! Run the plume model
 !
@@ -294,7 +294,7 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
     PLUME(ng) % trcB(I, itrc)   = 0.0
   ENDDO
 !
-  IF (fIni .GT. 0.0) .AND. (sgTyp .NE. 1) THEN
+  IF ( (fIni .GT. 0.0) .AND. (sgTyp .NE. 1) ) THEN
 !
 ! Write the active tracer (T & S) concentration to PLUME (ng) % trc
 !

@@ -338,38 +338,40 @@
 #  endif
 !
       DO is = 1, Nsrc(ng)
-        DO K = 1, N(ng)
-          PLUME(ng) % rhoAm0(is, K) = PLUME(ng) % rhoAm(is, K)
-          PLUME(ng) % rhoAm(is, K) = spv
-          PLUME(ng) % avgArea(is, K) = spv
-        ENDDO
-        DO j = PLUME(ng) % avgJstr(is), PLUME(ng) % avgJend(is)
-          DO i = PLUME(ng) % avgIstr(is), PLUME(ng) % avgIend(is)
-            IF ( ((IstrR .LE. i) .AND. (i .LE. IendR)) .AND.            &
-     &           ((JstrR .LE. j) .AND. (j .LE. JendR)) .AND.            &
-     &           (GRID(ng) % rmask(i, j) .GT. 0.5_r8) ) THEN
-              area = ABS(GRID(ng)%om_r(i,j)*GRID(ng)%on_r(i,j))
-              DO K = 1, N(ng)
-                IF ( (PLUME(ng) % zR(is, K) .GT.                        &
-     &                GRID(ng) % z_r(i, j, 1)) ) THEN
+        IF ( NINT(SOURCES(ng) % SGtyp(is)) .GT. 1 ) THEN
+          DO K = 1, N(ng)
+            PLUME(ng) % rhoAm0(is, K) = PLUME(ng) % rhoAm(is, K)
+            PLUME(ng) % rhoAm(is, K) = spv
+            PLUME(ng) % avgArea(is, K) = spv
+          ENDDO
+          DO j = PLUME(ng) % avgJstr(is), PLUME(ng) % avgJend(is)
+            DO i = PLUME(ng) % avgIstr(is), PLUME(ng) % avgIend(is)
+              IF ( ((IstrR .LE. i) .AND. (i .LE. IendR)) .AND.          &
+      &            ((JstrR .LE. j) .AND. (j .LE. JendR)) .AND.          &
+      &            (GRID(ng) % rmask(i, j) .GT. 0.5_r8) ) THEN
+                area = ABS(GRID(ng)%om_r(i,j)*GRID(ng)%on_r(i,j))
+                DO K = 1, N(ng)
+                  IF ( (PLUME(ng) % zR(is, K) .GT.                      &
+      &                 GRID(ng) % z_r(i, j, 1)) ) THEN
 !
 !  Interpolate density to the right depth.
 !
-                  CALL LININT(N(ng),                                    &
-     &              GRID(ng) % z_r(i, j, :), OCEAN(ng) % rho(i, j, :),  &
-     &              PLUME(ng) % zR(is, K),   rhoAm)
+                    CALL LININT(N(ng),                                  &
+     & GRID(ng) % z_r(i, j, :), OCEAN(ng) % rho(i, j, :),               &
+     & PLUME(ng) % zR(is, K),   rhoAm)
 !
 !  Integrate density and averaging area.
 !
-                  PLUME(ng) % avgArea(is, K) =                          &
-     &              PLUME(ng) % avgArea(is, K) + area
-                  PLUME(ng) % rhoAm(is, K) =                            &
-     &              PLUME(ng) % rhoAm(is, K) + rhoAm*area
-                ENDIF
-              ENDDO
-            ENDIF
+                    PLUME(ng) % avgArea(is, K) =                        &
+     &                PLUME(ng) % avgArea(is, K) + area
+                    PLUME(ng) % rhoAm(is, K) =                          &
+     &                PLUME(ng) % rhoAm(is, K) + rhoAm*area
+                  ENDIF
+                ENDDO
+              ENDIF
+            ENDDO
           ENDDO
-        ENDDO
+        ENDIF
       ENDDO
 #  ifdef DISTRIBUTE
 !

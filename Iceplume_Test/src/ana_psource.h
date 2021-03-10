@@ -112,7 +112,7 @@
 !
 !  Local variable declarations.
 !
-      integer :: Npts, NSUB, is, i, j, k, ised
+      integer :: Npts, NSUB, is, i, j, k, ised, itrc
       integer :: isc, is0
 
       real(r8) :: Pspv = 0.0_r8
@@ -144,16 +144,22 @@
 !
 #if defined ICEPLUME_TEST
         IF (Master.and.DOMAIN(ng)%SouthWest_Test(tile)) THEN
-          Nsrc = 3
+          ! Nsrc = 3
+          Nsrc = NINT(Mm(ng)-2.0_r8)
           isc=NINT((Mm(ng)+1)/2.0_r8)
           is0=isc-NINT((Nsrc(ng)+1)/2.0_r8)
+          isc=NINT((Nsrc(ng)+1)/2.0_r8)
           DO is=1,Nsrc(ng)
             SOURCES(ng)%Dsrc(is)=0.0_r8
             SOURCES(ng)%Isrc(is)=2
             SOURCES(ng)%Jsrc(is)=is0+is
 # if defined ICEPLUME
-            SOURCES(ng)%SGdep(is)=-260.0_r8
-            SOURCES(ng)%SGtyp(is)=4.0_r8
+            SOURCES(ng)%SGdep(is)=1.0_r8
+            IF (is.eq.isc) THEN
+              SOURCES(ng)%SGtyp(is)=4.0_r8
+            ELSE
+              SOURCES(ng)%SGtyp(is)=1.0_r8
+            ENDIF
             SOURCES(ng)%SGlen(is)=220.0_r8
 #  ifdef ICEPLUME_DET_AVERAGE
             SOURCES(ng)%SGIrange(is,1)=2.0_r8
@@ -237,8 +243,13 @@
           SOURCES(ng)%Qbar(is)=0.0_r8
         END DO
 # if defined ICEPLUME
+        isc=NINT((Nsrc(ng)+1)/2.0_r8)
         DO is=1,Nsrc(ng)
-          SOURCES(ng)%SGbar(is)=100.0_r8
+          IF (is.eq.isc) THEN
+            SOURCES(ng)%SGbar(is)=100.0_r8
+          ELSE
+            SOURCES(ng)%SGbar(is)=0.0_r8
+          ENDIF
         END DO
 # endif
 #else
@@ -285,7 +296,9 @@
           DO is=1,Nsrc(ng)
             SOURCES(ng)%SGtrc(is,itemp)=0.0_r8
             SOURCES(ng)%SGtrc(is,isalt)=0.0_r8
-            SOURCES(ng)%SGtrc(is,3)=1.0_r8
+            DO itrc=3,NT(ng)
+              SOURCES(ng)%SGtrc(is,itrc)=1.0_r8
+            END DO
           END DO
 #  endif
         END IF
