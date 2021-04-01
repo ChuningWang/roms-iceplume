@@ -3,9 +3,9 @@
       SUBROUTINE biology_floats (ng, Lstr, Lend, Predictor, my_thread)
 !
 !git $Id$
-!svn $Id: oyster_floats.h 995 2020-01-10 04:01:28Z arango $
+!svn $Id: oyster_floats.h 1054 2021-03-06 19:47:12Z arango $
 !************************************************** Hernan G. Arango ***
-!  Copyright (c) 2002-2020 The ROMS/TOMS Group      Diego A. Narvaez   !
+!  Copyright (c) 2002-2021 The ROMS/TOMS Group      Diego A. Narvaez   !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !***********************************************************************
@@ -83,8 +83,13 @@
       logical, intent(in) :: my_thread(Lstr:Lend)
 #endif
 !
+!  Local variable declarations.
+!
+      character (len=*), parameter :: MyFile =                          &
+     &  __FILE__
+!
 #ifdef PROFILE
-      CALL wclock_on (ng, iNLM, 10, __LINE__, __FILE__)
+      CALL wclock_on (ng, iNLM, 10, __LINE__, MyFile)
 #endif
       CALL biology_floats_tile (ng, Lstr, Lend,                         &
      &                          nfm3(ng), nfm2(ng), nfm1(ng), nf(ng),   &
@@ -94,9 +99,9 @@
      &                          DRIFTER(ng) % Tinfo,                    &
      &                          DRIFTER(ng) % track)
 #ifdef PROFILE
-      CALL wclock_off (ng, iNLM, 10, __LINE__, __FILE__)
+      CALL wclock_off (ng, iNLM, 10, __LINE__, MyFile)
 #endif
-
+!
       RETURN
       END SUBROUTINE biology_floats
 !
@@ -436,6 +441,6 @@
 
         END IF
       END DO
-
+!
       RETURN
       END SUBROUTINE biology_floats_tile

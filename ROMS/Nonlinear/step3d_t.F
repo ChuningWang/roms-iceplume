@@ -3,9 +3,9 @@
 #if !defined TS_FIXED && (defined NONLINEAR && defined SOLVE3D)
 !
 !git $Id$
-!svn $Id: step3d_t.F 1034 2020-07-15 21:16:28Z arango $
+!svn $Id: step3d_t.F 1054 2021-03-06 19:47:12Z arango $
 !=======================================================================
-!  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                           Hernan G. Arango   !
 !========================================== Alexander F. Shchepetkin ===
@@ -56,10 +56,13 @@
 !
 !  Local variable declarations.
 !
+      character (len=*), parameter :: MyFile =                          &
+     &  __FILE__
+!
 # include "tile.h"
 !
 # ifdef PROFILE
-      CALL wclock_on (ng, iNLM, 35, __LINE__, __FILE__)
+      CALL wclock_on (ng, iNLM, 35, __LINE__, MyFile)
 # endif
       CALL step3d_t_tile (ng, tile,                                     &
      &                    LBi, UBi, LBj, UBj,                           &
@@ -96,8 +99,9 @@
 # endif
      &                    OCEAN(ng) % t)
 # ifdef PROFILE
-      CALL wclock_off (ng, iNLM, 35, __LINE__, __FILE__)
+      CALL wclock_off (ng, iNLM, 35, __LINE__, MyFile)
 # endif
+!
       RETURN
       END SUBROUTINE step3d_t
 !

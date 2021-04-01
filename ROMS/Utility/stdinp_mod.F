@@ -2,9 +2,9 @@
       MODULE stdinp_mod
 !
 !git $Id$
-!svn $Id: stdinp_mod.F 1037 2020-08-15 01:56:27Z arango $
+!svn $Id: stdinp_mod.F 1054 2021-03-06 19:47:12Z arango $
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -85,7 +85,10 @@
 !
       integer :: InpUnit
 !
-      SourceFile=__FILE__// ", stdout_unit"
+      character (len=*), parameter :: MyFile =                          &
+     &  __FILE__//", stdout_unit"
+!
+      SourceFile=MyFile
 !
 !-----------------------------------------------------------------------
 !  Determine ROMS standard input unit.

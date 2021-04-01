@@ -3,9 +3,9 @@
 #ifdef TL_IOMS
 !
 !git $Id$
-!svn $Id: rp_set_vbc.F 1039 2020-10-12 03:54:49Z arango $
+!svn $Id: rp_set_vbc.F 1054 2021-03-06 19:47:12Z arango $
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2020 The ROMS/TOMS Group       Andrew M. Moore   !
+!  Copyright (c) 2002-2021 The ROMS/TOMS Group       Andrew M. Moore   !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -45,10 +45,13 @@
 !
 !  Local variable declarations.
 !
+      character (len=*), parameter :: MyFile =                          &
+     &  __FILE__
+!
 #  include "tile.h"
 !
 #  ifdef PROFILE
-      CALL wclock_on (ng, iRPM, 6, __LINE__, __FILE__)
+      CALL wclock_on (ng, iRPM, 6, __LINE__, MyFile)
 #  endif
       CALL rp_set_vbc_tile (ng, tile,                                   &
      &                      LBi, UBi, LBj, UBj,                         &
@@ -109,7 +112,7 @@
      &                      FORCES(ng) % tl_stflx,                      &
      &                      FORCES(ng) % tl_btflx)
 #  ifdef PROFILE
-      CALL wclock_off (ng, iRPM, 6, __LINE__, __FILE__)
+      CALL wclock_off (ng, iRPM, 6, __LINE__, MyFile)
 #  endif
 !
       RETURN
@@ -485,6 +488,9 @@
 !>          stflx(i,j,itrc)=stflux(i,j,itrc)
 !>
             rp_stflx(i,j,itrc)=0.0_r8
+!>          btflx(i,j,itrc)=btflux(i,j,itrc)
+!>
+            rp_btflx(i,j,itrc)=0.0_r8
           END DO
         END DO
       END DO
@@ -1021,10 +1027,13 @@
 !
 !  Local variable declarations.
 !
+      character (len=*), parameter :: MyFile =                          &
+     &  __FILE__
+!
 #  include "tile.h"
 !
 #  ifdef PROFILE
-      CALL wclock_on (ng, iRPM, 6, __LINE__, __FILE__)
+      CALL wclock_on (ng, iRPM, 6, __LINE__, MyFile)
 #  endif
       CALL rp_set_vbc_tile (ng, tile,                                   &
      &                      LBi, UBi, LBj, UBj,                         &
@@ -1044,9 +1053,9 @@
      &                      FORCES(ng) % tl_bustr,                      &
      &                      FORCES(ng) % tl_bvstr)
 #  ifdef PROFILE
-      CALL wclock_off (ng, iRPM, 6, __LINE__, __FILE__)
+      CALL wclock_off (ng, iRPM, 6, __LINE__, MyFile)
 #  endif
-
+!
       RETURN
       END SUBROUTINE rp_set_vbc
 !
