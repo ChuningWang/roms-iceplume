@@ -1,9 +1,9 @@
       SUBROUTINE ana_dqdsst (ng, tile, model)
 !
 !! git $Id$
-!! svn $Id: ana_dqdsst.h 995 2020-01-10 04:01:28Z arango $
+!! svn $Id: ana_dqdsst.h 1054 2021-03-06 19:47:12Z arango $
 !!======================================================================
-!! Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
+!! Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
 !!   Licensed under a MIT/X style license                              !
 !!   See License_ROMS.txt                                              !
 !=======================================================================
@@ -26,7 +26,12 @@
 ! Imported variable declarations.
 !
       integer, intent(in) :: ng, tile, model
-
+!
+! Local variable declarations.
+!
+      character (len=*), parameter :: MyFile =                          &
+     &  __FILE__
+!
 #include "tile.h"
 !
       CALL ana_dqdsst_tile (ng, tile, model,                            &
@@ -42,9 +47,9 @@
 #else
       IF (Lanafile.and.(tile.eq.0)) THEN
 #endif
-        ANANAME(38)=__FILE__
+        ANANAME(38)=MyFile
       END IF
-
+!
       RETURN
       END SUBROUTINE ana_dqdsst
 !
@@ -64,7 +69,7 @@
       USE mp_exchange_mod, ONLY : mp_exchange2d
 #endif
 !
-!  Imported variable declarations.
+! Imported variable declarations.
 !
       integer, intent(in) :: ng, tile, model
       integer, intent(in) :: LBi, UBi, LBj, UBj
@@ -78,10 +83,10 @@
       real(r8), intent(out) :: dqdt(LBi:UBi,LBj:UBj)
 #endif
 !
-!  Local variable declarations.
+! Local variable declarations.
 !
       integer :: i, j
-
+!
       real(r8) :: fac
 
 #include "set_bounds.h"
@@ -120,6 +125,6 @@
      &                    EWperiodic(ng), NSperiodic(ng),               &
      &                    dqdt)
 #endif
-
+!
       RETURN
       END SUBROUTINE ana_dqdsst_tile

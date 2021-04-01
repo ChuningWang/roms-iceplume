@@ -122,7 +122,7 @@
           ELSE
             mask(i,j)=1.0_r8
           END IF
-          IF ((j.gt.isc).and.(i.le.(j-isc))) mask(i,j)=0.0_r8
+          ! IF ((j.gt.isc).and.(i.le.(j-isc))) mask(i,j)=0.0_r8
         END DO
       END DO
 #else

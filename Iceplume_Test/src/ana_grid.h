@@ -226,9 +226,9 @@
 !-----------------------------------------------------------------------
 !
 #if defined ICEPLUME_TEST
-      Xsize=300.0_r8*REAL(Lm(ng),r8)
-      Esize=300.0_r8*REAL(Mm(ng),r8)
-      depth=400.0_r8
+      Xsize=220.0_r8*REAL(Lm(ng),r8)
+      Esize=220.0_r8*REAL(Mm(ng),r8)
+      depth=200.0_r8
       f0=1.0E-04_r8
       beta=0.0_r8
 #else

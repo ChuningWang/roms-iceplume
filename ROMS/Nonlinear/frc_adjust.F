@@ -4,9 +4,9 @@
 #if defined ADJUST_STFLUX || defined ADJUST_WSTRESS
 !
 !git $Id$
-!svn $Id: frc_adjust.F 1031 2020-07-14 01:39:55Z arango $
+!svn $Id: frc_adjust.F 1054 2021-03-06 19:47:12Z arango $
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -45,10 +45,13 @@
 !
 !  Local variable declarations.
 !
+      character (len=*), parameter :: MyFile =                          &
+     &  __FILE__
+!
 # include "tile.h"
 !
 # ifdef PROFILE
-      CALL wclock_on (ng, iNLM, 7, __LINE__, __FILE__)
+      CALL wclock_on (ng, iNLM, 7, __LINE__, MyFile)
 # endif
       CALL frc_adjust_tile (ng, tile,                                   &
      &                      LBi, UBi, LBj, UBj,                         &
@@ -68,8 +71,9 @@
 # endif
      &                      Linp)
 # ifdef PROFILE
-      CALL wclock_off (ng, iNLM, 7, __LINE__, __FILE__)
+      CALL wclock_off (ng, iNLM, 7, __LINE__, MyFile)
 # endif
+!
       RETURN
       END SUBROUTINE frc_adjust
 !
@@ -239,19 +243,22 @@
 !
 !  Local variable declarations.
 !
+      character (len=*), parameter :: MyFile =                          &
+     &  __FILE__//", load_frc"
+!
 # include "tile.h"
 !
 # ifdef PROFILE
-      CALL wclock_on (ng, iNLM, 8, __LINE__, __FILE__)
+      CALL wclock_on (ng, iNLM, 8, __LINE__, MyFile)
 # endif
       CALL load_frc_tile (ng, tile,                                     &
      &                    LBi, UBi, LBj, UBj,                           &
      &                    IminS, ImaxS, JminS, JmaxS,                   &
      &                    Lout)
 # ifdef PROFILE
-      CALL wclock_off (ng, iNLM, 8, __LINE__, __FILE__)
+      CALL wclock_off (ng, iNLM, 8, __LINE__, MyFile)
 # endif
-
+!
       RETURN
       END SUBROUTINE load_frc
 !
