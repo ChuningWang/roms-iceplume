@@ -2,9 +2,9 @@
       SUBROUTINE radiation_stress (ng, tile)
 !
 !git $Id$
-!svn $Id: nearshore_mellor05.h 995 2020-01-10 04:01:28Z arango $
+!svn $Id: nearshore_mellor05.h 1054 2021-03-06 19:47:12Z arango $
 !***********************************************************************
-!  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                           Hernan G. Arango   !
 !**************************************************   John C. Warner ***
@@ -33,12 +33,19 @@
       USE mod_diags
 #endif
 !
+!  Imported variable declarations.
+!
       integer, intent(in) :: ng, tile
-
+!
+!  Local variable declarations.
+!
+      character (len=*), parameter :: MyFile =                          &
+     &  __FILE__
+!
 #include "tile.h"
 
 #ifdef PROFILE
-      CALL wclock_on (ng, iNLM, 21, __LINE__, __FILE__)
+      CALL wclock_on (ng, iNLM, 21, __LINE__, MyFile)
 #endif
       CALL radiation_stress_tile (ng, tile,                             &
      &                            LBi, UBi, LBj, UBj, N(ng),            &
@@ -107,8 +114,9 @@
      &                            OCEAN(ng) % ubar_stokes,              &
      &                            OCEAN(ng) % vbar_stokes)
 #ifdef PROFILE
-      CALL wclock_off (ng, iNLM, 21, __LINE__, __FILE__)
+      CALL wclock_off (ng, iNLM, 21, __LINE__, MyFile)
 #endif
+!
       RETURN
       END SUBROUTINE radiation_stress
 !
@@ -1212,6 +1220,6 @@
      &                    u_stokes, v_stokes)
 # endif
 #endif
-
+!
       RETURN
       END SUBROUTINE radiation_stress_tile

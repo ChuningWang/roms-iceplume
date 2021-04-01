@@ -4,9 +4,9 @@
 #ifdef SOLVE3D
 !
 !git $Id$
-!svn $Id: set_zeta.F 995 2020-01-10 04:01:28Z arango $
+!svn $Id: set_zeta.F 1054 2021-03-06 19:47:12Z arango $
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -36,10 +36,13 @@
 !
 !  Local variable declarations.
 !
+      character (len=*), parameter :: MyFile =                          &
+     &  __FILE__
+!
 # include "tile.h"
 !
 # ifdef PROFILE
-      CALL wclock_on (ng, iNLM, 12, __LINE__, __FILE__)
+      CALL wclock_on (ng, iNLM, 12, __LINE__, MyFile)
 # endif
       CALL set_zeta_tile (ng, tile,                                     &
      &                    LBi, UBi, LBj, UBj,                           &
@@ -47,9 +50,9 @@
      &                    COUPLING(ng) % Zt_avg1,                       &
      &                    OCEAN(ng) % zeta)
 # ifdef PROFILE
-      CALL wclock_off (ng, iNLM, 12, __LINE__, __FILE__)
+      CALL wclock_off (ng, iNLM, 12, __LINE__, MyFile)
 # endif
-
+!
       RETURN
       END SUBROUTINE set_zeta
 !
@@ -120,7 +123,7 @@
      &                    zeta(:,:,1),                                  &
      &                    zeta(:,:,2))
 # endif
-
+!
       RETURN
       END SUBROUTINE set_zeta_tile
 #endif

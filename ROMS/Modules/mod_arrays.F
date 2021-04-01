@@ -2,9 +2,9 @@
       SUBROUTINE mod_arrays (allocate_vars)
 !
 !git $Id$
-!svn $Id: mod_arrays.F 1022 2020-05-13 03:03:15Z arango $
+!svn $Id: mod_arrays.F 1054 2021-03-06 19:47:12Z arango $
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -68,6 +68,9 @@
       integer :: LBi, UBi, LBj, UBj, LBij, UBij
 !
       integer, parameter :: model = 0
+!
+      character (len=*), parameter :: MyFile =                          &
+     &  __FILE__
 
 #ifdef PROFILE
 !
@@ -77,7 +80,7 @@
 !
       DO ng=1,Ngrids
         DO thread=THREAD_RANGE
-          CALL wclock_on (ng, iNLM, 1, __LINE__, __FILE__)
+          CALL wclock_on (ng, iNLM, 1, __LINE__, MyFile)
         END DO
 !$OMP BARRIER
       END DO
@@ -214,7 +217,7 @@
 !
       DO ng=1,Ngrids
         DO thread=THREAD_RANGE
-          CALL wclock_off (ng, iNLM, 1, __LINE__, __FILE__)
+          CALL wclock_off (ng, iNLM, 1, __LINE__, MyFile)
         END DO
 !$OMP BARRIER
       END DO

@@ -2,9 +2,9 @@
       SUBROUTINE checkdefs
 !
 !git $Id$
-!svn $Id: checkdefs.F 1045 2020-11-12 16:17:59Z arango $
+!svn $Id: checkdefs.F 1054 2021-03-06 19:47:12Z arango $
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2020 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -656,7 +656,7 @@
       IF (Master) WRITE (stdout,20) '!BOUNDARY_ALLGATHER',              &
      &   'Using mpi_allreduce in mp_boundary routine'
       is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+11)=' !BOUNDARY_ALLGATHER,'
+      Coptions(is:is+21)=' !BOUNDARY_ALLGATHER,'
 # endif
 #endif
 #ifdef BULK_FLUXES
@@ -1320,6 +1320,12 @@
      &   'Initialize automatic arrays in step2d for debugging'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+22)=' INITIALIZE_AUTOMATIC,'
+#endif
+#ifdef JEDI
+      IF (Master) WRITE (stdout,20) 'JEDI',                             &
+     &   'Joint Effort for Data Assimilation Integration'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+6)=' JEDI,'
 #endif
 #if defined LIMIT_BSTRESS && defined SOLVE3D  && !defined BBL_MODEL
 !
