@@ -59,7 +59,7 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
 ! Local variables declaration
 !
   integer :: iceDepthK, plumeDepthK, osDepthK
-  real(r8) :: areaP, areaB, meanVel, det, mB, tB, sB
+  real(r8) :: areaP, areaB, meanVel, det, mB, sB
   real(r8) :: RHO
 !
   integer :: K, itrc
@@ -264,7 +264,7 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
      &                       PLUME(ng) % sAm(I, K),                     &
      &                       meanVel,                                   &
      &                       PLUME(ng) % zR(I, K),                      &
-     &                       mB, tB, sB)
+     &                       mB, PLUME(ng) % tB(I, K), sB)
 !
 ! Calculate integrated background melt rate [m3 s-1]
 !
@@ -291,7 +291,9 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
     PLUME(ng) % trc(I, itrc)    = 0.0
     PLUME(ng) % trcCum(I, itrc) = 0.0
 !
-    PLUME(ng) % trcB(I, itrc)   = 0.0
+    DO K = iceDepthK+1, N(ng)
+      PLUME(ng) % trcB(I, K, itrc) = 0.0
+    ENDDO
   ENDDO
 !
   IF ( (fIni .GT. 0.0) .AND. (sgTyp .NE. 1) ) THEN
@@ -351,19 +353,22 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
     PLUME(ng) % trc(I, NT(ng)  ) = PLUME(ng) % trcCum(I, NT(ng)  )/det
 #  endif
 # endif
-  ENDIF
+  ENDIF  ! (fIni .GT. 0.0) .AND. (sgTyp .NE. 1)
 # ifdef ICEPLUME_MELT
 !
 ! Rewrite tracer concentration in background melt water 
 !
-  PLUME(ng) % trcB(I, itemp) = (cI*tIce - L)/cW
-  PLUME(ng) % trcB(I, isalt) = sIce
+  DO K = iceDepthK+1, N(ng)
+    PLUME(ng) % trcB(I, K, itemp) =                                     &
+     & (cI*(tIce - PLUME(ng) % tB(I, K)) - L)/cW
+    PLUME(ng) % trcB(I, K, isalt) = sIce
 #  ifdef ICEPLUME_MELT_TRACER
 !
 ! If use melt water tracer, rewrite the last tracer type.
 !
-  PLUME(ng) % trcB(I, NT(ng)) = PLUME(ng) % trcIni(I, NT(ng))
+    PLUME(ng) % trcB(I, K, NT(ng)) = PLUME(ng) % trcIni(I, NT(ng))
 #  endif
+  ENDDO
 # endif
 !
 ! Calculate depth integrated volume transport [m3 s-1]

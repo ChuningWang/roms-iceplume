@@ -764,7 +764,7 @@
      &                PLUME(ng)%det(is,k)*PLUME(ng)%trc   (is,  itrc)+  &
 #  endif
      &                PLUME(ng)%ent(is,k)*PLUME(ng)%trcAm (is,k,itrc)+  &
-     &                PLUME(ng)%mB (is,k)*PLUME(ng)%trcB  (is,  itrc))
+     &                PLUME(ng)%mB (is,k)*PLUME(ng)%trcB  (is,k,itrc))
 # else
                     FX(Isrc,Jsrc)=Huon(Isrc,Jsrc,k)*                    &
      &                            SOURCES(ng)%Tsrc(is,k,itrc)
@@ -808,7 +808,7 @@
      &                PLUME(ng)%det(is,k)*PLUME(ng)%trc   (is,  itrc)+  &
 #  endif
      &                PLUME(ng)%ent(is,k)*PLUME(ng)%trcAm (is,k,itrc)+  &
-     &                PLUME(ng)%mB (is,k)*PLUME(ng)%trcB  (is,  itrc))
+     &                PLUME(ng)%mB (is,k)*PLUME(ng)%trcB  (is,k,itrc))
 # else
                     FE(Isrc,Jsrc)=Hvom(Isrc,Jsrc,k)*                    &
      &                            SOURCES(ng)%Tsrc(is,k,itrc)
@@ -1192,7 +1192,7 @@
      &                   PLUME(ng)%ent   (is,k     )*                   &
      &                   PLUME(ng)%trcAm (is,k,itrc)+                   &
      &                   PLUME(ng)%mB    (is,k     )*                   &
-     &                   PLUME(ng)%trcB  (is,  itrc)
+     &                   PLUME(ng)%trcB  (is,k,itrc)
                     Ta(Isrc,Jsrc,k,itrc)=Ta(Isrc,Jsrc,k,itrc)+          &
      &                                   cff*cff3
 # endif
@@ -1401,7 +1401,7 @@
      &                 PLUME(ng)%ent   (is,k     )*                     &
      &                 PLUME(ng)%trcAm (is,k,itrc)+                     &
      &                 PLUME(ng)%mB    (is,k     )*                     &
-     &                 PLUME(ng)%trcB  (is,  itrc)
+     &                 PLUME(ng)%trcB  (is,k,itrc)
                   t(Isrc,Jsrc,k,nnew,itrc)=t(Isrc,Jsrc,k,nnew,itrc)+    &
      &                                     cff*cff3
 # endif

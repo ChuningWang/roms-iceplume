@@ -143,6 +143,7 @@
 !                                                                      !
 ! m          - plume melt rate [m^3 s^-1]                              !
 ! mB         - background melt rate [m^3 s^-1]                         !
+! tB         - background melt temperature [degC]                      !
 !                                                                      !
 ! dz         - RHO layer thickness [m]                                 !
 !                                                                      !
@@ -179,97 +180,98 @@
 !
 ! Depth independent variables.
 !
-          integer,  pointer :: Isrc(:)
-          integer,  pointer :: Jsrc(:)
-          real(r8), pointer :: dx(:)
-          real(r8), pointer :: dy(:)
-          real(r8), pointer :: dir(:)
-          real(r8), pointer :: trs(:)
+          integer,  pointer :: Isrc (:)
+          integer,  pointer :: Jsrc (:)
+          real(r8), pointer :: dx   (:)
+          real(r8), pointer :: dy   (:)
+          real(r8), pointer :: dir  (:)
+          real(r8), pointer :: trs  (:)
 # ifdef ICEPLUME_DET_AVERAGE
-          integer,  pointer :: avgIstr(:)
-          integer,  pointer :: avgIend(:)
-          integer,  pointer :: avgJstr(:)
-          integer,  pointer :: avgJend(:)
-          real(r8), pointer :: avgArea(:, :)
+          integer,  pointer :: avgIstr (:)
+          integer,  pointer :: avgIend (:)
+          integer,  pointer :: avgJstr (:)
+          integer,  pointer :: avgJend (:)
+          real(r8), pointer :: avgArea (:, :)
 # endif
 !
 ! Plume state (omega surface).
 !
-          real(r8), pointer :: zW(:, :)
-          real(r8), pointer :: f(:, :)
-          real(r8), pointer :: w(:, :)
-          real(r8), pointer :: t(:, :)
-          real(r8), pointer :: s(:, :)
-          real(r8), pointer :: a(:, :)
-          real(r8), pointer :: mInt(:, :)
-          real(r8), pointer :: rho(:, :)
+          real(r8), pointer :: zW   (:, :)
+          real(r8), pointer :: f    (:, :)
+          real(r8), pointer :: w    (:, :)
+          real(r8), pointer :: t    (:, :)
+          real(r8), pointer :: s    (:, :)
+          real(r8), pointer :: a    (:, :)
+          real(r8), pointer :: mInt (:, :)
+          real(r8), pointer :: rho  (:, :)
 !
 ! Grid, ambient state (rho surface).
 !
-          real(r8), pointer :: zR(:, :)
-          real(r8), pointer :: tAm(:, :)
-          real(r8), pointer :: sAm(:, :)
-          real(r8), pointer :: vAm(:, :)
-          real(r8), pointer :: wAm(:, :)
-          real(r8), pointer :: tpAm(:, :)
-          real(r8), pointer :: rhoAm(:, :)
+          real(r8), pointer :: zR    (:, :)
+          real(r8), pointer :: tAm   (:, :)
+          real(r8), pointer :: sAm   (:, :)
+          real(r8), pointer :: vAm   (:, :)
+          real(r8), pointer :: wAm   (:, :)
+          real(r8), pointer :: tpAm  (:, :)
+          real(r8), pointer :: rhoAm (:, :)
 # ifdef ICEPLUME_DET_AVERAGE
-          real(r8), pointer :: rhoAm0(:, :)
+          real(r8), pointer :: rhoAm0 (:, :)
 # endif
 !
 ! Plume shape parameters.
 !
-          real(r8), pointer :: lm(:, :)
-          real(r8), pointer :: lc(:, :)
+          real(r8), pointer :: lm (:, :)
+          real(r8), pointer :: lc (:, :)
 !
 ! Volume fluxes.
 !
-          real(r8), pointer :: ent(:, :)
-          real(r8), pointer :: det(:, :)
-          integer,  pointer :: detI(:, :)
-          real(r8), pointer :: detFrac(:, :)
+          real(r8), pointer :: ent     (:, :)
+          real(r8), pointer :: det     (:, :)
+          integer,  pointer :: detI    (:, :)
+          real(r8), pointer :: detFrac (:, :)
 # ifdef ICEPLUME_DET_NEUTRAL
 !
 ! For the neutral buoyancy detrainment model.
 !
-          real(r8), pointer :: detF(:, :)
-          real(r8), pointer :: detE(:, :)
-          real(r8), pointer :: detTrc(:, :, :)
+          real(r8), pointer :: detF   (:, :)
+          real(r8), pointer :: detE   (:, :)
+          real(r8), pointer :: detTrc (:, :, :)
 # endif
 !
 ! Melt rate, freshwater and heat fluxes.
 !
-          real(r8), pointer :: m(:, :)
-          real(r8), pointer :: mB(:, :)
+          real(r8), pointer :: m  (:, :)
+          real(r8), pointer :: mB (:, :)
+          real(r8), pointer :: tB (:, :)
 !
 ! Other profiles.
 !
-          real(r8), pointer :: dz(:, :)
+          real(r8), pointer :: dz (:, :)
 !
 ! Passive tracer concentration.
 !
-          real(r8), pointer :: trcAm(:, :, :)
-          real(r8), pointer :: trcB(:, :)
-          real(r8), pointer :: trc(:, :)
-          real(r8), pointer :: trcCum(:, :)
-          real(r8), pointer :: trcIni(:, :)
+          real(r8), pointer :: trcAm  (:, :, :)
+          real(r8), pointer :: trcB   (:, :, :)
+          real(r8), pointer :: trc    (:, :)
+          real(r8), pointer :: trcCum (:, :)
+          real(r8), pointer :: trcIni (:, :)
 # ifdef ICEPLUME_MIX
 !
 ! Volume fluxes through convergence/divergence.
 !
-          real(r8), pointer :: trsW(:)
-          real(r8), pointer :: entW(:, :)
-          real(r8), pointer :: detW(:, :)
-          real(r8), pointer :: mBW (:, :)
+          real(r8), pointer :: trsW (:)
+          real(r8), pointer :: entW (:, :)
+          real(r8), pointer :: detW (:, :)
+          real(r8), pointer :: mBW  (:, :)
 !
 ! For calculation of virtual tracer flux.
 !
-          real(r8), pointer :: dzNew(:, :)
-          real(r8), pointer :: zWNew(:, :)
-          real(r8), pointer :: zLNew(:, :)
-          real(r8), pointer :: dzWei(:, :)
-          real(r8), pointer :: trcL(:, :, :)
-          real(r8), pointer :: trcNew(:, :, :)
+          real(r8), pointer :: dzNew  (:, :)
+          real(r8), pointer :: zWNew  (:, :)
+          real(r8), pointer :: zLNew  (:, :)
+          real(r8), pointer :: dzWei  (:, :)
+          real(r8), pointer :: trcL   (:, :, :)
+          real(r8), pointer :: trcNew (:, :, :)
 # endif
         END TYPE T_PLUME
 !
@@ -364,19 +366,20 @@
 !
       allocate ( PLUME(ng) % m  (Nsrc(ng), N(ng)) )
       allocate ( PLUME(ng) % mB (Nsrc(ng), N(ng)) )
-      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*2,r8)
+      allocate ( PLUME(ng) % tB (Nsrc(ng), N(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*3,r8)
 !
       allocate ( PLUME(ng) % dz (Nsrc(ng), N(ng)) )
       Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng),r8)
 !
       allocate ( PLUME(ng) % trcAm  (Nsrc(ng), N(ng), NT(ng)) )
-      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*NT(ng),r8)
+      allocate ( PLUME(ng) % trcB   (Nsrc(ng), N(ng), NT(ng)) )
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*N(ng)*NT(ng)*2,r8)
 !
-      allocate ( PLUME(ng) % trcB   (Nsrc(ng), NT(ng)) )
       allocate ( PLUME(ng) % trc    (Nsrc(ng), NT(ng)) )
       allocate ( PLUME(ng) % trcCum (Nsrc(ng), NT(ng)) )
       allocate ( PLUME(ng) % trcIni (Nsrc(ng), NT(ng)) )
-      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*NT(ng)*4,r8)
+      Dmem(ng)=Dmem(ng)+REAL(Nsrc(ng)*NT(ng)*3,r8)
 # ifdef ICEPLUME_MIX
 !
       allocate ( PLUME(ng) % trsW   (Nsrc(ng)) )
@@ -475,16 +478,17 @@
         DO k=1,N(ng)
           PLUME(ng) % m  (is, k) = IniVal
           PLUME(ng) % mB (is, k) = IniVal
+          PLUME(ng) % tB (is, k) = IniVal
 !
           PLUME(ng) % dz (is, k) = IniVal
 !
           DO itrc=1,NT(ng)
             PLUME(ng) % trcAm (is, k, itrc) = IniVal
+            PLUME(ng) % trcB  (is, k, itrc) = IniVal
           ENDDO
         ENDDO
 !
         DO itrc=1,NT(ng)
-          PLUME(ng) % trcB   (is, itrc) = IniVal
           PLUME(ng) % trc    (is, itrc) = IniVal
           PLUME(ng) % trcCum (is, itrc) = IniVal
           PLUME(ng) % trcIni (is, itrc) = IniVal

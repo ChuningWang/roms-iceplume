@@ -29,7 +29,7 @@
      &                      PLUME(ng)%ent   (is,k     )*                &
      &                      PLUME(ng)%trcAm (is,k,itrc)+                &
      &                      PLUME(ng)%mB    (is,k     )*                &
-     &                      PLUME(ng)%trcB  (is,  itrc)
+     &                      PLUME(ng)%trcB  (is,k,itrc)
 # ifdef SPLINES_VDIFF
                     IF (.not.((Hadvection(itrc,ng)%MPDATA).and.         &
      &                 (Vadvection(itrc,ng)%MPDATA))) THEN

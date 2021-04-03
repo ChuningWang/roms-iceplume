@@ -698,7 +698,7 @@
      &                PLUME(ng) % entW(is, K)*                          &
      &                PLUME(ng) % trcAm(is, K, itrc)+                   &
      &                PLUME(ng) % mBW(is, K)*                           &
-     &                PLUME(ng) % trcB(is, itrc))*dt(ng)
+     &                PLUME(ng) % trcB(is, K, itrc))*dt(ng)
               PLUME(ng) % trcL(is, K, itrc) =                           &
      &            (PLUME(ng) % trcAm(is, K, itrc)*cff + cff2) /         &
      &            (cff + cff1)

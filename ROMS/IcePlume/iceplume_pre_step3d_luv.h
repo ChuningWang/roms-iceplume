@@ -20,7 +20,7 @@
      &                 PLUME(ng)%det(is,k)*PLUME(ng)%trc   (is,  itrc)+ &
 # endif
      &                 PLUME(ng)%ent(is,k)*PLUME(ng)%trcAm (is,k,itrc)+ &
-     &                 PLUME(ng)%mB (is,k)*PLUME(ng)%trcB  (is,  itrc))
+     &                 PLUME(ng)%mB (is,k)*PLUME(ng)%trcB  (is,k,itrc))
                     ELSE
                       FX(Isrc,Jsrc)=0.0_r8
                     END IF
@@ -35,7 +35,7 @@
      &                 PLUME(ng)%det(is,k)*PLUME(ng)%trc   (is,  itrc)+ &
 # endif
      &                 PLUME(ng)%ent(is,k)*PLUME(ng)%trcAm (is,k,itrc)+ &
-     &                 PLUME(ng)%mB (is,k)*PLUME(ng)%trcB  (is,  itrc))
+     &                 PLUME(ng)%mB (is,k)*PLUME(ng)%trcB  (is,k,itrc))
                     ELSE
                        FE(Isrc,Jsrc)=0.0_r8
                     END IF

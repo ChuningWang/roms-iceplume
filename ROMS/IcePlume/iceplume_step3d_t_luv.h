@@ -31,7 +31,7 @@
      &                 PLUME(ng)%det(is,k)*PLUME(ng)%trc   (is,  itrc)+ &
 # endif
      &                 PLUME(ng)%ent(is,k)*PLUME(ng)%trcAm (is,k,itrc)+ &
-     &                 PLUME(ng)%mB (is,k)*PLUME(ng)%trcB  (is,  itrc))
+     &                 PLUME(ng)%mB (is,k)*PLUME(ng)%trcB  (is,k,itrc))
 # ifdef MASKING
                     ELSE
                       IF ((rmask(Isrc  ,Jsrc).eq.0.0_r8).and.           &
@@ -70,7 +70,7 @@
      &                 PLUME(ng)%det(is,k)*PLUME(ng)%trc   (is,  itrc)+ &
 # endif
      &                 PLUME(ng)%ent(is,k)*PLUME(ng)%trcAm (is,k,itrc)+ &
-     &                 PLUME(ng)%mB (is,k)*PLUME(ng)%trcB  (is,  itrc))
+     &                 PLUME(ng)%mB (is,k)*PLUME(ng)%trcB  (is,k,itrc))
 # ifdef MASKING
                     ELSE
                       IF ((rmask(Isrc,Jsrc  ).eq.0.0_r8).and.           &
