@@ -37,7 +37,7 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
 ! ==================================================================!
 !                                                                   !
 ! iceDepthK   - vertical grid index of grounding line depth         !
-! plumeDepthK - vertical grid index of plume depth                  !
+! plumeDepthK-vertical grid index of plume depth                  !
 ! osDepthK    - vertical grid index of overshoot depth              !
 ! areaP       - surface area of plume in contact with ice in        !
 !               that cell [m^2]                                     !
@@ -51,19 +51,19 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
 !
 ! In/out variables
 !
-  integer, intent(in) :: ng, I
-  real(r8), intent(inout) :: fIni, tIni, sIni
-  integer, intent(in) :: sgTyp
-  real(r8), intent(in) :: sgDep, sgLen
+  integer, intent(in):: ng, I
+  real(r8), intent(inout):: fIni, tIni, sIni
+  integer, intent(in):: sgTyp
+  real(r8), intent(in):: sgDep, sgLen
 !
 ! Local variables declaration
 !
-  integer :: iceDepthK, plumeDepthK, osDepthK
-  real(r8) :: areaP, areaB, meanVel, det, mB, sB
-  real(r8) :: RHO
+  integer:: iceDepthK, plumeDepthK, osDepthK
+  real(r8):: areaP, areaB, meanVel, det, mB, sB
+  real(r8):: RHO
 !
-  integer :: K, itrc
-  real(r8) :: cff, cff1, cff2
+  integer:: K, itrc
+  real(r8):: cff, cff1, cff2
 !
 ! If discharge input salinity is less or equal than zero, set it to
 ! a small number
@@ -129,8 +129,8 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
      &                    fIni, tIni, sIni,                             &
      &                    sgTyp, sgLen)
 !
-! Calculate volume flux differential to give entrainment / extrainment
-! First clear ent / det
+! Calculate volume flux differential to give entrainment/extrainment
+! First clear ent/det
 !
     DO K = iceDepthK+1, N(ng)
       PLUME(ng) % ent(I, K) =                                           &
@@ -141,7 +141,7 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
       PLUME(ng) % ent(I, K) = MIN(PLUME(ng) % ent(I, K), 0.0)
     ENDDO
 !
-! Separate entrainment / detrainment
+! Separate entrainment/detrainment
 !
     DO K = iceDepthK+1, N(ng)
       IF (PLUME(ng) % f(I, K) .GT. 0.0) THEN
@@ -251,7 +251,7 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
 ! This will then be used to update the temperature and salinity in  !
 ! the adjacent cells. Velocities are calculated at cell faces -     !
 ! find averages for cell centres. Does not include velocity         !
-! perpendicular to ice - this differs depending on orientation of   !
+! perpendicular to ice-this differs depending on orientation of   !
 ! ice front.                                                        !
 !                                                                   !
 ! ==================================================================!
@@ -270,8 +270,8 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
 !
       PLUME(ng) % mB(I, K) = mB*areaB
     ENDIF
-# endif
   ENDDO
+# endif
 !
 ! ==================================================================!
 !                                                                   !
@@ -360,7 +360,7 @@ SUBROUTINE ICEPLUME_CALC(ng, I,                                         &
 !
   DO K = iceDepthK+1, N(ng)
     PLUME(ng) % trcB(I, K, itemp) =                                     &
-     & (cI*(tIce - PLUME(ng) % tB(I, K)) - L)/cW
+     & (cI*(tIce-PLUME(ng) % tB(I, K)) - L)/cW
     PLUME(ng) % trcB(I, K, isalt) = sIce
 #  ifdef ICEPLUME_MELT_TRACER
 !
@@ -392,10 +392,10 @@ SUBROUTINE ICEPLUME_MELTRATE(temp, salt, vel, depth, mdot, sB, tB)
   USE mod_iceplume
   implicit none
 !
-  real(r8) :: temp, salt, vel
-  real(r8) :: depth, absVelocity
-  real(r8) :: a, b, c
-  real(r8), intent(inout) :: mdot, sB, tB
+  real(r8):: temp, salt, vel
+  real(r8):: depth, absVelocity
+  real(r8):: a, b, c
+  real(r8), intent(inout):: mdot, sB, tB
 !
 ! Routine cannot cope with zero velocity.
 ! Unlikely to occur anyway with currents, waves, convection etc.
@@ -407,16 +407,16 @@ SUBROUTINE ICEPLUME_MELTRATE(temp, salt, vel, depth, mdot, sB, tB)
 ! models)
 ! Equations for Sb, Tb and mdot
 !
-  a = lambda1*(GamT*cW - GamS*cI)
-  b = GamS*cI*(lambda1*salt - lambda2 - lambda3*depth +                 &
+  a = lambda1*(GamT*cW-GamS*cI)
+  b = GamS*cI*(lambda1*salt-lambda2-lambda3*depth +                 &
      &         tIce - (L/cI)) -                                         &
-     &         GamT*cW*(temp - lambda2 - lambda3*depth + sIce)
-  c = GamS*salt*(cI*(lambda2 + lambda3*depth - tIce) + L) +             &
-     & GamT*sIce*cW*(temp - lambda2 - lambda3*depth)
+     &         GamT*cW*(temp-lambda2-lambda3*depth+sIce)
+  c = GamS*salt*(cI*(lambda2+lambda3*depth-tIce) + L) +             &
+     & GamT*sIce*cW*(temp-lambda2-lambda3*depth)
 !
-  sB   = (1.0/(2.0*a))*(-b - SQRT(b**2 - 4.0*a*c))
-  tB   = lambda1*sB + lambda2 + lambda3*depth
-  mdot = GamS*SQRT(CdBkg)*ABS(vel)*(salt - sB)/sB
+  sB   = (1.0/(2.0*a))*(-b-SQRT(b**2 - 4.0*a*c))
+  tB   = lambda1*sB+lambda2+lambda3*depth
+  mdot = GamS*SQRT(CdBkg)*ABS(vel)*(salt-sB)/sB
 !
 END SUBROUTINE ICEPLUME_MELTRATE
 !
@@ -442,7 +442,7 @@ SUBROUTINE SW_TEMP(S, T, P, PR, rv)
 ! Bryden, H. 1973.
 ! New Polynomials for thermal expansion, adiabatic temperature
 ! gradient and potential temperature of sea water.
-! DEEP-SEA RES., 1973, Vol20,401-408.
+! DEEP-SEA RES., 1973, Vol20, 401-408.
 !
   USE mod_kinds
   IMPLICIT NONE
@@ -455,10 +455,10 @@ SUBROUTINE SW_TEMP(S, T, P, PR, rv)
 ! T      :: potential temperature
 ! P      :: pressure
 ! PR     :: reference pressure
-! rv :: return value (in-situ temeparture in degree C)
+! rv:: return value (in-situ temeparture in degree C)
 !
-  real(r8) :: S, T, P, PR
-  real(r8) :: rv
+  real(r8):: S, T, P, PR
+  real(r8):: rv
 !
 ! !LOCAL VARIABLES:
 ! === local variables ===
@@ -493,51 +493,51 @@ SUBROUTINE SW_PTMP  (S, T, P, PR, rv)
 ! S  :: salinity    [psu      (PSS-78) ]
 ! T  :: temperature [degree C (IPTS-68)]
 ! P  :: pressure    [db]
-! PR :: Reference pressure  [db]
-! rv :: return value (potential temeparture in degree C)
+! PR:: Reference pressure  [db]
+! rv:: return value (potential temeparture in degree C)
 !
-  real(r8) :: S, T, P, PR
-  real(r8) :: rv
+  real(r8):: S, T, P, PR
+  real(r8):: rv
 !
 ! !LOCAL VARIABLES
 ! === local variables ===
 !
-  real(r8) :: del_P ,del_th, th, q
-  real(r8) :: onehalf, two, three
+  real(r8):: del_P, del_th, th, q
+  real(r8):: onehalf, two, three
   parameter ( onehalf = 0.5d0, two = 2.d0, three = 3.d0 )
-  real(r8) :: adtg_val
+  real(r8):: adtg_val
 !
 ! theta1
 !
-  del_P   = PR - P
+  del_P   = PR-P
   call sw_adtg(S, T, P, adtg_val)
   del_th  = del_P*adtg_val
-  th      = T + onehalf*del_th
+  th      = T+onehalf*del_th
   q       = del_th
 !
 ! theta2
 !
   call sw_adtg(S, th, P+onehalf*del_P, adtg_val)
   del_th  = del_P*adtg_val
-  th      = th + (1 - 1/sqrt(two))*(del_th - q)
+  th      = th + (1-1/sqrt(two))*(del_th-q)
   q       = (two-sqrt(two))*del_th + (-two+three/sqrt(two))*q
 !
 ! theta3
 !
   call sw_adtg(S, th, P+onehalf*del_P, adtg_val)
   del_th  = del_P*adtg_val
-  th      = th + (1 + 1/sqrt(two))*(del_th - q)
-  q       = (two + sqrt(two))*del_th + (-two-three/sqrt(two))*q
+  th      = th + (1+1/sqrt(two))*(del_th-q)
+  q       = (two+sqrt(two))*del_th + (-two-three/sqrt(two))*q
 !
 ! theta4
 !
   call sw_adtg(S, th, P+del_P, adtg_val)
   del_th  = del_P*adtg_val
-  rv      = th + (del_th - two*q)/(two*three)
+  rv      = th + (del_th-two*q)/(two*three)
 !
 END
 !
-SUBROUTINE SW_ADTG  (S,T,P, rv)
+SUBROUTINE SW_ADTG  (S, T, P, rv)
 !
 ! !DESCRIPTION: \bv
 ! *=============================================================*
@@ -559,14 +559,14 @@ SUBROUTINE SW_ADTG  (S,T,P, rv)
 ! !INPUT/OUTPUT PARAMETERS:
 ! === Routine arguments ===
 !
-  real(r8) :: S,T,P
-  real(r8) :: rv
+  real(r8):: S, T, P
+  real(r8):: rv
 !
 ! !LOCAL VARIABLES:
 ! === local variables ===
 !
-  real(r8) :: a0,a1,a2,a3,b0,b1,c0,c1,c2,c3,d0,d1,e0,e1,e2
-  real(r8) :: sref
+  real(r8):: a0, a1, a2, a3, b0, b1, c0, c1, c2, c3, d0, d1, e0, e1, e2
+  real(r8):: sref
 !
   sref = 35.d0
   a0 =  3.5803d-5
@@ -589,10 +589,10 @@ SUBROUTINE SW_ADTG  (S,T,P, rv)
   e1 = +1.8676d-14
   e2 = -2.1687d-16
 !
-  rv =  a0 + (a1 + (a2 + a3*T)*T)*T                                     &
-     &  + (b0 + b1*T)*(S-sref)                                          &
-     &  + ( (c0 + (c1 + (c2 + c3*T)*T)*T) + (d0 + d1*T)*(S-sref) )*P    &
-     &  + (  e0 + (e1 + e2*T)*T )*P*P
+  rv =  a0 + (a1 + (a2+a3*T)*T)*T                                     &
+     &  + (b0+b1*T)*(S-sref)                                          &
+     &  + ( (c0 + (c1 + (c2+c3*T)*T)*T) + (d0+d1*T)*(S-sref) )*P    &
+     &  + (  e0 + (e1+e2*T)*T )*P*P
 !
 END
 #endif
