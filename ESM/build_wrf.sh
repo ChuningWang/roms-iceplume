@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # git $Id$
-# svn $Id: build_wrf.sh 1054 2021-03-06 19:47:12Z arango $
+# svn $Id: build_wrf.sh 1064 2021-05-10 19:55:56Z arango $
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Copyright (c) 2002-2021 The ROMS/TOMS Group                           :::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::: Hernan G. Arango :::
@@ -64,7 +64,7 @@ do
 
     -move )
       shift
-      move=0
+      move=1
       ;;
 
     -noclean )
@@ -229,7 +229,7 @@ export  WRF_BIN_DIR=${WRF_BUILD_DIR}/Bin
 # column for distributed-memory configuration.
 #--------------------------------------------------------------------------
 
-# Clean source code and remove build directory.
+# Clean source code.
 
 if [ "$clean" -eq "1" ]; then
   echo ""
@@ -237,8 +237,7 @@ if [ "$clean" -eq "1" ]; then
   echo "Cleaning WRF source code:  ${WRF_ROOT_DIR}/clean -a"
   echo "${separator}"
   echo ""
-  ${WRF_ROOT_DIR}/clean -a            # clean source code
-  /bin/rm -rf ${WRF_BUILD_DIR}        # remove existing build directories
+  ${WRF_ROOT_DIR}/clean -a
 fi
 
 if [ -n "${USE_DEBUG:+1}" ]; then
@@ -287,8 +286,7 @@ if [ "$config" -eq "1" ]; then
     echo "   No need to replace: ${WRF_ROOT_DIR}/arch/postamble"  else
   fi
 
-# Changing -openmp to -qopenmp, renaming ESMF/esmf to MYESMF/myesmf, adding
-# Intel/GNU with OpenMPI
+# Adding MacOS Intel/GNU with OpenMPI
 
   if [ `grep -c "${CHECK_STRING}" ${WRF_ROOT_DIR}/arch/configure.defaults` -eq "0" ]; then
     mv -v  ${WRF_ROOT_DIR}/arch/configure.defaults ${WRF_ROOT_DIR}/arch/configure.defaults.orig
@@ -297,14 +295,7 @@ if [ "$config" -eq "1" ]; then
     echo "   No need to replace: ${WRF_ROOT_DIR}/arch/configure.defaults"
   fi
 
-# Renaming ESMF/esmf to MYESMF/myesmf
-
-  if [ `grep -c "${CHECK_STRING}" ${WRF_ROOT_DIR}/arch/Config.pl` -eq "0" ]; then
-    mv -v  ${WRF_ROOT_DIR}/arch/Config.pl ${WRF_ROOT_DIR}/arch/Config.pl.orig
-    cp -fv ${ROMS_SRC_DIR}/ESM/wrf_Config.pl ${WRF_ROOT_DIR}/arch/Config.pl
-  else
-    echo "   No need to replace: ${WRF_ROOT_DIR}/arch/Config.pl"
-  fi
+# Create clean .f90 files for debugging and rename modules to WRF_ESMF_*
 
   if [ `grep -c "${CHECK_STRING}" ${WRF_ROOT_DIR}/external/esmf_time_f90/Makefile` -eq "0" ]; then
     mv -v  ${WRF_ROOT_DIR}/external/esmf_time_f90/Makefile ${WRF_ROOT_DIR}/external/esmf_time_f90/Makefile.orig
@@ -313,7 +304,7 @@ if [ "$config" -eq "1" ]; then
     echo "   No need to replace: ${WRF_ROOT_DIR}/external/esmf_time_f90/Makefile"
   fi
 
-# Correcting optional argument from defaultCalendar to defaultCalKind to
+# Correcting optional argument from defaultCalendar to defaultCalKind in
 # ESMF_Initialize call
 
   if [ `grep -c "${CHECK_STRING}" ${WRF_ROOT_DIR}/external/esmf_time_f90/Test1.F90` -eq "0" ]; then
@@ -330,11 +321,6 @@ if [ "$config" -eq "1" ]; then
   echo ""
 
   ${WRF_ROOT_DIR}/configure ${CONFIG_FLAGS}
-
-#  Custom CPP Macros for renaming ESMF/esmf to MYESMF/myesmf to avoid
-#  conflict with newer versions of the ESMF/NUOPC libraries
-
-  cat ${ROMS_SRC_DIR}/ESM/wrf_add_configure.wrf >> ${WRF_ROOT_DIR}/configure.wrf
 
 fi
 
@@ -375,6 +361,17 @@ fi
 export WRF_DA_CORE=0             # no Data Assimilation core
 export WRF_EM_CORE=1             # Eurelian Mass-coordinate core
 export WRF_NMM_CORE=0            # Nonhydrostatic Mesoscale Model core
+
+# Remove existing build directory.
+
+if [ "$clean" -eq "1" ]; then
+  echo ""
+  echo "${separator}"
+  echo "Removing WRF build directory:  ${WRF_BUILD_DIR}"
+  echo "${separator}"
+  echo ""
+  /bin/rm -rf ${WRF_BUILD_DIR}
+fi
 
 # Compile (the binary will go to BINDIR set above).
 
@@ -462,7 +459,7 @@ if [ "$move" -eq "1" ]; then
   find ${WRF_ROOT_DIR} -type l -name "*.exe" -exec /bin/rm -fv {} \;
 
   /bin/mv -fv external/esmf_time_f90/*.f ${WRF_BUILD_DIR}
-  /bin/mv -fv external/esmf_time_f90/MYESMF*.inc ${WRF_BUILD_DIR}
+  /bin/cp -pv external/esmf_time_f90/ESMF*.inc ${WRF_BUILD_DIR}
 
   /bin/mv -fv external/io_int/diffwrf ${WRF_BIN_DIR}/diffwrf_int
   /bin/mv -fv external/io_int/test_io_idx ${WRF_BIN_DIR}
@@ -528,8 +525,8 @@ if [ "$WRF_CASE" == "em_real" ]; then
   ln -sfv ${WRF_ROOT_DIR}/run/bulkdens.asc_s_0_03_0_9 .
   ln -sfv ${WRF_ROOT_DIR}/run/bulkradii.asc_s_0_03_0_9 .
   ln -sfv ${WRF_ROOT_DIR}/run/CCN_ACTIVATE.BIN .
-  ln -sfv ${WRF_ROOT_DIR}/run/p3_lookup_table_1.dat-v2.8.2 .
-  ln -sfv ${WRF_ROOT_DIR}/run/p3_lookup_table_2.dat-v2.8.2 .
+  ln -sfv ${WRF_ROOT_DIR}/run/p3_lookup_table_1.dat-v4.1 .
+  ln -sfv ${WRF_ROOT_DIR}/run/p3_lookup_table_2.dat-v4.1 .
 
   if [ "${USE_REAL_DOUBLE:+1}" ]; then
     ln -sfv ${WRF_ROOT_DIR}/run/ETAMPNEW_DATA_DBL ETAMPNEW_DATA
