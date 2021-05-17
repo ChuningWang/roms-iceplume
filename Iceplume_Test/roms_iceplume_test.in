@@ -91,9 +91,9 @@ GridsInLayer =  1
 ! Grid dimension parameters. See notes below in the Glossary for how to set
 ! these parameters correctly.
 
-          Lm == 100           ! Number of I-direction INTERIOR RHO-points
-          Mm == 21            ! Number of J-direction INTERIOR RHO-points
-           N == 20            ! Number of vertical levels
+          Lm == 50            ! Number of I-direction INTERIOR RHO-points
+          Mm == 3             ! Number of J-direction INTERIOR RHO-points
+           N == 30            ! Number of vertical levels
 
         Nbed =  0             ! Number of sediment bed layers
 
@@ -106,8 +106,8 @@ GridsInLayer =  1
 ! shared-memory configurations used to determine tile horizontal range
 ! indices (Istr,Iend) and (Jstr,Jend), [1:Ngrids].
 
-      NtileI == 1                               ! I-direction partition
-      NtileJ == 2                               ! J-direction partition
+      NtileI == 2                               ! I-direction partition
+      NtileJ == 1                               ! J-direction partition
 
 ! Set horizontal and vertical advection schemes for active and inert
 ! tracers. A different advection scheme is allowed for each tracer.
@@ -224,8 +224,8 @@ ad_VolCons(north) ==  F                            ! northern boundary
 ! Time-Stepping parameters.
 
       NTIMES == 2880
-          DT == 60.0d0
-     NDTFAST == 30
+          DT == 30.0d0
+     NDTFAST == 15
 
 ! Number of timesteps for computing observation impacts during the
 ! analysis-forecast cycle.
@@ -261,15 +261,15 @@ ad_VolCons(north) ==  F                            ! northern boundary
 ! Output history, quicksave, average, and diagnostic files parameters.
 
      LDEFOUT == T
-        NHIS == 60
+        NHIS == 120
      NDEFHIS == 0
         NQCK == 0
      NDEFQCK == 0
       NTSAVG == 1
-        NAVG == 1440
+        NAVG == 2880
      NDEFAVG == 0
       NTSDIA == 1
-        NDIA == 1440
+        NDIA == 2880
      NDEFDIA == 0
 
 ! Output tangent linear and adjoint models parameters.
@@ -883,9 +883,72 @@ Dout(iTvdif) == T T     ! temp_vdiff, ...    vertical diffusion
 
        NUSER =  2
 !               Thermocline depth   Surface Salinity
-        USER =  50.d0               33.d0
+        USER =  50.d0               34.d0
 
-! NetCDF-4/HDF5 compression parameters for output files.
+! Input and Output files processing library to use:
+!
+!   [1] Standard NetCDF-3 or NetCDF-4 library
+!   [2] Serial or Parallel I/O with Parallel-IO (PIO) library (MPI only)
+
+     INP_LIB =  1
+     OUT_LIB =  1
+
+! PIO library methods for reading/writing NetCDF files:
+!
+!   [0] parallel read and write of PnetCDF (CDF-5, not recommended)
+!   [1] parallel read and write of NetCDF3 (64-bit offset)
+!   [2] serial   read and write of NetCDF3 (64-bit offset)
+!   [3] parallel read and serial write of NetCDF4/HDF5
+!   [4] parallel read and write of NETCDF4/HDF5
+
+  PIO_METHOD =  2
+
+! PIO library MPI processes set-up:
+
+ PIO_IOTASKS =  1                 ! number of I/O tasks to define
+  PIO_STRIDE =  1                 ! stride in the MPI-ran between I/O tasks
+    PIO_BASE =  0                 ! offset for the first I/O task
+  PIO_AGGREG =  1                 ! number of MPI-aggregators to use
+
+! PIO library rearranger methods for moving data between computational and I/O
+! processes:
+!
+!   [1] Box rearrangement
+!   [2] Subset rearrangement
+
+   PIO_REARR =  1
+
+! PIO library rearranger flag for MPI communications between computational
+! and I/O processes:
+!
+!   [0] Point-to-Point (low-level communications)
+!   [1] Collective (high-level grouped communications)
+
+PIO_REARRCOM =  0
+
+! PIO library rearranger flow control direction flag for MPI communications
+! between computational and I/O processes:
+!
+!   [0] Enable computational to I/O processes, and vice versa
+!   [2] Enable computational to I/O processes only
+!   [3] Enable I/O to computational processes only
+!   [4] Disable flow control
+
+PIO_REARRDIR = 0
+
+! PIO rearranger options for computational to I/O processes (C2I):
+
+  PIO_C2I_HS = T                  ! Enable C2I handshake (T/F)
+PIO_C2I_Send = T                  ! Enable C2I Isends (T/F)
+PIO_C2I_Preq = 64                 ! Maximum pending C2I requests
+
+! PIO rearranger options for I/O to computational processes (I2C):
+
+  PIO_I2C_HS = T                  ! Enable I2C handshake (T/F)
+PIO_I2C_Send = T                  ! Enable I2C Isends (T/F)
+PIO_I2C_Preq = 65                 ! Maximum pending I2C requests
+
+! If OUT_LIB=1, NetCDF-4/HDF5 compression parameters for output files.
 
   NC_SHUFFLE =  1                 ! if non-zero, turn on shuffle filter
   NC_DEFLATE =  1                 ! if non-zero, turn on deflate filter
@@ -893,8 +956,8 @@ Dout(iTvdif) == T T     ! temp_vdiff, ...    vertical diffusion
 
 ! Input NetCDF file names, [1:Ngrids].
 
-     GRDNAME == fjord_grid.nc
-     ININAME == fjord_init.nc
+     GRDNAME == roms_grd.nc
+     ININAME == roms_ini.nc
      ITLNAME == roms_itl.nc
      IRPNAME == roms_irp.nc
      IADNAME == roms_iad.nc
@@ -956,7 +1019,7 @@ Dout(iTvdif) == T T     ! temp_vdiff, ...    vertical diffusion
 
 ! Input Sources/Sinks forcing (like river runoff) file name.
 
-     SSFNAME == fjord_river.nc
+     SSFNAME == roms_rivers.nc
 
 ! Input tidal forcing file name.
 
@@ -986,19 +1049,19 @@ Dout(iTvdif) == T T     ! temp_vdiff, ...    vertical diffusion
 
 ! Output NetCDF file names, [1:Ngrids].
 
-     DAINAME == outputs/fjord_dai.nc
-     GSTNAME == outputs/fjord_gst.nc
-     RSTNAME == outputs/fjord_rst.nc
-     HISNAME == outputs/fjord_his.nc
-     QCKNAME == outputs/fjord_qck.nc
-     TLMNAME == outputs/fjord_tlm.nc
-     TLFNAME == outputs/fjord_tlf.nc
-     ADJNAME == outputs/fjord_adj.nc
-     AVGNAME == outputs/fjord_avg.nc
-     HARNAME == outputs/fjord_har.nc
-     DIANAME == outputs/fjord_dia.nc
-     STANAME == outputs/fjord_sta.nc
-     FLTNAME == outputs/fjord_flt.nc
+     DAINAME == outputs/roms_dai.nc
+     GSTNAME == outputs/roms_gst.nc
+     RSTNAME == outputs/roms_rst.nc
+     HISNAME == outputs/roms_his.nc
+     QCKNAME == outputs/roms_qck.nc
+     TLMNAME == outputs/roms_tlm.nc
+     TLFNAME == outputs/roms_tlf.nc
+     ADJNAME == outputs/roms_adj.nc
+     AVGNAME == outputs/roms_avg.nc
+     HARNAME == outputs/roms_har.nc
+     DIANAME == outputs/roms_dia.nc
+     STANAME == outputs/roms_sta.nc
+     FLTNAME == outputs/roms_flt.nc
 
 ! Input ASCII parameter filenames.
 
@@ -2763,13 +2826,162 @@ Dout(iTvdif) == T T     ! temp_vdiff, ...    vertical diffusion
 ! I/O NetCDF files parameters.
 !------------------------------------------------------------------------------
 !
-! NetCDF-4/HDF5 compression parameters for output files. This capability
-! is used when both HDF5 and DEFLATE C-preprocessing options are
-! activated. The user needs to compile with the NetCDF-4/HDF5 and MPI
-! libraries. File deflation cannot be used in parallel I/O for writing
-! because the compression makes it impossible for the HDF5 library
-! to exactly map the data to the disk location.  For more information,
-! check NetCDF official website: www.unidata.ucar.edu/software/netcdf.
+! The ROMS input and output NetCDF files can be processed using the standard
+! NetCDF library developed by UNIDATA, the Parallel-IO (PIO) library developed
+! at NCAR, or the SCORPIO library available in E3SM (Sreepathi et al., 2013;
+! doi:10.1109/HiPC.2013.6799128). The SCORPIO library was forked from the PIO
+! library several years ago, and they have evolved separately. In addition to
+! the standard NetCDF library, ROMS can be compiled with either the PIO or
+! SCORPIO libraries. Check  www.myroms.org/wiki/External_Libraries  for more
+! information on how to obtain and install these libraries. The user has the
+! choice to select which library is used to process input and output NetCDF
+! files. For parallel I/O, we recommend using the PIO library because it is
+! more efficient than the SCORPIO library in our benchmark tests.
+!
+! The Parallel I/O using the PIO or SCORPIO libraries is restricted to
+! distributed-memory applications because it uses MPI-IO implementations
+! like ROMIO.
+!
+! * ROMS Input and Output NetCDF library to use flag: [1 or 2]
+!
+!   [1] Standard NetCDF3 or NetCDF4 library (Unidata)
+!   [2] Serial/Parallel I/O using Paralle-IO (PIO) library (MPI applications)
+!
+! INP_LIB      Reading library flag for input NetCDF files
+!
+! OUT_LIB      Creation/writing library flag for output NetCDF files
+!
+! * PIO method flag for reading/writing NetCDF files: [0,1,2,3,4]
+!
+!   [0] parallel read and write of PnetCDF files (CDF-5 type)
+!   [1] parallel read and write of PnetCDF files (NetCDF3 64-bit offset type)
+!   [2] serial   read and write of NetCDF3 files (NetCDF3 64-bit offset type)
+!   [3] parallel read and serial write of NetCDF4/HDF5 files (NetCDF4 type)
+!   [4] parallel read and write of NETCDF4/HDF5 files (NetCDF4 type)
+!
+! PIO_METHOD   PIO library file type for reading or writing. Depending on
+!                the build of the PIO library, not all the I/O types are
+!                available. If NetCDF library does not support parallel I/O,
+!                PIO_METHOD=3,4 are not available. Notice that we can create
+!                CDF-5 type PnetCDF files (PIO_METHOD=0), but it is not
+!                recommended because portability and post-processing
+!                constraints. Currently, NetCDF4/HDF5 data compression is
+!                possible with PIO_METHOD=3 during serial write.
+!
+! * PIO library processes set-up:
+!
+! PIO_IOTASKS  Number of MPI processors used for I/O. If I/O decomposition is
+!                identical to the computational decomposition, PIO_IOTASK is
+!                equal to NtileI*NtileJ.  Typically, it is advantageous and
+!                highly recommended to define the I/O decomposition in smaller
+!                number of processes for efficiency and to avoid MPI
+!                communication bottlenecks.
+!
+! PIO_STRIDE   Stride step in the MPI-rank between I/O tasks.
+!
+! PIO_BASE     Offset for the first I/O task (usually, PIO_BASE=1).
+!
+! PIO_AGGREG   Number of MPI-aggregators to use in intra-communication mode to
+!              improve MPI collective I/O performance.
+!
+!              In intra-communications mode, all processors in OCN_COMM_WORLD
+!              are involved in computations. A subset or all processors does
+!              I/O (and also computations). The PIO_IOTASKS and PIO_STRIDE
+!              parameters specify the total number of I/O tasks and the stride
+!              between them with respect to the ROMS MPI-communicator object,
+!              OCN_COMM_WORLD. The optional PIO_BASE parameter is used to shift
+!              the first I/O task away from the first computational task. This
+!              is often desirable because the application's first computational
+!              task usually has higher memory requirements than other processes.
+!              If the MPI-processes are spread over several hardware nodes, it
+!              is highly recommended to use a value for PIO_STRIDE that scatters
+!              the I/O processes over all nodes.  Avoid all the I/O processes
+!              occupying the same node.
+!
+!              In the inter-communications (asynchronous) mode, the I/O tasks
+!              are a disjointed set of dedicated I/O processes and do not
+!              perform computations. It is possible to have several groups of
+!              computational units running separate models (coupling) where
+!              all the I/O data are sent to dedicated processes. Asynchronous
+!              I/O is still under development and not recommended for use at
+!              this time.
+!
+!
+! * PIO rearranger methods for moving data between computational and I/O
+!   processes:
+!
+!   [1] Box rearrangement
+!   [2] Subset rearrangement
+!
+! PIO_REARR    Rearrangement method between computational and I/O processes. It
+!                provides the ability to rearrange data between computational
+!                and parallel I/O decompositions.
+!
+!              In the box method, data is rearranged from computational to I/O
+!              processes in a continuous manner to the data ordering in the
+!              file. Since the ordering of data between computational and I/O
+!              partitions may be different, the rearrangement will require
+!              all-to-all MPI communications. Also, notice that each computing
+!              tile may transfer data to one or more I/O processes.
+!
+!              In the subset method, each I/O process is associated with a
+!              subset of computing processes. The computing tile sends its data
+!              to a unique I/O process. The data on I/O processes may be more
+!              fragmented to the ordering on disk, which may increase the
+!              communications to the storage medium. However, the rearrangement
+!              scales better since all-to-all MPI communications are not
+!              required.
+!
+! * PIO rearranger MPI communication flag:
+!
+!   [0] Point-to-Point (basic send/receive individual operations)
+!   [1] Collective (high-level gather/scatter grouped operations)
+!
+! PIO_REARRCOM  Type of communications between computational to I/O processes.
+!               In some systems with a generic MPI library implementation, the
+!               Point-to-Point communications are more efficient.
+!
+! * PIO rearranger MPI communications direction control flag:
+!
+!   [0] Enable computational to I/O processes, and vice versa
+!   [1] Enable computational to I/O processes only
+!   [2] Enable I/O to computational processes only
+!   [3] Disable flow control
+!
+! PIO_REARRDIR Flow control algorithm between computational and I/O processes:
+!
+!              Optimally, MPI communications should be designed to send a modest
+!              number messages evenly distributed across a number of processes.
+!              An excessive number of messages to a single MPI-process can
+!              exhaust the buffer space which can affect efficiency or failure
+!              due to the slowdown in the retransmitting of dropped messages.
+!              PIO only send messages (Isend) when the receiver is ready and
+!              has sufficient resources.
+!
+! * PIO rearranger options for communications from computational to I/O
+!   processes (C2I):
+!
+! PIO_C2I_HS   Logical switch (T/F) to enable C2I exchange handshake
+! PIO_C2I_Send Logical switch (T/F) to enable C2I MPI-Isends
+! PIO_C2I_Preq Maximum pending C2I requests
+!
+! * PIO rearranger options for communications from I/O to computational
+!   processes (I2C):
+!
+! PIO_I2C_HS   Logical switch (T/F) to enable I2C exchange handshake
+! PIO_I2C_Send Logical switch (T/F) to enable I2C MPI-Isends
+! PIO_I2C_Preq Maximum pending I2C requests
+!
+! * NetCDF-4/HDF5 compression parameters for output files:
+!
+!   This capability is used when both HDF5 and DEFLATE C-preprocessing
+!   options are  activated. The user needs to compile with the NetCDF-4
+!   (HDF5) and MPI libraries. File deflation cannot be used in parallel
+!   I/O for writing because the compression makes it impossible for the
+!   HDF5 library to exactly map the data to the disk location.  For more
+!   information, check NetCDF official website:
+!
+!   www.unidata.ucar.edu/software/netcdf
 !
 ! NC_SHUFFLE   Shuffle filter integer flag. If non-zero, turn on shuffle
 !                filter.
