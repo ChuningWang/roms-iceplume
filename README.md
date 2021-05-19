@@ -79,7 +79,7 @@ This background melt parameterization is known to underestimate the melt rate by
 
 ### Outflow Parameterization
 
-
+To simplify the problem, the ambient stratification is represented with a two-layer setup, where *ρ<sub>1</sub><ρ<sub>2</sub>* are average densities of the upper and lower layer, respectively; *g'=g(ρ<sub>1</sub>-ρ<sub>2</sub>)/ρ<sub>ref</sub>* is defined as the reduced gravity between two layers; *ρ<sub>ref</sub>* is a reference density and *g* is the gravitational acceleration. Subglacial discharge plume rises along the glacier wall, during which the plume properties are predicted by the BPT. The plume density is *ρ<sub>p</sub>* when the rising stage terminates. If the value of *ρ<sub>p</sub>* falls between the densities of the two layers (*ρ<sub>1</sub><ρ<sub>p</sub><ρ<sub>2</sub>*), the outflowing plume forms near the density jump; otherwise the plume outflows at surface and travels downstream as gravity current. Assuming that the plume detrains as one uniform water mass, the nose speed *U<sub>D</sub>* of the outflowing current is estimated with an empirical parameterization developed by [Noh et al. (1992); Ching et al. (1993)](#key-references). For outflow in two-layer fluid, the nose velocity is dependent on a modified Richardson number ![][4], where $l_p$
 
 ## Example Case
 An exmaple is provided for users to try out this coupled model. The files for this case is located in *./Iceplume\_Test*. It is a pure analytical case, thus no extra file is needed. The test domain is a 15x3 km channel, with an open boundary towards the east side. The first two rows of grid are masked to represent the glacier; subglacial discharge is injected from the center of the glacier into the channel. The channel is uniformly 400 m deep.
@@ -91,19 +91,28 @@ To run this test case, set the right path in the build\_roms.bash file and compi
 ---
 
 ## Key References
+
 [Ching, C. Y., Fernando, H. J. S., & Noh, Y. (1993). Interaction of a Negatively Buoyant Line Plume with a Density Interface. Dynamics of Atmospheres and Oceans, 19(1-4), 367-388.](https://www.sciencedirect.com/science/article/abs/pii/0377026593900426)
+
 [Cowton, T., Slater, D., Sole, A., Goldberg, D., & Nienow, P. (2015). Modeling the impact of glacial runoff on fjord circulation and submarine melt rate using a new subgrid‐scale parameterization for glacial plumes. Journal of Geophysical Research: Oceans, 120(2), 796-812.](https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2014JC010324)
+
 [Sutherland, D. A., Jackson, R. H., Kienholz, C., Amundson, J. M., Dryer, W. P., Duncan, D., et al. (2019). Direct observations of submarine melt and subsurface geometry at a tidewater glacier. Science, 365(6451), 369.](https://science.sciencemag.org/content/365/6451/369.full)
+
 [Ezhova, E., Cenedese, C., & Brandt, L. (2018). Dynamics of Three-Dimensional Turbulent Wall Plumes and Implications for Estimates of Submarine Glacier Melting. Journal of Physical Oceanography, 48(9), 1941-1950.](https://journals.ametsoc.org/view/journals/phoc/48/9/jpo-d-17-0194.1.xml)
+
 [Holland, D. M., & Jenkins, A. (1999). Modeling thermodynamic ice-ocean interactions at the base of an ice shelf. Journal of Physical Oceanography, 29(8), 1787-1800.](https://journals.ametsoc.org/view/journals/phoc/29/8/1520-0485_1999_029_1787_mtioia_2.0.co_2.xml?tab_body=fulltext-display)
+
 [Jenkins, A. (1991). A One-Dimensional Model of Ice Shelf-Ocean Interaction. Journal of Geophysical Research-Oceans, 96(C11), 20671-20677.](https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/91JC01842)
+
 [Jenkins, A. (2011). Convection-Driven Melting near the Grounding Lines of Ice Shelves and Tidewater Glaciers. Journal of Physical Oceanography, 41(12), 2279-2294.](https://journals.ametsoc.org/view/journals/phoc/41/12/jpo-d-11-03.1.xml)
+
+[Noh, Y., Fernando, H. J. S., & Ching, C. Y. (1992). Flows Induced by the Impingement of a 2-Dimensional Thermal on a Density Interface. Journal of Physical Oceanography, 22(10), 1207-1220.](https://journals.ametsoc.org/view/journals/phoc/22/10/1520-0485_1992_022_1207_fibtio_2_0_co_2.xml)
 
 ---
 
 ## Contact Info
 
-Chuning Wang
+Chuning Wang, School of Oceanography, Shanghai Jiaotong University
 
 wangchuning@sjtu.edu.cn
 
@@ -146,3 +155,4 @@ Chuning Wang
 [1]: https://latex.codecogs.com/svg.image?\begin{aligned}\frac{d}{dz}[Au]&space;&&space;=\alpha&space;L_c&space;u&space;&plus;&space;L_m\dot{m}&space;\\\\\frac{d}{dz}[Au^2]&space;&&space;=g'A&space;&plus;&space;L_m&space;C_d&space;u^2&space;\\\\\frac{d}{dz}[AuT_p]&space;&&space;=\alpha&space;L_c&space;u&space;T_a&space;&plus;&space;L_m\dot{m}T_b&space;-&space;L_m\Gamma_T&space;C_d^{1/2}u(T_p-T_b)&space;\\\\\frac{d}{dz}[AuS_p]&space;&&space;=\alpha&space;L_c&space;u&space;S_a&space;&plus;&space;L_m\dot{m}S_b&space;-&space;L_m\Gamma_S&space;C_d^{1/2}u(S_p-S_b)\end{aligned}
 [2]: https://latex.codecogs.com/svg.image?\begin{aligned}\dot{m}(c_i(T_b-T_i)&plus;L)&space;&&space;=c_w\Gamma_T&space;C_d^{1/2}u(T_p-T_b)\\\\\dot{m}S_b&space;&&space;=\Gamma_S&space;C_d^{1/2}u(S_p-S_b)\\\\T_b&space;&&space;=\lambda_1&space;S_b&space;&plus;&space;\lambda_2&space;&plus;&space;\lambda_3&space;z\end{aligned}
 [3]: https://latex.codecogs.com/svg.image?\dot{m}
+[4]: https://latex.codecogs.com/svg.image?Ri=\frac{g'l_P}{W_P^2}
