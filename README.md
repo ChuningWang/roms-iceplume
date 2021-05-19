@@ -36,7 +36,7 @@ The buoyant plume theory (BPT) is a set of equations that describes the developm
 
 To summarize, the development of buoyant plume is controlled by the following budget equations: 
 
-![eq1][1]
+<div align=center>![eq1][1]</div>
 
 
 There is no way to explain the BPT in a few words in a Markdown file. A separate document is being constructed to fully explain the model.
@@ -97,4 +97,4 @@ Chuning Wang
 
 
 
-[1]: https://latex.codecogs.com/svg.image?\begin{aligned}\frac{d}{dz}[Au]&space;&&space;=\alpha&space;L_c&space;u&space;&plus;&space;L_m\dot{m}&space;\\\frac{d}{dz}[Au^2]&space;&&space;=g'A&space;&plus;&space;L_m&space;C_d&space;u^2&space;\\\frac{d}{dz}[AuT_p]&space;&&space;=\alpha&space;L_c&space;u&space;T_a&space;&plus;&space;L_m\dot{m}T_b&space;-&space;L_m\Gamma_T&space;C_d^{1/2}u(T_p-T_b)&space;\\\frac{d}{dz}[AuS_p]&space;&&space;=\alpha&space;L_c&space;u&space;S_a&space;&plus;&space;L_m\dot{m}S_b&space;-&space;L_m\Gamma_S&space;C_d^{1/2}u(S_p-S_b)\end{aligned}
+[1]: https://latex.codecogs.com/svg.image?\begin{aligned}\frac{d}{dz}[Au]&space;&&space;=\alpha&space;L_c&space;u&space;&plus;&space;L_m\dot{m}&space;\\\\\frac{d}{dz}[Au^2]&space;&&space;=g'A&space;&plus;&space;L_m&space;C_d&space;u^2&space;\\\\\frac{d}{dz}[AuT_p]&space;&&space;=\alpha&space;L_c&space;u&space;T_a&space;&plus;&space;L_m\dot{m}T_b&space;-&space;L_m\Gamma_T&space;C_d^{1/2}u(T_p-T_b)&space;\\\\\frac{d}{dz}[AuS_p]&space;&&space;=\alpha&space;L_c&space;u&space;S_a&space;&plus;&space;L_m\dot{m}S_b&space;-&space;L_m\Gamma_S&space;C_d^{1/2}u(S_p-S_b)\end{aligned}
