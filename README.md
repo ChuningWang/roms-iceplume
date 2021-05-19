@@ -36,7 +36,7 @@ The buoyant plume theory (BPT) is a set of equations that describes the developm
 
 To summarize, the development of buoyant plume is controlled by the following budget equations: 
 
-<div align=center>![eq1][1]</div>
+![eq1][1]
 
 
 There is no way to explain the BPT in a few words in a Markdown file. A separate document is being constructed to fully explain the model.
