@@ -1,22 +1,40 @@
 # ROMS-ICEPLUME
+
+[![ver info](https://img.shields.io/badge/ROMS 3.9-ICEPLUME 1.1.1-brightgreen.svg)](https://github.com/ChuningWang/roms-iceplume)
+
 Buoyant plume theory coupled with Rutgers ROMS.
 
 This repository contains code of the Buoyant Plume Theory (BPT)/ROMS Coupled Model. Previously the model is developed based on Kate's ROMS branch (ROMS-ice) in order to allow coupling with sea-ice model.
 
 However, Kate's ROMS is heavily modified and contains a lot of uniform configurations, which is potentially buggy. Since so far we haven't get the chance to couple the model with sea-ice, it is reasonable to migrate back to Rutgers ROMS to maintain a tidy version of the code.
 
-# Theory
+This document is an introduction to the work in process ICEPLUME module for ROMS. It is modified from a similar package, IcePlume for the MITgcm, first developed by Dr. Tom Cowton. A detailed description of the MITgcm version is in [Cowton et al. 2015][1]
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Thoery](#theory)
+- [Code Structure](#code-structure)
+- [Example Case](#example-case)
+
+## Overview
+
+In ROMS, freshwater discharge is treated as point source going into a ROMS grid, which is activated by the compiling options **LuvSrc** or **LwSrc**. It reads in a total discharge ($Q_{bar}$), a prescribed vertical weight function ($Q_shape$), and tracer concentrations (T, S and passive), and volume/tracers are injected into a grid cell through horizontal advection (**LuvSrc**) or vertical convergence (**LwSrc**).
+
+This method works well for shallow estuaries with a barotropic freshwater discharge forcing. In most cases, the freshwater is advected into the grid uniformly ($Q_{shape}=\frac{1}{N}$ or $Q_{shape}=\frac{dz}{H}$). The expansion in volume and dilution of tracers drives a gravitational flow, which adjusts quickly to form an estuarine circulation.
+
+## Theory
 There is no way to explain the BPT in a few words in a Markdown file. A separate document is being constructed to fully explain the model.
 
-# Example Case
+## Example Case
 An exmaple is provided for users to try out this coupled model. The files for this case is located in *./Iceplume\_Test*. It is a pure analytical case, thus no extra file is needed. The test domain is a 15x3 km channel, with an open boundary towards the east side. The first two rows of grid are masked to represent the glacier; subglacial discharge is injected from the center of the glacier into the channel. The channel is uniformly 400 m deep.
 
 Initially the channel is stratified by a strong halocline at 50 m (set in roms\_fjord.in). Subglacial discharge of 200 m3/s is injected at 300 m depth, and a finite-line style plume of 260 m deep and 220 m long is used. Details of the plume parameters are set in *src/ana\_psource.h*.
 
 To run this test case, set the right path in the build\_roms.bash file and compile. Different model options are provided in *src/iceplume\_test.h*; the default setup is the recommended options in terms of the ICEPLUME module.
 
-# Key References
-Cowton, T., Slater, D., Sole, A., Goldberg, D., & Nienow, P. (2015). Modeling the impact of glacial runoff on fjord circulation and submarine melt rate using a new subgrid‐scale parameterization for glacial plumes. Journal of Geophysical Research: Oceans, 120(2), 796-812.
+## Key References
+[1] [Cowton, T., Slater, D., Sole, A., Goldberg, D., & Nienow, P. (2015). Modeling the impact of glacial runoff on fjord circulation and submarine melt rate using a new subgrid‐scale parameterization for glacial plumes. Journal of Geophysical Research: Oceans, 120(2), 796-812.](https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2014JC010324)
 
 Chuning Wang
 
