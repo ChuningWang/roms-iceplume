@@ -1,0 +1,6 @@
+\begin{aligned}
+\frac{d}{dz}[Au] & =\alpha L_c u + L_m\dot{m} \\
+\frac{d}{dz}[Au^2] & =g'A + L_m C_d u^2 \\
+\frac{d}{dz}[AuT_p] & =\alpha L_c u T_a + L_m\dot{m}T_b - L_m\Gamma_T C_d^{1/2}u(T_p-T_b) \\
+\frac{d}{dz}[AuS_p] & =\alpha L_c u S_a + L_m\dot{m}S_b - L_m\Gamma_S C_d^{1/2}u(S_p-S_b)
+\end{aligned}

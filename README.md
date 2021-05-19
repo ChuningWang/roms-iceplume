@@ -8,7 +8,7 @@ This repository contains code of the Buoyant Plume Theory (BPT)/ROMS Coupled Mod
 
 However, Kate's ROMS is heavily modified and contains a lot of uniform configurations, which is potentially buggy. Since so far we haven't get the chance to couple the model with sea-ice, it is reasonable to migrate back to Rutgers ROMS to maintain a tidy version of the code.
 
-This document is an introduction to the work in process ICEPLUME module for ROMS. It is modified from a similar package, IcePlume for the MITgcm, first developed by Dr. Tom Cowton. A detailed description of the MITgcm version is in [Cowton et al. 2015](#key-references)
+This document is an introduction to the work in process ICEPLUME module for ROMS. It is modified from a similar package, IcePlume for the MITgcm, first developed by Dr. Tom Cowton. A detailed description of the MITgcm version is in [Cowton et al. (2015)](#key-references).
 
 ## Table of Contents
 
@@ -32,6 +32,13 @@ This document is a technical manual to introduce the ROMS-ICEPLUME coupled model
 ![schem](readme_figs/schematics.png)
 
 ## Theory
+The buoyant plume theory (BPT) is a set of equations that describes the development of buoyant plume rising near an ocean/glacier boundary. It is first described using a one-dimensional model by [Jenkins (1991, 2011)](#key-references), which assumes the plume initiates from a line source and only grows in direction normal to line source. Later this model is modified by [Cowton et al. (2015)](#key-references), which assumes the plume initiates from a point source instead of a line source, and grows uniformly in horizontal direction. In reality it is likely that the development of buoyant plume falls in between the two cases [(Jackson et al., 2017)](#key-references). In this section we attempt to use a ‘generalized’ buoyant plume model to describe both cases. This generalized model gives more flexibility in modeling different geometries of buoyant plume, and is also convenient for numerical applications. 
+
+To summarize, the development of buoyant plume is controlled by the following budget equations: 
+
+![eq1][1]
+
+
 There is no way to explain the BPT in a few words in a Markdown file. A separate document is being constructed to fully explain the model.
 
 ## Example Case
@@ -48,9 +55,11 @@ To run this test case, set the right path in the build\_roms.bash file and compi
 
 ---
 
+## Contact Info
+
 Chuning Wang
 
-chuning@marine.rutgers.edu
+wangchuning@sjtu.edu.cn
 
 ---
 
@@ -85,3 +94,7 @@ Other modifications - Previously **ICEPLUME_DET_AVERAGE** averages density profi
 Chuning Wang
 
 2020-12-03
+
+
+
+[1]: https://latex.codecogs.com/svg.image?\begin{aligned}\frac{d}{dz}[Au]&space;&&space;=\alpha&space;L_c&space;u&space;&plus;&space;L_m\dot{m}&space;\\\frac{d}{dz}[Au^2]&space;&&space;=g'A&space;&plus;&space;L_m&space;C_d&space;u^2&space;\\\frac{d}{dz}[AuT_p]&space;&&space;=\alpha&space;L_c&space;u&space;T_a&space;&plus;&space;L_m\dot{m}T_b&space;-&space;L_m\Gamma_T&space;C_d^{1/2}u(T_p-T_b)&space;\\\frac{d}{dz}[AuS_p]&space;&&space;=\alpha&space;L_c&space;u&space;S_a&space;&plus;&space;L_m\dot{m}S_b&space;-&space;L_m\Gamma_S&space;C_d^{1/2}u(S_p-S_b)\end{aligned}
