@@ -4,3 +4,9 @@
 \frac{d}{dz}[AuT_p] & =\alpha L_c u T_a + L_m\dot{m}T_b - L_m\Gamma_T C_d^{1/2}u(T_p-T_b) \\
 \frac{d}{dz}[AuS_p] & =\alpha L_c u S_a + L_m\dot{m}S_b - L_m\Gamma_S C_d^{1/2}u(S_p-S_b)
 \end{aligned}
+
+\begin{aligned}
+\dot{m}(c_i(T_b-T_i)+L) & =c_w\Gamma_T C_d^{1/2}u(T_p-T_b)\\
+\dot{m}S_b & =\Gamma_S C_d^{1/2}u(S_p-S_b)\\
+T_b & =\lambda_1 S_b + \lambda_2 + \lambda_3 z
+\end{aligned}
