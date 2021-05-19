@@ -1,6 +1,6 @@
 # ROMS-ICEPLUME
 
-[![ver info](https://img.shields.io/badge/ROMS 3.9-ICEPLUME 1.1.1-brightgreen.svg)](https://github.com/ChuningWang/roms-iceplume)
+[![ver info](https://img.shields.io/badge/ROMS%20ver3.9-ICEPLUME%20ver1.1.1-brightgreen.svg)](https://github.com/ChuningWang/roms-iceplume)
 
 Buoyant plume theory coupled with Rutgers ROMS.
 
