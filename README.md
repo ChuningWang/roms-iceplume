@@ -12,7 +12,21 @@ This document is an introduction to the work in process ICEPLUME module for ROMS
 
 **<font size=5>Contents</font>**
 
-[toc]
+- [Overview](#overview)
+- [Theory](#Theory)
+  - [Buoyant Plume Theory](#buoyant-plume-theory)
+  - [Outflow Parameterization](#outflow-parameterization)
+  - [Couplers](#couplers)
+- [Numerical Implementation](#numerical-implementation)
+  - [Code Structure](#code-structure)
+  - [CPP Options](#cpp-options)
+  - [Model Inputs](#model-inputs)
+- [Analytical Test Case](#analytical-test-case)
+- [Key References](#key-references)
+- [Contact Info](#contact-info)
+- [Updates](#updates)
+  - [Ver 1.1.0](#ver-1.1.0)
+  - [Ver 1.1.1](#ver-1.1.1)
 
 ---
 
@@ -249,6 +263,8 @@ Other than the above model configurations, there are other experimental CPP opti
 - **ICEPLUME_SLOPE**
 
     Use this option to activate the **Slope** coupler, a linear combination of **Mix** and **H<sub>Mass</sub>**. Requires **ICEPLUME_MIX**.
+
+### Model Inputs
 
 When **ICEPLUME** is activated, ROMS needs to read in additional variables from the river netCDF file, including:
 
