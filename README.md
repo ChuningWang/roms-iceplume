@@ -27,6 +27,7 @@ This document is an introduction to the work in process ICEPLUME module for ROMS
 - [Updates](#updates)
   - [Ver 1.1.0](#ver-1.1.0)
   - [Ver 1.1.1](#ver-1.1.1)
+  - [Ver 1.1.2](#ver-1.1.2)
 
 ---
 
@@ -323,7 +324,7 @@ The ICEPLUME model has a standalone version that is able to calculate the plume 
 
 ![plume_type_schem](readme_figs/plume_type_schem.png)
 
-**Figure 4:** Schematic diagram of different plume type.
+**Figure 4:** Schematic diagram of different plume types.
 
 ## Analytical Test Case
 An analytical test case is provided for users to try out this coupled model. The files for this case is located in *./Iceplume_Test*. It is a pure analytical case, thus no extra file is needed. The test domain is a rectangular basin, with an open boundary towards the east side. Horizontal resolution is uniformly 220 m; the total domain size is determined by Lm and Mm in the *roms_iceplume_test.in* file. The first two rows of grid are masked to represent the glacier; subglacial discharge is injected from the center of the glacier into the channel. The channel is uniformly 200 m deep.
@@ -370,6 +371,7 @@ wangchuning@sjtu.edu.cn
 
 ## Updates
 ### Ver 1.1.0
+
 This is a major update. In this update I attempt to fix and improve the **ICEPLUME_DET_AVERAGE** method. The major issue I had is to average data across tiles. Depending on the MPI method, accessing data from another tile may not be allowed. This happened when I run the code on a super computer with Intel MPI. Historically it has also caused issues for other uses; in my own applications I 'fix' it by manually set averaging span within a single tile.
 
 However this simple 'patch' is not a good solution. It is necessary to design the code so it can either
@@ -391,6 +393,7 @@ Chuning Wang
 ---
 
 ### Ver 1.1.1
+
 More optimization on the averaging algorithm. Using ROMS internal function *mp_assemble* to substitute *mp_aggregate* in the coupling function. This is to avoid fetching global arrays of density at each timestep. Instead, each tile calculates the weighted SUM, and *mp_assemble* is used to get and broadcast the reduced sum from and to each tile; then the weighted average is calculated using the reduced sum.
 
 Since this is a better scheme over the method introduced in [Ver 1.1.0](##Ver-1.1.0), I decide to remove the temporarily used CPP flag **ICEPLUME_CTIL_AVG**. From now on only the new default averaging method is available.
@@ -400,6 +403,16 @@ Other modifications - Previously **ICEPLUME_DET_AVERAGE** averages density profi
 Chuning Wang
 
 2020-12-03
+
+---
+
+### Ver 1.1.2
+
+Bug fixing and new README page on github. The README is rewritten using materials from my thesis.
+
+Chuning Wang
+
+2021-05-21
 
 
 
