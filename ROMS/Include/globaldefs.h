@@ -919,6 +919,14 @@
 #endif
 
 /*
+** Define internal option for iceplume model.
+*/
+
+#if defined ICEPLUME && defined T_PASSIVE
+# define ICEPLUME_TRACER
+#endif
+
+/*
 ** Define internal flag indicating processing of input forcing
 ** NetCDF file.
 */

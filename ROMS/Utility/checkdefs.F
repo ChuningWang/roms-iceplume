@@ -1244,6 +1244,13 @@
       Coptions(is:is+22)=' ICEPLUME_MELT_TRACER,'
 # endif
 !
+#ifdef ICEPLUME_DET_AVERAGE
+      IF (Master) WRITE (stdout,20) 'ICEPLUME_DET_AVERAGE',             &
+     &   'Average ambient density for detrainment model.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+22)=' ICEPLUME_DET_AVERAGE,'
+# endif
+!
 #ifdef ICEPLUME_MIX
       IF (Master) WRITE (stdout,20) 'ICEPLUME_MIX',                     &
      &   'Mixing instead of flux form for iceplume model.'
@@ -1270,34 +1277,6 @@
      &   'Suppress detrainment model for iceplume model.'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+17)=' ICEPLUME_DET_NO,'
-# endif
-!
-#ifdef ICEPLUME_DET_AVERAGE
-      IF (Master) WRITE (stdout,20) 'ICEPLUME_DET_AVERAGE',             &
-     &   'Average ambient density for detrainment model.'
-      is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+22)=' ICEPLUME_DET_AVERAGE,'
-# endif
-!
-#ifdef ICEPLUME_DET_IWCP
-      IF (Master) WRITE (stdout,20) 'ICEPLUME_DET_IWCP',                &
-     &   'Use internal wave speed for detrainment model.'
-      is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+19)=' ICEPLUME_DET_IWCP,'
-# endif
-!
-#ifdef ICEPLUME_DET_BULK
-      IF (Master) WRITE (stdout,20) 'ICEPLUME_DET_BULK',                &
-     &   'Use bulk formula for detrainment model.'
-      is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+19)=' ICEPLUME_DET_BULK,'
-# endif
-!
-#ifdef ICEPLUME_DET_UNIFORM
-      IF (Master) WRITE (stdout,20) 'ICEPLUME_DET_UNIFORM',             &
-     &   'Use uniform detrainment velocity.'
-      is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+22)=' ICEPLUME_DET_UNIFORM,'
 # endif
 !
 #ifdef ICEPLUME_DET_NEUTRAL

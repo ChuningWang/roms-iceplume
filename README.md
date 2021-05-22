@@ -227,6 +227,8 @@ The current version of ICEPLUME is based on Rutgers ROMS version 3.9. To activat
 
     Use this option to activate tracer computation of subglacial discharge. Requires **T_PASSIVE**.
 
+    <font color=red>This option is now automatically turned on when both ICEPLUME and T_PASSIVE are defined (check *globaldeffs.h*). No need to define this option in the header file.</font>
+
 - **ICEPLUME_MELT_TRACER**
 
     Use this activate tracer computation of plume and ambient melt water. When this method is used, the last two dye types (**NT(ng)-1**, **NT(ng)**) will be used for the plume melt and background melt water, respectively; do not use them for other purpose, and make sure **NPT>2** in your roms_\*.in file.
@@ -249,11 +251,11 @@ Other than the above model configurations, there are other experimental CPP opti
 
     Use this option to disable calculating of overshooting stage in the upwelling plume model.
 
-- **ICEPLUME_DET_BULK**
+- **ICEPLUME_DET_BULK** (**<font color=red>REMOVED</font>**)
 
     Use a bulk formula (instead of adding layers from above/below) to calculate *h<sub>1</sub>* and *h<sub>2</sub>*.
 
-- **ICEPLUME_DET_IWCP**
+- **ICEPLUME_DET_IWCP** (**<font color=red>REMOVED</font>**)
 
     Use internal wave speed (instead of the Ching93 outflow parameterization) to estimate *U<sub>D</sub>*.
 

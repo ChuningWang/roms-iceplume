@@ -487,6 +487,19 @@
 ** SED_MORPH               to allow bottom model elevation to evolve         **
 ** SUSPLOAD                to activate suspended load transport              **
 **                                                                           **
+** Sediment transport model OPTIONS:                                         **
+**                                                                           **
+** ICEPLUME                to activate iceplume model                        **
+** ICEPLUME_TRACER         to activate passive tracer for SG discharge       **
+** ICEPLUME_MELT           to activate background melt                       **
+** ICEPLUME_MELT_TRACER    to activate passive tracer for melt water         **
+** ICEPLUME_DET_AVERAGE    to use averaged profiles for detrainment param    **
+** ICEPLUME_MIX            to use the MIX coupler                            **
+** ICEPLUME_SLOPE          to use the SLOPE coupler                          **
+** ICEPLUME_SHOOT_NO       to deactivate overshooting of upwelling plume     **
+** ICEPLUME_DET_NO         to deactivate detrainment parameterization        **
+** ICEPLUME_DET_NEUTRAL    to use non-uniform tracer concentration in plume  **
+**                                                                           **
 ** OPTIONS for grid nesting:                                                 **
 **                                                                           **
 ** NESTING                 to activate grid nesting: composite/refinement    **

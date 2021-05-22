@@ -151,56 +151,6 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
 !
   rhoP = RHO(PLUME(ng) % t(I, osDepthK), PLUME(ng) % s(I, osDepthK),    &
      &       PLUME(ng) % zR(I, plumeDepthK))
-# ifdef ICEPLUME_DET_IWCP
-!
-! Use internal wave speed to limited the detrainment flow speed.
-!
-  IF (isSurface) THEN
-!
-! Use Froude number to limit detrainment flow speed.
-!
-    rhoH = 0.0
-    h1 = 0.0
-    DO K = N(ng), 1, -1
-      h1 = h1+PLUME(ng) % dz(I, K)
-      rhoH = rhoH+PLUME(ng) % dz(I, K)*PLUME(ng) % rhoAm(I, K)
-      rho1 = rhoH/h1
-      gRed = MAX(g*(rho1-rhoP)/rhoRef, gRedBkg)
-      Fr = det/(lc*h1)/SQRT(gRed*h1)
-      IF (Fr .LE. 1.0/RiB) EXIT
-    ENDDO
-    minDz = h1
-  ELSE  ! (.NOT. isSurface)
-!
-! Use the Richardson number criteria.
-!
-    KI = plumeDepthK
-    rhoH = 0.0
-    h1 = 0.0
-    DO K = KI+1, N(ng)
-      h1 = h1+PLUME(ng) % dz(I, K)
-      rhoH = rhoH + PLUME(ng) % dz(I, K)*PLUME(ng) % rhoAm(I, K)
-    ENDDO
-    rho1 = rhoH/h1
-!
-    rhoH = 0.0
-    h2 = 0.0
-    DO K = 1, KI 
-      h2 = h2+PLUME(ng) % dz(I, K)
-      rhoH = rhoH + PLUME(ng) % dz(I, K)*PLUME(ng) % rhoAm(I, K)
-    ENDDO
-    rho2 = rhoH/h2
-!
-! Compute minimum detrainment thickness.
-!
-    gRed = MAX(-g*(rho1-rho2)/rhoRef, gRedBkg)
-    maxVel = SQRT(gRed*h1*h2/(h1+h2))/RiB
-#  if !defined ICEPLUME_DET_BULK
-    maxVel = maxVel*(SQRT(pi/2)*detSigma)
-#  endif
-    minDz = det/maxVel/lc
-  ENDIF
-# else
 !
 ! Use the Parameterization of Ching et al. (1993) to determine the bulk
 ! velocity and nt in several layers. First, calculate BV frequency.
@@ -241,11 +191,8 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
       maxVel = 0.95*PLUME(ng) % w(I, KI)
     ENDIF
   ENDIF
-#  if !defined ICEPLUME_DET_BULK
   maxVel = maxVel*(SQRT(pi/2)*detSigma)
-#  endif
   minDz = det/lc/maxVel
-# endif
 !
 ! Determine the vertical extent of detrainment plume.
 !
@@ -253,54 +200,6 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
   K1 = KI
   K2 = KI
   detDz = 0.0
-# ifdef ICEPLUME_DET_BULK
-!
-! Use a bulk formula.
-!
-  IF (isSurface) THEN
-    DO K = N(ng), 1, -1
-      detDz = detDz + PLUME(ng) % dz(I, K)
-      PLUME(ng) % detI(I, KI) = 1
-      PLUME(ng) % detFrac(I, KI) = 1.0
-      IF ( detDz .GT. minDz ) THEN
-        PLUME(ng) % detFrac(I, KI) =                                    &
-     &    (detDz - minDz) / PLUME(ng) % dz(I, KI)
-        detDz = minDz
-        EXIT
-      ENDIF
-    ENDDO
-  ELSE
-    cff1 = (rho2-rhoP)/(rho2-rho1)*minDz
-    cff2 = (rhoP-rho1)/(rho2-rho1)*minDz
-    h1 = 0.0
-    h2 = 0.0
-    DO K = plumeDepthK+1, N(ng)
-      h1 = h1 + PLUME(ng) % dz(I, K)
-      PLUME(ng) % detI(I, K) = 1
-      PLUME(ng) % detFrac(I, K) = 1.0
-      K1 = K
-      IF ( h1 .GT. cff1 ) THEN
-        PLUME(ng) % detFrac(I, K) =                                     &
-     &    1 - (h1 - cff1) / PLUME(ng) % dz(I, K)
-        h1 = cff1
-        EXIT
-      ENDIF
-    ENDDO
-    DO K = plumeDepthK, 1, -1
-      h2 = h2 + PLUME(ng) % dz(I, K)
-      PLUME(ng) % detI(I, K) = 1
-      PLUME(ng) % detFrac(I, K) = 1.0
-      K2 = K
-      IF ( h2 .GT. cff2 ) THEN
-        PLUME(ng) % detFrac(I, K) =                                     &
-     &    1 - (h2 - cff2) / PLUME(ng) % dz(I, K)
-        h2 = cff2
-        EXIT
-      ENDIF
-    ENDDO
-    detDz = h1 + h2
-  ENDIF
-# else
 !
 ! Add layers around plumeDepthK until it reaches critical thickness.
 !
@@ -388,7 +287,6 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
       detDz = detDz - PLUME(ng) % dz(I, KI)*(1 - cff)
     ENDIF
   ENDIF
-# endif
 !
 ! ==================================================================!
 !                                                                   !
@@ -405,9 +303,6 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
   detVel = det / (lc * detDz)
   DO K = 1,N(ng)
     IF (PLUME(ng) % detI(I, K) .EQ. 1) THEN
-# ifdef ICEPLUME_DET_UNIFORM
-      detWeight = 1.0
-# else
 !
 ! First, calculate weight using Gaussian function.
 !
@@ -419,7 +314,6 @@ SUBROUTINE ICEPLUME_DETRAIN(ng, I,                                      &
      &    (PLUME(ng) % zR(I, K2)-PLUME(ng) % zR(I, plumeDepthK)+0.0001)
       ENDIF
       detWeight = EXP(-0.5 * (cff/detSigma)**2)
-# endif
 !
 ! Distribute the detrainment.
 !
