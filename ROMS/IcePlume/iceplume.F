@@ -101,6 +101,7 @@
         IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.          &
      &       ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
           Dsrc = NINT(SOURCES(ng) % Dsrc(is))
+# ifdef MASKING
           IF (LuvSrc(ng)) THEN
             IF (Dsrc .EQ. 0) THEN
               IF ((GRID(ng)%rmask(Isrc  , Jsrc) .LT. 0.5_r8) .AND.      &
@@ -128,6 +129,9 @@
           ELSEIF (LwSrc(ng)) THEN
             D2src = 0
           ENDIF
+# else
+          D2src = 0
+# endif
           PLUME(ng) % Isrc(is) = Isrc
           PLUME(ng) % Jsrc(is) = Jsrc
           PLUME(ng) % dir(is) = REAL(D2src)
@@ -346,9 +350,14 @@
           ENDDO
           DO j = PLUME(ng) % avgJstr(is), PLUME(ng) % avgJend(is)
             DO i = PLUME(ng) % avgIstr(is), PLUME(ng) % avgIend(is)
+#  ifdef MASKING
               IF ( ((IstrR .LE. i) .AND. (i .LE. IendR)) .AND.          &
       &            ((JstrR .LE. j) .AND. (j .LE. JendR)) .AND.          &
       &            (GRID(ng) % rmask(i, j) .GT. 0.5_r8) ) THEN
+#  else
+              IF ( ((IstrR .LE. i) .AND. (i .LE. IendR)) .AND.          &
+      &            ((JstrR .LE. j) .AND. (j .LE. JendR)) ) THEN
+#  endif
                 area = ABS(GRID(ng)%om_r(i,j)*GRID(ng)%on_r(i,j))
                 DO K = 1, N(ng)
                   IF ( (PLUME(ng) % zR(is, K) .GT.                      &
