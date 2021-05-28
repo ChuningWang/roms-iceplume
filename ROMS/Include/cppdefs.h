@@ -487,7 +487,7 @@
 ** SED_MORPH               to allow bottom model elevation to evolve         **
 ** SUSPLOAD                to activate suspended load transport              **
 **                                                                           **
-** Sediment transport model OPTIONS:                                         **
+** ICEPLUME model OPTIONS:                                                   **
 **                                                                           **
 ** ICEPLUME                to activate iceplume model                        **
 ** ICEPLUME_TRACER         to activate passive tracer for SG discharge       **
