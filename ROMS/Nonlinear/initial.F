@@ -75,6 +75,9 @@
     (defined MASKING    && (defined READ_WATER || defined WRITE_WATER))
       USE wpoints_mod,       ONLY : wpoints
 #endif
+#ifdef ICEPLUME
+      USE iceplume_mod,      ONLY : iceplume_init
+#endif
 !
       implicit none
 !

@@ -1,5 +1,7 @@
 #include "cppdefs.h"
-
+!-----------------------------------------------------------------------
+! This code piece is stripped from the Fortran ODEpack.
+!-----------------------------------------------------------------------
 #ifdef ICEPLUME
 SUBROUTINE DLSODE (F, NEQ, Y, T, TOUT, ITOL, RTOL, ATOL, ITASK, &
      &                  ISTATE, IOPT, RWORK, LRW, IWORK, LIW, JAC, MF)

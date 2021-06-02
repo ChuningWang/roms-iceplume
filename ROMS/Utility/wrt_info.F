@@ -3744,7 +3744,7 @@
 !-----------------------------------------------------------------------
 !
 # ifdef NO_WRITE_GRID
-      GRID_VARS : IF (FileH.eq.ABS(STA(ng)%pioFile&fh)) THEN
+      GRID_VARS : IF (FileH.eq.ABS(STA(ng)%pioFile%fh)) THEN
 # else
       GRID_VARS : IF (FileH.ne.ABS(FLT(ng)%pioFile%fh)) THEN
 # endif

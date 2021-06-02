@@ -120,6 +120,15 @@
 # endif
       USE strings_mod,          ONLY : FoundError
       USE wvelocity_mod,        ONLY : wvelocity
+# ifdef ICEPLUME
+      USE iceplume_mod,         ONLY : iceplume
+#  ifdef ICEPLUME_MIX
+      USE iceplume_mod,         ONLY : iceplume_mix
+#  endif
+#  ifdef ICEPLUME_SPREAD
+      USE iceplume_mod,         ONLY : iceplume_spread
+#  endif
+# endif
 !
       implicit none
 !
