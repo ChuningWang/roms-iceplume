@@ -456,142 +456,6 @@
       ENDDO
       RETURN
       END SUBROUTINE iceplume_tile
-# ifdef ICEPLUME_SPREAD
-!
-!=======================================================================
-!                                                                      !
-!  PART III - Spread the plume horizontally in a few grids.            !
-!    This section is still being tested.                               !
-!                                                                      !
-!=======================================================================
-!
-!***********************************************************************
-      SUBROUTINE iceplume_spread (ng, tile)
-!***********************************************************************
-!
-      USE mod_param
-!
-!  Imported variable declarations.
-!
-      integer, intent(in) :: ng, tile
-!
-!  Local variable declarations.
-!
-# ifdef PROFILE
-      CALL wclock_on (ng, iNLM, 4, __LINE__, __FILE__)
-# endif
-      CALL iceplume_spread_tile (ng, tile)
-# ifdef PROFILE
-      CALL wclock_off (ng, iNLM, 4, __LINE__, __FILE__)
-# endif
-
-      RETURN
-      END SUBROUTINE iceplume_spread
-!
-!***********************************************************************
-      SUBROUTINE iceplume_spread_tile (ng, tile)
-!***********************************************************************
-!
-      USE mod_ocean, ONLY : OCEAN
-      USE mod_stepping, ONLY : nstp
-      USE mod_sources
-      USE mod_iceplume
-!
-!  Imported variable declarations.
-!
-      integer, intent(in) :: ng, tile
-!
-!  Local variable declarations.
-!
-      integer :: is, is0, is1, Isrc, Jsrc, K, itrc
-      real(r8) :: fIni, trcIni, trcM
-      real(r8) :: cff, cff1
-!
-# include "set_bounds.h"
-!
-      is  = 2
-      Isrc = PLUME(ng) % Isrc(is)
-      Jsrc = PLUME(ng) % Jsrc(is)
-      IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.            &
-     &     ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
-        is0 = is-1
-        is1 = is+1
-        cff = PLUME(ng) % trs(is)/3.0_r8
-        PLUME(ng) % trs(is0) = cff
-        PLUME(ng) % trs(is1) = cff
-        PLUME(ng) % trs(is ) = cff
-        DO K = 1, N(ng)
-          cff = PLUME(ng) % ent(is, K)/3.0_r8
-          PLUME(ng) % ent(is0, K) = cff
-          PLUME(ng) % ent(is1, K) = cff
-          PLUME(ng) % ent(is , K) = cff
-!
-          cff = PLUME(ng) % det(is, K)/3.0_r8
-          PLUME(ng) % det(is0, K) = cff
-          PLUME(ng) % det(is1, K) = cff
-          PLUME(ng) % det(is , K) = cff
-!
-          cff = PLUME(ng) % m(is, K)/3.0_r8
-          PLUME(ng) % m(is0, K) = cff
-          PLUME(ng) % m(is1, K) = cff
-          PLUME(ng) % m(is , K) = cff
-        ENDDO
-!
-!  Tracers.
-!
-        fIni = ABS(SOURCES(ng) % SGbar(is))/3.0_r8
-        DO itrc = 1, NT(ng)
-          trcIni = PLUME(ng) % trcIni(is, itrc)
-          IF (itrc .EQ. isalt) THEN
-            trcM = sIce
-          ELSEIF (itrc .EQ. itemp) THEN
-            trcM = tGade
-          ELSE
-            trcM = 0.0_r8
-          ENDIF
-# ifdef ICEPLUME_MELT_TRACER
-          IF (itrc .EQ. NT(ng)-1) THEN
-            trcIni = 0.0_r8
-            trcM   = PLUME(ng) % trcIni(is, itrc)
-          ELSEIF (itrc .EQ. NT(ng)) THEN
-            trcIni = 0.0_r8
-            trcM   = 0.0_r8
-          ENDIF
-# endif
-          cff  = fIni
-          cff1 = fIni*trcIni
-          DO K = 1, N(ng)
-            cff  = cff  - PLUME(ng) % ent(is, K)+PLUME(ng) % m(is, K)
-            cff1 = cff1 -                                               &
-     &        PLUME(ng) % ent(is, K)*PLUME(ng) % trcAm(is, K, itrc) +   &
-     &        PLUME(ng) % m(is, K)*trcM
-          ENDDO
-          PLUME(ng) % trc(is, itrc) = cff1/cff
-!
-          cff  = fIni
-          cff1 = fIni*trcIni
-          DO K = 1, N(ng)
-            cff  = cff  - PLUME(ng) % ent(is0, K)+PLUME(ng) % m(is0, K)
-            cff1 = cff1 -                                               &
-     &        PLUME(ng) % ent(is0, K)*PLUME(ng) % trcAm(is0, K, itrc) + &
-     &        PLUME(ng) % m(is0, K)*trcM
-          ENDDO
-          PLUME(ng) % trc(is1, itrc) = cff1/cff
-!
-          cff  = fIni
-          cff1 = fIni*trcIni
-          DO K = 1, N(ng)
-            cff  = cff  - PLUME(ng) % ent(is1, K)+PLUME(ng) % m(is1, K)
-            cff1 = cff1 -                                               &
-     &        PLUME(ng) % ent(is1, K)*PLUME(ng) % trcAm(is1, K, itrc) + &
-     &        PLUME(ng) % m(is1, K)*trcM
-          ENDDO
-          PLUME(ng) % trc(is1, itrc) = cff1/cff
-        ENDDO
-      ENDIF
-      RETURN
-      END SUBROUTINE iceplume_spread_tile
-# endif
 # ifdef ICEPLUME_MIX
 !
 !=======================================================================
@@ -819,6 +683,142 @@
       ENDDO
       RETURN
       END SUBROUTINE iceplume_mix_tile
+# endif
+# ifdef ICEPLUME_SPREAD
+!
+!=======================================================================
+!                                                                      !
+!  PART III - Spread the plume horizontally in a few grids.            !
+!    This section is still being tested.                               !
+!                                                                      !
+!=======================================================================
+!
+!***********************************************************************
+      SUBROUTINE iceplume_spread (ng, tile)
+!***********************************************************************
+!
+      USE mod_param
+!
+!  Imported variable declarations.
+!
+      integer, intent(in) :: ng, tile
+!
+!  Local variable declarations.
+!
+# ifdef PROFILE
+      CALL wclock_on (ng, iNLM, 4, __LINE__, __FILE__)
+# endif
+      CALL iceplume_spread_tile (ng, tile)
+# ifdef PROFILE
+      CALL wclock_off (ng, iNLM, 4, __LINE__, __FILE__)
+# endif
+
+      RETURN
+      END SUBROUTINE iceplume_spread
+!
+!***********************************************************************
+      SUBROUTINE iceplume_spread_tile (ng, tile)
+!***********************************************************************
+!
+      USE mod_ocean, ONLY : OCEAN
+      USE mod_stepping, ONLY : nstp
+      USE mod_sources
+      USE mod_iceplume
+!
+!  Imported variable declarations.
+!
+      integer, intent(in) :: ng, tile
+!
+!  Local variable declarations.
+!
+      integer :: is, is0, is1, Isrc, Jsrc, K, itrc
+      real(r8) :: fIni, trcIni, trcM
+      real(r8) :: cff, cff1
+!
+# include "set_bounds.h"
+!
+      is  = 2
+      Isrc = PLUME(ng) % Isrc(is)
+      Jsrc = PLUME(ng) % Jsrc(is)
+      IF ( ((IstrR .LE. Isrc) .AND. (Isrc .LE. IendR)) .AND.            &
+     &     ((JstrR .LE. Jsrc) .AND. (Jsrc .LE. JendR)) ) THEN
+        is0 = is-1
+        is1 = is+1
+        cff = PLUME(ng) % trs(is)/3.0_r8
+        PLUME(ng) % trs(is0) = cff
+        PLUME(ng) % trs(is1) = cff
+        PLUME(ng) % trs(is ) = cff
+        DO K = 1, N(ng)
+          cff = PLUME(ng) % ent(is, K)/3.0_r8
+          PLUME(ng) % ent(is0, K) = cff
+          PLUME(ng) % ent(is1, K) = cff
+          PLUME(ng) % ent(is , K) = cff
+!
+          cff = PLUME(ng) % det(is, K)/3.0_r8
+          PLUME(ng) % det(is0, K) = cff
+          PLUME(ng) % det(is1, K) = cff
+          PLUME(ng) % det(is , K) = cff
+!
+          cff = PLUME(ng) % m(is, K)/3.0_r8
+          PLUME(ng) % m(is0, K) = cff
+          PLUME(ng) % m(is1, K) = cff
+          PLUME(ng) % m(is , K) = cff
+        ENDDO
+!
+!  Tracers.
+!
+        fIni = ABS(SOURCES(ng) % SGbar(is))/3.0_r8
+        DO itrc = 1, NT(ng)
+          trcIni = PLUME(ng) % trcIni(is, itrc)
+          IF (itrc .EQ. isalt) THEN
+            trcM = sIce
+          ELSEIF (itrc .EQ. itemp) THEN
+            trcM = tGade
+          ELSE
+            trcM = 0.0_r8
+          ENDIF
+# ifdef ICEPLUME_MELT_TRACER
+          IF (itrc .EQ. NT(ng)-1) THEN
+            trcIni = 0.0_r8
+            trcM   = PLUME(ng) % trcIni(is, itrc)
+          ELSEIF (itrc .EQ. NT(ng)) THEN
+            trcIni = 0.0_r8
+            trcM   = 0.0_r8
+          ENDIF
+# endif
+          cff  = fIni
+          cff1 = fIni*trcIni
+          DO K = 1, N(ng)
+            cff  = cff  - PLUME(ng) % ent(is, K)+PLUME(ng) % m(is, K)
+            cff1 = cff1 -                                               &
+     &        PLUME(ng) % ent(is, K)*PLUME(ng) % trcAm(is, K, itrc) +   &
+     &        PLUME(ng) % m(is, K)*trcM
+          ENDDO
+          PLUME(ng) % trc(is, itrc) = cff1/cff
+!
+          cff  = fIni
+          cff1 = fIni*trcIni
+          DO K = 1, N(ng)
+            cff  = cff  - PLUME(ng) % ent(is0, K)+PLUME(ng) % m(is0, K)
+            cff1 = cff1 -                                               &
+     &        PLUME(ng) % ent(is0, K)*PLUME(ng) % trcAm(is0, K, itrc) + &
+     &        PLUME(ng) % m(is0, K)*trcM
+          ENDDO
+          PLUME(ng) % trc(is1, itrc) = cff1/cff
+!
+          cff  = fIni
+          cff1 = fIni*trcIni
+          DO K = 1, N(ng)
+            cff  = cff  - PLUME(ng) % ent(is1, K)+PLUME(ng) % m(is1, K)
+            cff1 = cff1 -                                               &
+     &        PLUME(ng) % ent(is1, K)*PLUME(ng) % trcAm(is1, K, itrc) + &
+     &        PLUME(ng) % m(is1, K)*trcM
+          ENDDO
+          PLUME(ng) % trc(is1, itrc) = cff1/cff
+        ENDDO
+      ENDIF
+      RETURN
+      END SUBROUTINE iceplume_spread_tile
 # endif
 !
 !=======================================================================

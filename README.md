@@ -185,15 +185,26 @@ In ROMS, the options **LuvSrc** and **LwSrc** are generally used to represent ri
 
 ### Code Structure
 
-ROMS-ICEPLUME is forked from the Rutgers ROMS. It contains several additional FORTRAN source code files as well as modifications to the original code. New source code files are located in *ROMS/IcePlume*. The module is written in six source code files:
+ROMS-ICEPLUME is forked from the Rutgers ROMS. It contains several additional FORTRAN source code files as well as modifications to the original code. New source code files are located in *ROMS/IcePlume*. The module is written in three source code files:
 
-- *mod_iceplume.F*: This file contains model constants, parameters, shared variables and arrays for ICEPLUME. All profiles of plume status are stored in TYPE **PLUME**, which is also used to communicate with the ocean model.
+- *mod_iceplume.F*: This file contains model constants, parameters, shared variables and arrays for ICEPLUME. All profiles of plume status are stored in TYPE **PLUME**, which is also accessed by the ocean model.
 
 - *iceplume_opkd.F*: This file contains an ODE solver, ODEPACK, developed by [Hindmarsh (1982)](#key-references). It is originally written in FORTRAN 77, here it is revamped to be compatible with the ROMS C preprocessor.
-- *iceplume_entrain.F*: This file contains the entrainment model based on the BPT. The main subroutine is **ICEPLUME_ENTRAIN**, which calculates entrainment and melt rates; the subroutine **GENERAL_ENTRAIN_MODEL** contains the BPT equation code, which is called repeatedly by the ODE solver; the subroutine **PLUME_METRICS** is used to calculate L_m and L_c based on the model type.
-- *iceplume_detrain.F*: This file contains the detrainment model. The main subroutine is **ICEPLUME_DETRAIN**, which calculates velocity and tracer profiles of the outflow.
-- *iceplume_calc.F*: This file contains the wrapper function that calls the plume entrainment and detrainment melting models. It also calculates volume and tracer fluxes and background melt rates.
-- *iceplume.F*: This file contains the main function **ICEPLUME**, which communicates with the ocean model.
+
+- *iceplume.F*: This file contains the main module **iceplume_mod**. The main functions in this module are
+  - **iceplume_init**, which initialize the plume model during the initialization stage in *initial.F*.
+  - **iceplume**, which communicates between the plume model and ocean model.
+  - **iceplume_mix**, which implements the **ICEPLUME_MIX** method.
+  - **iceplume_spread**, which spreads the buoyant plume fluxes in adjacent grids. <font color=red>EXPERIMENTAL!!! DO NOT USE</font>
+  - **iceplume_entrain**, which calculates entrainment and melt rates. The related subroutines are
+    - **general_entrain_model**, which contains the BPT equation code and is called repeatedly by the ODE solver;
+    - **plume_metrics**, which is used to calculate *L<sub>m</sub>* and *L<sub>c</sub>* based on the model type.
+  - **iceplume_detrain**, which contains the detrainment model. This subroutine calculates velocity and tracer profiles of the outflow.
+  - **iceplume_calc**, which contains the wrapper function that calls the plume entrainment and detrainment melting models. It also calculates volume and tracer fluxes and background melt rates. The related subroutine is
+    - **iceplume_meltrate**, which calcuates background meltrate using the three-equation parameterization.
+  - **rho**, which computers in-situ density.
+  - **sw_temp**/**sw_ptmp**/**sw_adtg**, which calculates in-situ temperature. These three functions are modified from the **MITgcm** code repository.
+  - **linint**, which performs linear interpolation.
 
 To couple ICEPLUME to ROMS, a few pieces of code are added/modified in the following source codes:
 
@@ -416,6 +427,14 @@ Chuning Wang
 
 2021-05-21
 
+### Ver 1.1.3 [ongoing]
+
+Move all iceplume related functions to one file *ROMS/IcePlume/iceplume.F* to pack it in a module **iceplume_mod**. The purpose is to seal the iceplume module to avoid accidental access of other model components. This is part of the preparation for coupling with an icesheet model, potentially the FISOC coupling system.
+
+Unfortunately the ODEpack code cannot be packed into the same module due to some conflicts with F77. For now it is kept in a separate file in *iceplume_opkd.F*. I haven't had a solution on this minor problem.
+
+Chuning Wang
+2021-06-08
 
 
 [1]: https://latex.codecogs.com/svg.image?\begin{aligned}\frac{d}{dz}[Au]&=\alpha&space;L_cu&plus;L_m\dot{m}\\\\\frac{d}{dz}[Au^2]&=g'A&plus;L_mC_du^2\\\\\frac{d}{dz}[AuT_p]&=\alpha&space;L_cuT_a&plus;L_m\dot{m}T_b-L_m\Gamma_TC_d^{1/2}u(T_p-T_b)\\\\\frac{d}{dz}[AuS_p]&=\alpha&space;L_cuS_a&plus;L_m\dot{m}S_b-L_m\Gamma_SC_d^{1/2}u(S_p-S_b)\end{aligned}

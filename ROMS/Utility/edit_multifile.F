@@ -365,6 +365,7 @@
 !***********************************************************************
 !
       USE mod_param
+      USE mod_ncparam, ONLY : NV
 !
 !  Imported variable declarations.
 !
