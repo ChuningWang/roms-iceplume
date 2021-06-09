@@ -195,7 +195,7 @@ ROMS-ICEPLUME is forked from the Rutgers ROMS. It contains several additional FO
   - **iceplume_init**, which initialize the plume model during the initialization stage in *initial.F*.
   - **iceplume**, which communicates between the plume model and ocean model.
   - **iceplume_mix**, which implements the **ICEPLUME_MIX** method.
-  - **iceplume_spread**, which spreads the buoyant plume fluxes in adjacent grids. <font color=red>EXPERIMENTAL!!! DO NOT USE</font>
+  - **iceplume_spread**, which spreads the buoyant plume fluxes in adjacent grids. **(EXPERIMENTAL!!! DO NOT USE)**
   - **iceplume_entrain**, which calculates entrainment and melt rates. The related subroutines are
     - **general_entrain_model**, which contains the BPT equation code and is called repeatedly by the ODE solver;
     - **plume_metrics**, which is used to calculate *L<sub>m</sub>* and *L<sub>c</sub>* based on the model type.
@@ -238,7 +238,7 @@ The current version of ICEPLUME is based on Rutgers ROMS version 3.9. To activat
 
     Use this option to activate tracer computation of subglacial discharge. Requires **T_PASSIVE**.
 
-    <font color=red>This option is now automatically turned on when both ICEPLUME and T_PASSIVE are defined (check *globaldeffs.h*). No need to define this option in the header file.</font>
+    **This option is now automatically turned on when both ICEPLUME and T_PASSIVE are defined (check *globaldeffs.h*). No need to define this option in the header file.**
 
 - **ICEPLUME_MELT_TRACER**
 
@@ -262,11 +262,11 @@ Other than the above model configurations, there are other experimental CPP opti
 
     Use this option to disable calculating of overshooting stage in the upwelling plume model.
 
-- **ICEPLUME_DET_BULK** (**<font color=red>REMOVED</font>**)
+- **ICEPLUME_DET_BULK** **(OBSOLETE)**
 
     Use a bulk formula (instead of adding layers from above/below) to calculate *h<sub>1</sub>* and *h<sub>2</sub>*.
 
-- **ICEPLUME_DET_IWCP** (**<font color=red>REMOVED</font>**)
+- **ICEPLUME_DET_IWCP** **(OBSOLETE)**
 
     Use internal wave speed (instead of the Ching93 outflow parameterization) to estimate *U<sub>D</sub>*.
 
@@ -426,6 +426,8 @@ Bug fixing and new README page on github. The README is rewritten using material
 Chuning Wang
 
 2021-05-21
+
+---
 
 ### Ver 1.1.3 [ongoing]
 
