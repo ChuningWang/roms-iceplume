@@ -438,6 +438,11 @@ Unfortunately the ODEpack code cannot be packed into the same module due to some
 Chuning Wang
 2021-06-08
 
+Add new method ICEPLUME_DET_SMOOTH. This method allows a smooth transition from a subsurface plume to a surface plume. This is still experimental - more testing is on the way.
+
+Chuning Wang
+2021-06-22
+
 
 [1]: https://latex.codecogs.com/svg.image?\begin{aligned}\frac{d}{dz}[Au]&=\alpha&space;L_cu&plus;L_m\dot{m}\\\\\frac{d}{dz}[Au^2]&=g'A&plus;L_mC_du^2\\\\\frac{d}{dz}[AuT_p]&=\alpha&space;L_cuT_a&plus;L_m\dot{m}T_b-L_m\Gamma_TC_d^{1/2}u(T_p-T_b)\\\\\frac{d}{dz}[AuS_p]&=\alpha&space;L_cuS_a&plus;L_m\dot{m}S_b-L_m\Gamma_SC_d^{1/2}u(S_p-S_b)\end{aligned}
 
