@@ -1753,6 +1753,9 @@ END SUBROUTINE iceplume_calc
 !
       integer  :: KI, K, K1, K2, itrc, counter
       real(r8) :: cff, cff1, cff2, cff3, cff4
+# ifdef ICEPLUME_DET_SMOOTH
+      real(r8) :: potEi, potEp, potEn, potERatio
+# endif
 # ifdef ICEPLUME_DET_NEUTRAL
 !
 ! Initialize.
@@ -1826,6 +1829,26 @@ END SUBROUTINE iceplume_calc
         KI = MAXLOC(PLUME(ng) % w(I, :), 1)
         cff1 = PLUME(ng) % f(I, KI)/PLUME(ng) % w(I, KI)/lc
         Ri = gRed*cff1/(PLUME(ng) % w(I, KI)**2)
+# ifdef ICEPLUME_DET_SMOOTH
+!
+! Add a correction term to generate a smooth transition from subsurface
+! plume to surface plume. The idea is to nudge the Richardson number
+! towards 6.0 (thus the outflow behaves more like a surface plume) when
+! the vertical momentum at surface is non-zero.
+!
+! This is an engineering fix in order to address Becca's concerns when
+! running iceplume with a realistic topography.
+!
+! Chuning Wang 2021-05-17
+!
+        cff = 0.0
+        DO K = 0,N(ng)
+          IF (PLUME(ng) % w(I, K) .gt. cff) cff = PLUME(ng) % w(I, K)
+        ENDDO
+        cff1 = PLUME(ng) % w(I, N(ng)) / cff
+        Ri = Ri + cff1*(6.0 - Ri)
+# endif
+!
         IF (Ri .LT. 6.0) THEN
           maxVel = (0.7*(Ri**0.17))*PLUME(ng) % w(I, KI)
         ELSE
@@ -1928,6 +1951,29 @@ END SUBROUTINE iceplume_calc
           detDz = detDz - PLUME(ng) % dz(I, KI)*(1 - cff)
         ENDIF
       ENDIF
+# ifdef ICEPLUME_DET_SMOOTH
+!
+! Make correction for plume shape towards surface.
+!
+! Chuning Wang 2021-05-17
+!
+      potEp = 0.0
+      potEn = 0.0
+      DO K = K2,K1
+        potEi = g*PLUME(ng) % detFrac(I, KI)*PLUME(ng) % dz(I, K)*      &
+     &          (PLUME(ng) % rhoAm(I, K)-rhoP)
+        IF (potEi .gt. 0.0) THEN
+          potEp = potEp + potEi
+        ELSE
+          potEn = potEn - potEi
+        ENDIF
+      ENDDO
+      IF ((potEp .gt. 0.0) .and. (potEn .gt. 0.0)) THEN
+        potERatio = potEp/potEn
+      ELSE
+        potERatio = 1.0
+      ENDIF
+# endif
 !
 !=======================================================================
 !                                                                      !
@@ -1947,12 +1993,15 @@ END SUBROUTINE iceplume_calc
 !
 ! First, calculate weight using Gaussian function.
 !
+          h1 = PLUME(ng)%zR(I, K1)-PLUME(ng)%zR(I, plumeDepthK)+0.0001
+          h2 = PLUME(ng)%zR(I, K2)-PLUME(ng)%zR(I, plumeDepthK)+0.0001
+# ifdef ICEPLUME_DET_SMOOTH
+          h1 = h1*potERatio
+# endif
           IF ( K .GT. plumeDepthK ) THEN
-            cff = (PLUME(ng)%zR(I, K)-PLUME(ng)%zR(I, plumeDepthK)) /   &
-     &        (PLUME(ng)%zR(I, K1)-PLUME(ng)%zR(I, plumeDepthK)+0.0001)
+            cff = (PLUME(ng)%zR(I, K)-PLUME(ng)%zR(I, plumeDepthK))/h1
           ELSE
-            cff = (PLUME(ng)%zR(I, K)-PLUME(ng)%zR(I, plumeDepthK)) /   &
-     &        (PLUME(ng)%zR(I, K2)-PLUME(ng)%zR(I, plumeDepthK)+0.0001)
+            cff = (PLUME(ng)%zR(I, K)-PLUME(ng)%zR(I, plumeDepthK))/h2
           ENDIF
           detWeight = EXP(-0.5 * (cff/detSigma)**2)
 !
