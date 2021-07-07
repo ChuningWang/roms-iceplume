@@ -1230,7 +1230,7 @@ END SUBROUTINE iceplume_calc
       a = lambda1*(GamT*cW-GamS*cI)
       b = GamS*cI*(lambda1*salt-lambda2-lambda3*depth +                 &
      &             tIce - (L/cI)) -                                     &
-     &             GamT*cW*(temp-lambda2-lambda3*depth+sIce)
+     &    GamT*cW*(temp-lambda2-lambda3*depth+lambda1*sIce)
       c = GamS*salt*(cI*(lambda2+lambda3*depth-tIce) + L) +             &
      &     GamT*sIce*cW*(temp-lambda2-lambda3*depth)
 !
@@ -1519,7 +1519,7 @@ END SUBROUTINE iceplume_calc
         a = lambda1*(GamT*cW - GamS*cI)
         b = GamS*cI*(lambda1*Y(4) - lambda2 - lambda3*T +               &
      &               tIce - (L/cI)) -                                   &
-     &               GamT*cW*(Y(3) - lambda2 - lambda3*T + sIce)
+     &      GamT*cW*(Y(3) - lambda2 - lambda3*T + lambda1*sIce)
         c = GamS*Y(4)*(cI*(lambda2 + lambda3*T - tIce) + L) +           &
      &      GamT*sIce*cW*(Y(3) - lambda2 - lambda3*T)
 !
