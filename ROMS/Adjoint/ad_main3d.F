@@ -3,7 +3,7 @@
       SUBROUTINE ad_main3d (RunInterval)
 !
 !git $Id$
-!svn $Id: ad_main3d.F 1064 2021-05-10 19:55:56Z arango $
+!svn $Id: ad_main3d.F 1087 2021-09-10 01:11:17Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2021 The ROMS/TOMS Group       Andrew M. Moore   !
 !    Licensed under a MIT/X style license                              !
@@ -125,6 +125,9 @@
       USE bulk_flux_mod,           ONLY : bulk_flux
 # endif
       USE dateclock_mod,           ONLY : time_string
+# ifdef TIDE_GENERATING_FORCES
+      USE equilibrium_tide_mod,    ONLY : equilibrium_tide
+# endif
 # if defined ATM_COUPLING_NOT_YET && defined MCT_LIB
       USE ocean_coupler_mod,       ONLY : atmos_coupling
 # endif
@@ -210,6 +213,9 @@
             CALL ad_set_data (ng, tile)
 # ifdef FORWARD_READ
             CALL set_depth (ng, tile, iADM)
+# endif
+# ifdef TIDE_GENERATING_FORCES
+            CALL equilibrium_tide (ng, tile, iADM)
 # endif
           END DO
         END DO
@@ -370,16 +376,16 @@
               next_indx1=3-indx1(ng)
               IF (.not.PREDICTOR_2D_STEP(ng)) THEN
                 PREDICTOR_2D_STEP(ng)=.TRUE.
-!>              knew(ng)=next_indx1
-!>              kstp(ng)=3-knew(ng)
-!>              krhs(ng)=3
-!>
+!^              knew(ng)=next_indx1
+!^              kstp(ng)=3-knew(ng)
+!^              krhs(ng)=3
+!^
                 kt=knew(ng)
                 ks=kstp(ng)
                 knew(ng)=krhs(ng)
                 kstp(ng)=kt
                 krhs(ng)=ks
-!>              IF (my_iif.lt.(nfast(ng)+1)) indx1(ng)=next_indx1
+!^              IF (my_iif.lt.(nfast(ng)+1)) indx1(ng)=next_indx1
               END IF
             END DO
 !
@@ -403,14 +409,14 @@
               IF (PREDICTOR_2D_STEP(ng).and.                            &
      &            my_iif.le.(nfast(ng)+1)) THEN
                 PREDICTOR_2D_STEP(ng)=.FALSE.
-!>              IF (FIRST_2D_STEP) THEN
-!>                kstp(ng)=indx1(ng)
-!>              ELSE
-!>                kstp(ng)=3-indx1(ng)
-!>              END IF
-!>              knew(ng)=3
-!>              krhs(ng)=indx1(ng)
-!>
+!^              IF (FIRST_2D_STEP) THEN
+!^                kstp(ng)=indx1(ng)
+!^              ELSE
+!^                kstp(ng)=3-indx1(ng)
+!^              END IF
+!^              knew(ng)=3
+!^              krhs(ng)=indx1(ng)
+!^
                 ks=knew(ng)
                 knew(ng)=krhs(ng)
                 krhs(ng)=ks

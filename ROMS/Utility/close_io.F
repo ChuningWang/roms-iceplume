@@ -2,7 +2,7 @@
       MODULE close_io_mod
 !
 !git $Id$
-!svn $Id: close_io.F 1064 2021-05-10 19:55:56Z arango $
+!svn $Id: close_io.F 1085 2021-08-13 00:03:50Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -108,6 +108,10 @@
 !-----------------------------------------------------------------------
 !  If multi-file input fields, close several input files.
 !-----------------------------------------------------------------------
+!
+!  Skip if configuration error.
+!
+      IF ((exit_flag.eq.5).or.(exit_flag.eq.6)) RETURN
 
 #ifdef FRC_FILE
 !
@@ -180,8 +184,10 @@
 !
       logical :: First
 !
-      integer :: Fcount, MyError, i, ng
+      integer :: Fcount, MyError, i, ivalue, ng
 !
+      character (len=256) :: ana_string
+
       character (len=*), parameter :: MyFile =                          &
      &  __FILE__//", close_out"
 !
@@ -190,6 +196,12 @@
 !-----------------------------------------------------------------------
 !  Close output NetCDF files. Set file indices to closed state.
 !-----------------------------------------------------------------------
+!
+!  Skip if configuration error.
+!
+      IF ((exit_flag.eq.5).or.(exit_flag.eq.6)) RETURN
+!
+!  Close output NetCDF files.
 !
       DO ng=1,Ngrids
         CALL close_file (ng, iNLM, RST(ng), RST(ng)%name)
@@ -344,12 +356,16 @@
       IF (Master) THEN
         First=.TRUE.
         DO i=1,39
-          IF ((LEN_TRIM(ANANAME(i)).gt.0).and.(exit_flag.ne.5)) THEN
-            IF (First) THEN
-              First=.FALSE.
-              WRITE (stdout,30) ' Analytical header files used:'
+          ana_string=TRIM(ANANAME(i))
+          ivalue=ICHAR(ana_string(1:1))
+          IF (ivalue.ge.47) THEN          ! decimal value for characters
+            IF (exit_flag.ne.5) THEN
+              IF (First) THEN
+                First=.FALSE.
+                WRITE (stdout,30) ' Analytical header files used:'
+              END IF
+              WRITE (stdout,'(5x,a)') TRIM(ADJUSTL(ANANAME(i)))
             END IF
-            WRITE (stdout,'(5x,a)') TRIM(ADJUSTL(ANANAME(i)))
           END IF
         END DO
       END IF
@@ -363,12 +379,16 @@
       IF (Master) THEN
         First=.TRUE.
         DO i=1,4
-          IF ((LEN_TRIM(BIONAME(i)).gt.0).and.(exit_flag.ne.5)) THEN
-            IF (First) THEN
-              First=.FALSE.
-              WRITE (stdout,30) ' Biology model header files used:'
+          ana_string=TRIM(BIONAME(i))
+          ivalue=ICHAR(ana_string(1:1))
+          IF (ivalue.ge.47) THEN          ! decimal value for characters
+            IF (exit_flag.ne.5) THEN
+              IF (First) THEN
+                First=.FALSE.
+                WRITE (stdout,30) ' Biology model header files used:'
+              END IF
+              WRITE (stdout,'(5x,a)') TRIM(ADJUSTL(BIONAME(i)))
             END IF
-            WRITE (stdout,'(5x,a)') TRIM(ADJUSTL(BIONAME(i)))
           END IF
         END DO
       END IF
