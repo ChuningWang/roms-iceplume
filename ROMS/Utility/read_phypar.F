@@ -2,7 +2,7 @@
       SUBROUTINE read_PhyPar (model, inp, out, Lwrite)
 !
 !git $Id$
-!svn $Id: read_phypar.F 1087 2021-09-10 01:11:17Z arango $
+!svn $Id: read_phypar.F 1095 2021-10-14 23:18:45Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -171,11 +171,11 @@
                 exit_flag=5
                 RETURN
               END IF
-              got_Ngrids=.TRUE.
-              CALL allocate_param       ! Start allocating variables in
-              CALL allocate_parallel    ! modules that solely depend on
-              CALL allocate_iounits     ! the number of nested grids
-              CALL allocate_stepping
+              got_Ngrids=.TRUE.                ! Allocating variables in
+              CALL allocate_param              ! modules that solely
+              CALL allocate_parallel (Ngrids)  ! depend on the number
+              CALL allocate_iounits (Ngrids)   ! nested grids
+              CALL allocate_stepping (Ngrids)
 #if defined PIO_LIB && defined DISTRIBUTE
               IF (.not.associated(var_desc)) THEN
                 allocate ( var_desc(Mvars) )
@@ -4096,16 +4096,24 @@
 #ifdef AVERAGES
         IF ((nAVG(ng).gt.0).and.(ndefAVG(ng).gt.0)) THEN
           OutFiles=ntimes(ng)/ndefAVG(ng)
+          IF ((nAVG(ng).eq.ndefAVG(ng)).or.                             &
+     &        (MOD(ntimes(ng),ndefAVG(ng)).ge.nAVG(ng))) THEN
+            OutFiles=Outfiles+1
+          END IF
           CALL edit_file_struct (ng, OutFiles, AVG)
           AVG(ng)%load=0       ! because delayed creation of NetCDF file
-        END IF                 ! due to time-aveeraging
+        END IF                 ! due to time-averaging
 #endif
 #ifdef DIAGNOSTICS
         IF ((nDIA(ng).gt.0).and.(ndefDIA(ng).gt.0)) THEN
           OutFiles=ntimes(ng)/ndefDIA(ng)
+          IF ((nDIA(ng).eq.ndefDIA(ng)).or.                             &
+     &        (MOD(ntimes(ng),ndefDIA(ng)).ge.nDIA(ng))) THEN
+            OutFiles=Outfiles+1
+          END IF
           CALL edit_file_struct (ng, OutFiles, DIA)
           DIA(ng)%load=0       ! because delayed creation of NetCDF file
-        END IF                 ! due to time-aveeraging
+        END IF                 ! due to time-averaging
 #endif
 #if defined TANGENT || defined TL_IOMS
         IF ((nTLM(ng).gt.0).and.(ndefTLM(ng).gt.0)) THEN
@@ -6585,8 +6593,9 @@
 # if !defined CORRELATION
 #  if defined TANGENT && \
      !(defined FOUR_DVAR         || defined I4DVAR_ANA_SENSITIVITY || \
-       defined OPT_OBSERVATIONS  || defined SANITY_CHECK           || \
-       defined SENSITIVITY_4DVAR || defined TLM_CHECK)
+       defined JEDI              || defined OPT_OBSERVATIONS       || \
+       defined SANITY_CHECK      || defined SENSITIVITY_4DVAR      || \
+       defined TLM_CHECK)
         fname=ITL(ng)%name
         IF (.not.find_file(ng, out, fname, 'ITLNAME')) THEN
           IF (FoundError(exit_flag, NoError, __LINE__, MyFile)) RETURN
@@ -6616,7 +6625,7 @@
        defined SANITY_CHECK           || defined SENSITIVITY_4DVAR || \
        defined SO_SEMI                || defined STOCHASTIC_OPT    || \
        defined HESSIAN_SV             || defined HESSIAN_SO        || \
-       defined HESSIAN_FSV)
+       defined HESSIAN_FSV            || defined JEDI)
         fname=IAD(ng)%name
         IF (.not.find_file(ng, out, fname, 'IADNAME')) THEN
           IF (FoundError(exit_flag, NoError, __LINE__, MyFile)) RETURN
@@ -6699,7 +6708,8 @@
           END IF
         END IF
 # endif
-# if defined FORWARD_READ && !(defined FOUR_DVAR || defined PICARD_TEST)
+# if defined FORWARD_READ && \
+   !(defined FOUR_DVAR    || defined JEDI || defined PICARD_TEST)
         DO ifile=1,FWD(ng)%Nfiles
           fname=FWD(ng)%files(ifile)
           IF (.not.find_file(ng, out, fname, 'FWDNAME')) THEN
