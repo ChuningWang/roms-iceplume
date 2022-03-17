@@ -24,7 +24,7 @@ The official community version of **ROMS** is developed and maintained at Rutger
 The State University of New Jersey, New Brunswick, New Jersey, USA. The scarlet
 flag in the above logo indicates the location of our institution.
 
-The **doxygen** verson of **ROMS** is available at:
+The **doxygen** version of **ROMS** is available at:
 ```
 https://www.myroms.org/doxygen
 ```
