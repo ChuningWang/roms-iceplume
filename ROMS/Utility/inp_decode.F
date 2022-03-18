@@ -2,9 +2,9 @@
       MODULE inp_decode_mod
 !
 !git $Id$
-!svn $Id: inp_decode.F 1085 2021-08-13 00:03:50Z arango $
+!svn $Id: inp_decode.F 1110 2022-02-27 21:37:32Z arango $
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2022 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -194,6 +194,7 @@
 !
 !  SP    32        Space
 !  !     33        Exclamation mark
+!  #     35        Number sign, hash, or pound sign
 !  *     42        Asterisk (star, multiply)
 !  +     43        Plus
 !  -     45        Hyphen, dash, minus
@@ -208,6 +209,7 @@
 !  7     55        Seven
 !  8     56        Eight
 !  9     57        Nine
+!  :     58        colon sign
 !  =     61        Equals sign
 !  \     92        Reverse slant (Backslash)
 !  |    124        Vertical line

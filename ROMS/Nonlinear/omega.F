@@ -3,9 +3,9 @@
 #ifdef SOLVE3D
 !
 !git $Id$
-!svn $Id: omega.F 1054 2021-03-06 19:47:12Z arango $
+!svn $Id: omega.F 1103 2022-01-13 03:38:35Z arango $
 !=======================================================================
-!  Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2022 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                           Hernan G. Arango   !
 !========================================== Alexander F. Shchepetkin ===
@@ -169,19 +169,23 @@
 !  sum to obtain the correct net Qbar given in user input - J. Levin
 !  (Jupiter Intelligence Inc.) and J. Wilkin
 !
+!    Dsrc(is) = 2,  flow across grid cell w-face (positive or negative)
+!
         IF (LwSrc(ng)) THEN
           DO is=1,Nsrc(ng)
-            ii=SOURCES(ng)%Isrc(is)
-            jj=SOURCES(ng)%Jsrc(is)
-            IF (((IstrR.le.ii).and.(ii.le.IendR)).and.                  &
-     &          ((JstrR.le.jj).and.(jj.le.JendR)).and.                  &
-     &          (j.eq.jj)) THEN
-              DO k=1,N(ng)
-                W(ii,jj,k)=W(ii,jj,k-1)-                                &
-     &                     (Huon(ii+1,jj,k)-Huon(ii,jj,k)+              &
-     &                      Hvom(ii,jj+1,k)-Hvom(ii,jj,k))+             &
-     &                     SOURCES(ng)%Qsrc(is,k)
-              END DO
+            IF (INT(SOURCES(ng)%Dsrc(is)).eq.2) THEN
+              ii=SOURCES(ng)%Isrc(is)
+              jj=SOURCES(ng)%Jsrc(is)
+              IF (((IstrR.le.ii).and.(ii.le.IendR)).and.                &
+     &            ((JstrR.le.jj).and.(jj.le.JendR)).and.                &
+     &            (j.eq.jj)) THEN
+                DO k=1,N(ng)
+                  W(ii,jj,k)=W(ii,jj,k-1)-                              &
+     &                       (Huon(ii+1,jj,k)-Huon(ii,jj,k)+            &
+     &                        Hvom(ii,jj+1,k)-Hvom(ii,jj,k))+           &
+     &                       SOURCES(ng)%Qsrc(is,k)
+                END DO
+              END IF
             END IF
           END DO
         END IF

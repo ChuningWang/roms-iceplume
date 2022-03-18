@@ -2,9 +2,9 @@
       SUBROUTINE checkdefs
 !
 !git $Id$
-!svn $Id: checkdefs.F 1098 2021-12-28 03:52:35Z arango $
+!svn $Id: checkdefs.F 1110 2022-02-27 21:37:32Z arango $
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2022 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -1482,13 +1482,6 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+9)=' MB_Z0BL,'
 # endif
-# ifdef MB_Z0RIP
-!
-      IF (Master) WRITE (stdout,20) 'MB_Z0RIP',                         &
-     &   'Bedform roughness ripple height and length'
-      is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+10)=' MB_Z0RIP,'
-# endif
 #endif
 #if defined MCT_LIB && defined MODEL_COUPLING
 !
@@ -1496,6 +1489,13 @@
      &   'Using Model Coupling Toolkit library'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+9)=' MCT_LIB,'
+#endif
+#ifdef METADATA_REPORT
+!
+      IF (Master) WRITE (stdout,20) 'METADATA_REPORT',                  &
+     &   'Reports/dumps YAML metadata dictionary'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+10)=' METADATA_REPORT,'
 #endif
 #if defined MINRES && defined FOUR_DVAR
 !

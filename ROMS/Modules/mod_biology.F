@@ -1,9 +1,9 @@
 #include "cppdefs.h"
 /*
 ** git $Id$
-** svn $Id: mod_biology.F 1081 2021-07-24 02:25:06Z arango $
+** svn $Id: mod_biology.F 1110 2022-02-27 21:37:32Z arango $
 *************************************************** Hernan G. Arango ***
-** Copyright (c) 2002-2021 The ROMS/TOMS Group                        **
+** Copyright (c) 2002-2022 The ROMS/TOMS Group                        **
 **   Licensed under a MIT/X style license                             **
 **   See License_ROMS.txt                                             **
 ************************************************************************
@@ -61,7 +61,7 @@
 **         red_tide_inp.h                                             **
 **                                                                    **
 **   (5) Code to assign indices to model variables during the         **
-**       reading of metadata information from "varinfo.dat":          **
+**       reading of metadata information from "varinfo.yaml":         **
 **                                                                    **
 **         ecosim_var.h                                               **
 **         fennel_var.h                                               **

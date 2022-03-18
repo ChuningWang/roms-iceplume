@@ -2,9 +2,9 @@
       MODULE radiation_stress_mod
 !
 !git $Id$
-!svn $Id: nearshore_mellor08.h 1081 2021-07-24 02:25:06Z arango $
+!svn $Id: nearshore_mellor08.h 1110 2022-02-27 21:37:32Z arango $
 !***********************************************************************
-!  Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2022 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                           Hernan G. Arango   !
 !**************************************************   John C. Warner ***
@@ -35,6 +35,7 @@
       SUBROUTINE radiation_stress (ng, tile)
 !***********************************************************************
 !
+      USE mod_param
       USE mod_forces
       USE mod_grid
       USE mod_mixing
@@ -1277,6 +1278,6 @@
 #endif
 !
       RETURN
-      END SUBROUTINE radiation_stress_08_tile
+      END SUBROUTINE nearshore_mellor08_tile
 
       END MODULE radiation_stress_mod

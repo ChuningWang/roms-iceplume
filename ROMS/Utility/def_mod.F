@@ -3,9 +3,9 @@
 #if defined FOUR_DVAR || defined VERIFICATION
 !
 !git $Id$
-!svn $Id: def_mod.F 1067 2021-05-27 05:11:41Z arango $
+!svn $Id: def_mod.F 1103 2022-01-13 03:38:35Z arango $
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2022 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -194,6 +194,7 @@
         CALL netcdf_get_satt (ng, iNLM, OBS(ng)%name, nf90_global,      &
      &                        AttName, AttValue, foundAtt,              &
      &                        ncid = OBSncid)
+        IF (FoundError(exit_flag, NoError, __LINE__, MyFile)) RETURN
 !
 !  Create model/observation (DAV) file
 !

@@ -1,9 +1,9 @@
       MODULE roms_kernel_mod
 !
 !git $Id$
-!svn $Id: nl_roms.h 1090 2021-09-29 03:19:30Z arango $
+!svn $Id: nl_roms.h 1110 2022-02-27 21:37:32Z arango $
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2022 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -167,6 +167,7 @@
         CALL ROMS_allocate_arrays (allocate_vars)
         CALL ROMS_initialize_arrays
 !$OMP END PARALLEL
+        IF (FoundError(exit_flag, NoError, __LINE__, MyFile)) RETURN
 
       END IF
 
@@ -317,7 +318,7 @@
 !
       character (len=*), parameter :: MyFile =                          &
      &  __FILE__//", ROMS_finalize"
-!
+
 #ifdef ENKF_RESTART
 !
 !-----------------------------------------------------------------------
