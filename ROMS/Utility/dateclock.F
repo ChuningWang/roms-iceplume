@@ -2,7 +2,7 @@
       MODULE dateclock_mod
 !
 !git $Id$
-!svn $Id: dateclock.F 1099 2022-01-06 21:01:01Z arango $
+!svn $Id: dateclock.F 1139 2022-09-28 16:04:42Z arango $
 !================================================== Hernan G. Arango ===
 !  Copyright (c) 2002-2022 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
@@ -651,7 +651,7 @@
         seconds=ABS(seconds-REAL(hour*3600,dp))
         F_minutes=seconds/60.0_dp
         minutes=INT(F_minutes)
-        seconds=ABS(seconds-REAL(F_minutes*60,dp))
+        seconds=ABS(seconds-REAL(minutes*60,dp))
 !
 !-----------------------------------------------------------------------
 !  Compute date vector from date mumber for the 360_day calendar: the
@@ -1118,7 +1118,7 @@
         isec=0
         yday=yearday(iyear, month, iday)
         DateNumber(1)=2440000.0_dp              ! Truncated offset
-        DateNumber(2)=DateNumber(1)*86400_dp
+        DateNumber(2)=DateNumber(1)*86400.0_dp
       END IF
 !
 !-----------------------------------------------------------------------
