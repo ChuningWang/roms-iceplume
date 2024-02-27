@@ -340,7 +340,7 @@
 !
 !=======================================================================
 !                                                                      !
-! Average density profiles in a box to surpress oscillation.           !
+! Average density profiles in a box to suppress oscillation.           !
 !                                                                      !
 !=======================================================================
 !
