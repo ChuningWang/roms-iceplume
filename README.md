@@ -372,6 +372,7 @@ To run this test case, set the right path in the *build_roms.bash* file and comp
 
 Ungarish, M. (2010). An Introduction to Gravity Currents and Intrusions Introduction. Introduction to Gravity Currents and Intrusions, 1-10.
 
+[Wang, C., Chant, R. J., & Jackson, R. H. (2023). Parameterizing Subglacial Discharge in Modeling Buoyancy Driven Flow in Tidewater Glacier Fjords. Journal of Geophysical Research: Oceans, 128(8), e2023JC019924.](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2023JC019924)
 ---
 
 ## Contact Info
