@@ -1,0 +1,18 @@
+#!/bin/bash
+#SBATCH --job-name=<exp>
+#SBATCH --ntasks=<nmpi>
+#SBATCH --ntasks-per-node=40
+#SBATCH --hint=nomultithread
+#SBATCH --time=<timedur>
+#SBATCH --output=<exp>.out
+#SBATCH --error=<exp>.out
+#SBATCH -A <projectid>
+
+cd ${SLURM_SUBMIT_DIR}
+#===============================================================================
+
+source ../myenv_mypath.sh
+source $I_MPI_ROOT/intel64/bin/mpivars.sh release_mt
+# < insert here variables definitions > !!! DO NOT REMOVE THIS LINE (used by submitjob) !!!
+
+

@@ -1,0 +1,120 @@
+# ci croco
+# check this file with: https://gitlab.inria.fr/ci/lint
+variables:
+  TERM: "xterm-256color"
+  CVTKHOME: "$CI_PROJECT_DIR/CVTK/test_repro"
+  PERFRSTHOME: "$CI_PROJECT_DIR/CVTK/test_perfrst"
+  #
+  DATADIR: "$CI_PROJECT_DIR/.datadir"
+  PERFRSTDIR: "$CI_PROJECT_DIR/.perfrstdir"
+  #
+  CVTKWORK: "$CI_PROJECT_DIR/.datawork"
+  PERFRSTWORK: "$CI_PROJECT_DIR/.perfrstwork"
+  CROCO_CI_MPIRUN: "mpirun.openmpi"
+  #
+  CI_FC: "gfortran"
+  CI_MPIF90: "mpif90"
+  CI_CROCO_PWD: $(pwd)
+  SOURCE_CROCO: "$CI_PROJECT_DIR/OCEAN"
+  TESTROOTDIR: ${CVTKWORK}
+  #
+  # Here define the direcory with the input files
+  # => for BENGUELA_VHR
+  DATAREG: "$CI_PROJECT_DIR/../../../../VHR_CROCO_FILES_BCK"
+  nest_position_reg: "79 137 37 117 3 3 3 3"
+  # => for VORTEX if needed
+  DATAVOR: ""
+  nest_position_vort: ""
+  # => for ANA if needed
+  DATAANA: ""
+  
+before_script:
+  - mkdir -p $DATADIR
+  - mkdir -p $CVTKWORK
+  - cd $DATADIR
+  - mkdir -p TESTROOT/VORT TESTROOT/KTEST TESTROOT/REG
+  - mkdir -p $PERFRSTDIR
+  - mkdir -p $PERFRSTWORK
+  - cd $PERFRSTDIR
+  - mkdir -p TESTROOT/REG
+  - cd -
+
+ana_run:
+  #only:
+  #  - pushes    
+  script:
+    - cd $CVTKHOME/Scripts_ana
+    - ./create_link_master_ana.sh
+    - cd -
+    - cd $CVTKWORK/KTEST
+   
+    - ./mk_TESTALL.bash CONFIGURE_ANA ana
+    - ./gather_recap.bash KTEST > /dev/null 2>&1
+    - /bin/sh -c '! grep -i "Compilation failure" KTEST_gather_recap_*_git*' > /dev/null 2>&1
+    - /bin/sh -c '! grep -i "Execution failure" KTEST_gather_recap_*_git*' > /dev/null 2>&1
+    - /bin/sh -c '! grep -i "Parallel reproducibility failed" KTEST_gather_recap_*_git*' > /dev/null 2>&1
+    
+  artifacts:
+    paths:
+      - $CVTKWORK/ftp
+    when: always
+
+vort_run:
+  only:
+    - schedules
+  script:
+    - cd $CVTKHOME/Scripts_vort
+    - ./create_link_master_vort.sh
+    - cd -
+    - cd $CVTKWORK/VORT
+    
+    - ./mk_TESTALL.bash CONFIGURE_VORT vort
+    - ./gather_recap.bash VORT > /dev/null 2>&1
+    - /bin/sh -c '! grep -i "Compilation failure" VORT_gather_recap_*_git*' > /dev/null 2>&1
+    - /bin/sh -c '! grep -i "Execution failure" VORT_gather_recap_*_git*' > /dev/null 2>&1
+    - /bin/sh -c '! grep -i "Parallel reproducibility failed" VORT_gather_recap_*_git*' > /dev/null 2>&1
+
+  artifacts:
+    paths:
+       - $CVTKWORK/ftp
+    when: always
+   
+reg_run:
+  only:
+    - schedules  
+  script:
+    - cd $CVTKHOME/Scripts_reg
+    - ./create_link_master_reg.sh
+    - cd -
+    - cd $CVTKWORK/REG
+    
+    - ./mk_TESTALL.bash CONFIGURE_REG reg
+    - ./gather_recap.bash REG > /dev/null 2>&1
+    - /bin/sh -c '! grep -i "Compilation failure" REG_gather_recap_*_git*' > /dev/null 2>&1
+    - /bin/sh -c '! grep -i "Execution failure" REG_gather_recap_*_git*' > /dev/null 2>&1
+    - /bin/sh -c '! grep -i "Parallel reproducibility failed" REG_gather_recap_*_git*' > /dev/null 2>&1
+ 
+  artifacts:
+    paths:
+      - $CVTKWORK/ftp
+    when: always 
+
+reg_perfrst:
+  only:
+    - schedules
+  script:
+    - cd $PERFRSTHOME/Scripts_reg_perfrst
+    - ./create_link_master_reg_perfrst.sh
+    - cd -
+    - cd $PERFRSTWORK/REG
+   
+    - ./mk_TESTALL_perfrst.bash CONFIGURE_REG_PERFRST reg
+    - ./gather_recap_perfrst.bash REG > /dev/null 2>&1
+    - /bin/sh -c '! grep -i "Compilation failure" REG_gather_recap_*_git*' > /dev/null 2>&1
+    - /bin/sh -c '! grep -i "Execution failure" REG_gather_recap_*_git*' > /dev/null 2>&1
+    - /bin/sh -c '! grep -i "Restartabilty failed" REG_gather_recap_*_git*' > /dev/null 2>&1
+
+  artifacts:
+    paths:
+      - $PERFRSTWORK/ftp
+    when: always

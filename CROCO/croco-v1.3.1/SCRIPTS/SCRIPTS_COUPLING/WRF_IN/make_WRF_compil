@@ -1,0 +1,98 @@
+#!/bin/bash -e
+
+# --------------------------------------------------
+# Script to compile WRF in coupled and uncoupled modes
+# --------------------------------------------------
+#
+# Further Information:   
+# http://www.croco-ocean.org
+#  
+# This file is part of CROCOTOOLS
+#
+# CROCOTOOLS is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published
+# by the Free Software Foundation; either version 2 of the License,
+# or (at your option) any later version.
+#
+# CROCOTOOLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA  02111-1307  USA
+#
+# Copyright (c) 2018 S. Jullien
+# swen.jullien@ifremer.fr
+# --------------------------------------------------
+
+#=========================================================================
+#=======================  USER CHANGES  ==================================
+#=========================================================================
+
+#source ../myenv_mypath.sh
+
+# number of CPUs used for WRF compilation
+export J='-j 8'
+
+# environment variables for WRF
+# --------------------------
+#export NETCDF=$(nf-config --prefix)
+#export NETCDF=$(nc-config --prefix)
+#export NETCDF4=1
+#export WRFIO_NCD_LARGE_FILE_SUPPORT=1
+
+# define your cases to be compiled
+my_compil_cases=(uncoupled \
+                 coupled) # av: uncoupled / uncoupled_xios / coupled /coupled_xios
+# Note that you need to create configure.wrf.$mycase before running this script
+# Go in your $wrf directory and execute ./configure, choose settings:
+#      your machine architecture + dmpar
+# in case of coupled compilation you then need to add specificities in the generated configure.wrf:
+# Edit configure.wrf.coupled by adding:
+#      OA3MCT_ROOT_DIR = $(oasisdir)
+#      ARCH_LOCAL : for OASIS add -Dkey_cpp_oasis3
+#      INCLUDE_MODULES : add before netcdf include: -I$(OA3MCT_ROOT_DIR)/build/lib/mct \
+#                                                   -I$(OA3MCT_ROOT_DIR)/build/lib/psmile.MPI1 \
+#      LIB_EXTERNAL : add before netcdf library:    -L$(OA3MCT_ROOT_DIR)/lib -lpsmile.MPI1 -lmct -lmpeu -lscrip \
+
+#=========================================================================
+#====================== END USER CHANGES  ================================
+#=========================================================================
+
+
+# Enter model sources directory
+cd $ATM
+
+# Count number of cases to compile
+NB_cases=${#my_compil_cases[@]}
+
+# Loop on compil cases
+for k in `seq 0 $(( ${NB_cases} - 1))` ; do
+
+    mycase=${my_compil_cases[$k]}
+
+    # Check if configure.wrf.$mycase file is available
+    if [ ! -e ${CHOME}/WRF_IN/CONFIGURE_WRF/${MACHINE}/configure.wrf.$mycase ]; then
+        echo 'ERROR configure.wrf.'$mycase' file does not exist in ${CHOME}/WRF_IN/CONFIGURE_WRF/${MACHINE} . Create it before running compilation'
+        exit 1
+    else 
+        cp ${CHOME}/WRF_IN/CONFIGURE_WRF/${MACHINE}/configure.wrf.$mycase ${ATM}
+    fi
+
+    ./clean -a
+    cp configure.wrf.$mycase configure.wrf
+    ./compile em_real > compile_${mycase}.log
+    if [ ! -d exe_${mycase} ] ; then
+        mkdir exe_${mycase}
+    else
+        rm -rf exe_${mycase}/*
+    fi
+    cp run/*.exe exe_${mycase}/.
+    cp configure.wrf exe_${mycase}/.
+    mv compile_${mycase}.log exe_${mycase}/.
+
+done
+

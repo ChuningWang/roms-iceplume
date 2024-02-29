@@ -1,0 +1,27 @@
+$ -------------------------------------------------------------------- $
+$ WAVEWATCH III Initial conditions input file                          $
+$--------------------------------------------------------------------- $
+$                                                                   -- $
+$ type of initial field                                             -- $
+$                                                                   -- $
+$ 1 : Gaussian in freq and space, cos type in direction             -- $
+$     fp, spread, mean dir, cos power, Xm, spread, Ym, spread, Hmax  - $
+$                                                                   -- $
+$ 2 : JONSWAP spectrum with Hasselmann et al. (1980) dir. distrib.  -- $
+$     alfa, fp, mean dir, gamma, sigA, sigB, Xm, spread, Ym, spread  - $
+$                                                                   -- $
+$ 3 : Fetch-limited JONSWAP                                         -- $
+$     no additional data (computed from local wind)                 -- $
+$                                                                   -- $ 
+$ 4 : User-defined spectrum                                         -- $
+$     scale factor                                                  -- $
+$     spectrum                                                      -- $
+$                                                                   -- $
+$ 5 : Calm conditions                                               -- $
+$     no additional data
+$
+  3 
+$
+$ -------------------------------------------------------------------- $
+$ End of input file                                                    $
+$ -------------------------------------------------------------------- $

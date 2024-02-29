@@ -1,0 +1,114 @@
+$ -------------------------------------------------------------------- $
+$ WAVEWATCH III Grid preprocessor input file                           $
+$ -------------------------------------------------------------------- $
+$
+$ Grid name (C*30, in quotes) ---------------------------------------- $
+$
+  '<CEXPER>'
+$
+$ Frequency settings ------------------------------------------------- $
+$ freq factor, first freq (Hz), nb of freq, nb of dir, offset in dir - $
+$
+  1.1  0.0373  32  24  0.
+$
+$ Model activation --------------------------------------------------- $
+$ Dry run, X propag, Y propag, dir shift, wavenb shift, source terms - $
+$ wavenb shift : seulement utile si courant pour refraction
+$
+$  F T T F F F
+  F T T T T T
+$
+$ Time steps --------------------------------------------------------- $
+$ max global dt, max propag. dt, refraction dt, min source term dt --- $
+$   TMAX             TCFL            TREF           TSRC            -- $
+$ (all in seconds, 2nd and 3rd dt should be at least half of global) - $
+$ As a first guess you can try (and decrease if not ok):            -- $ 
+$ TMAX = 3 x TCFL                                                   -- $
+$ TCFL = 0.8 x dx/(g/fmin4pi) with fmin=0.0373 => 3-4 % of dx       -- $
+$ TREF = TMAX / 2 or much less if strong current area like TMAX / 10 - $
+$ TSRC = usually 10s  (could be between 5s and 60s)                 -- $ 
+  <wavdt> <wavdtPRO> <wavdtREF> <wavdtSRC> 
+$
+$ Namelist section --------------------------------------------------- $
+$   Existing namelists:                                             -- $ 
+$   - source terms:                                                 -- $ 
+$        - input: SIN1, SIN2,                                       -- $
+$        - non linear interactions: SNL1, SNL2, ANL2,               -- $
+$        - dissipation: SDS1, SDS2,                                 -- $
+$        - bottom friction: SBT1                                    -- $
+$   - propagation schemes: PRO1, PRO2, PRO3, PRO4                   -- $
+$   - miscellanous: MISC                                            -- $
+$
+$  &MISC CICE0 = 0.25, CICEN = 0.75, FLAGTR = 4 /
+$  &FLX3 CDMAX = 2.5E-3 , CTYPE = 0 /
+$  &PRO3 WDTHCG = 4.00, WDTHTH = 4.00 /
+$  &SIN4 BETAMAX = 1.33 /
+$  &SDS4 WHITECAPWIDTH = 0.3 /
+$
+END OF NAMELISTS
+$
+$ Define grid -------------------------------------------------------- $
+$  Grid type,                                                       -- $ 
+$  NX, NY                                                           -- $
+$  DX, DY, Scaling Factor                                           -- $
+$  Coord of (1,1) in X (deg), Coord of (1,1) in Y, scaling factor   -- $
+$  5th line:                                                        -- $
+$       - coastline limiting depth (m, negative in the ocean)       -- $
+$          points with depth values above this limit will be        -- $
+$          considered as excluded points (never be wet points,      -- $
+$          even if the water level grows over)                      -- $
+$       - min water depth (m, positive absolute value) allowed      -- $
+$          for the model computation (to avoid blow up)             -- $
+$       - unit number of bathy file (not 10 (=current file))        -- $
+$       - scale factor for bathy                                    -- $
+$       - how to read bathy file (bot->top: 1 or 2, top->bot: 3 or 4)  $
+$       - format indicator (1: free format, 2: fixed, 3: unformatted)  $
+$       - format for formatted read                                 -- $
+$       - file type parameter ('UNIT' or 'NAME')                    -- $ 
+$       - filename (in quotes)                                      -- $
+$  additional lines if FLAGTR is indicated in namelists             -- $
+$                   with last 7 fields described above              -- $
+$  for mask input, the following values are allowed:                -- $
+$       -2 -> excluded boundary points (sea points covered by ice)  -- $
+$       -1 -> excluded sea points (sea points covered by ice)       -- $
+$        0 -> excluded points (land)                                -- $
+$        1 -> sea points (ocean)                                    -- $
+$        2 -> active boundary points                                -- $
+$        3 -> excluded points                                       -- $
+$        7 -> ice                                                   -- $
+$  
+$     'RECT'  T  'NONE'
+$     340     600
+$     0.0374 0.0336 1
+$     161.4687 -26.4313 1
+$     -0.1 2.50 20 1 1 1 '(....)' 'NAME' 'bottom.inp'
+$               21 1 1 1 '(....)' 'NAME' 'Obst.inp'
+$               22 1 1   '(....)' 'NAME' 'mapsta.inp'
+$
+     'CURV'  T  'NONE'
+     <wavnx>     <wavny>
+     21 1 0 1 1 '(....)' 'NAME' 'x.inp'
+     22 1 0 1 1 '(....)' 'NAME' 'y.inp'
+$
+     -<hmin> 10 23 1 1 1 '(....)' 'NAME' 'bottom.inp'
+$               24 1 1 1 '(....)'  'NAME' 'obst.inp'
+               25 1 1 '(....)'  'NAME' 'mask_and_bdy.inp'
+$
+$ Input boundary points ---------------------------------------------- $
+$  Points at which input boundary conditions are to be defined ------- $
+$    Each line contains: grid counters: IX,IY, and connect flag (T/F)  $
+$    Close list by defining point (0,0) (mandatory): 0 0 F 
+$  If not defined initial cond. will be applied as constant bdy cond.  $
+$
+$
+$ Output boundary points --------------------------------------------- $
+$  starting point (X0,Y0), increments (DX,DY) and nb of pts         -- $
+$  a negative number of points starts a new output file             -- $
+$  Close list by defining line with 0 points (mandatory)
+$
+  0.    0.    0.    0.       0
+$
+$ -------------------------------------------------------------------- $
+$ End of input file                                                    $
+$ -------------------------------------------------------------------- $
+

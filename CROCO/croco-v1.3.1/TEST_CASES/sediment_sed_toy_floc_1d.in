@@ -1,0 +1,226 @@
+1  Stitle (a80)
+CROCO - SED_TOY (flocculation) - Test
+
+2  Sd(1-NST), CSED,  SRHO,       WSED,       ERATE,  TAU_CE, TAU_CD, BED_FRAC(1:NLAY)
+    0.0300      0.   2650.       0.4722      0.  1000.   60.   10*0. 10*0.016 
+    0.0625      0.   2650.       2.0421      0.  1000.   60.   10*0. 10*0.1766 
+    0.1250      0.   2650.       7.9478      0.  1000.   60.   10*0. 10*0.7136 
+    0.2500      0.   2650.       26.9607     0.  1000.   60.   10*0. 10*0.0938 
+    4.0000E-03  0.00465   2600.       0      0.0005  0.3     60.   20*0.
+    6.0000E-03  0.00930   2600.       0      0.0005  0.3     60.   20*0.
+    9.0000E-03  0.01860   2600.       0      0.0005  0.3     60.   20*0.
+    1.4000E-02  0.03720   2600.       0      0.0005  0.3     60.   20*0.
+    2.1000E-02  0.02325   2600.       0      0.0005  0.3     60.   20*0.
+    3.3000E-02  0.   2600.       0           0.0005  0.3     60.   10*1. 10*0.
+    5.0000E-02  0.   2600.       0           0.0005  0.3     60.   20*0.
+    7.7000E-02  0.   2600.       0           0.0005  0.3     60.   20*0.
+    1.1800E-01  0.   2600.       0           0.0005  0.3     60.   20*0.
+    1.8000E-01  0.   2600.       0           0.0005  0.3     60.   20*0.
+    2.7500E-01  0.   2600.       0           0.0005  0.3     60.   20*0.
+    4.2100E-01  0.   2600.       0           0.0005  0.3     60.   20*0.
+    6.4300E-01  0.   2600.       0           0.0005  0.3     60.   20*0.
+    9.8200E-01  0.   2600.       0           0.0005  0.3     60.   20*0.
+    1.5000E+00  0.   2600.       0           0.0005  0.3     60.   20*0.
+
+
+3 BTHK(1:NLAY)
+      20*0.001
+            
+4 BPOR(1:NLAY)
+      20*0.42
+
+5 Hrip             
+       17*0.001  0.401  0.401  1.201
+
+6 Lrip
+       0.1  
+
+7 bedload_coeff 
+      1.
+
+8 morph_fac
+      1. 
+
+9  transC
+      0.03
+
+10  transN
+      0.2      
+
+11  tcr_min
+      0.03
+
+12  tcr_max
+      5.5
+
+13  tcr_slp
+      0.3
+
+14  tcr_off 
+      1.
+
+15  tcr_tim
+      28800.
+
+16  L_ADS  L_ASH  L_COLLFRAG  L_TESTCASE
+     F       T         F           F
+
+17  F_DP0      F_NF    F_DMAX     F_NB_FRAG    F_ALPHA   F_BETA  F_ATER   F_ERO_FAC F_ERO_NBFRAG  F_COLLFRAGPARAM  F_CLIM    F_ERO_IV
+    0.000004    1.9     0.0015        2.          0.8     0.2    0.         0.        2.             0.01          0.001        1
+
+18  MUD_FRAC_EQ [1:NMUD]    
+    0.10  0.20  0.40  0.20  0.10  0.0  0.0  0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+
+19  MUD_T_DFLOC
+    200.
+
+99 END of sediment input data
+
+
+!
+!=====================================================================
+!  Copyright (c) 2004 UCLA/Rutgers
+!==================================== Meinte Blaas | Hernan G. Arango =
+!
+   GLOSSARY
+   ========
+
+*** CARD 1: String with a maximum of eighty characters.
+
+  Stitle    Sediment case title.
+
+
+*** CARD 2: Sediment grain parameters & initial values (NST lines).
+            Non-Cohesive sediment first 
+
+  Sd        Diameter of grain size class [mm].
+
+  CSED      Initial concentration (spatially uniform) [mg/l].  
+  
+  SRHO      Density of sediment material of size class [kg/m3]. 
+            Quartz: SRHO=2650 kg/m3  
+  
+  WSED      Settling velocity of size class [mm/s].   
+            Typically WSED  = 1E3*  {visk*(sqrt(10.36^2+1.049*D^3)-10.36)/d50} [mm/s] (Soulsby 97)
+            with  D=d50*(g*(srho/rhow-1)/(visk^2))^0.33333
+                  rhow=1000 kg/m3; d50=Sd*1.e-3 m; 
+                  visk=1.3e-3/rhow m2/s; g=9.8 m/s2  
+            
+  ERATE     Erosion rate of size class [kg/m2/s].  
+            Typically ERATE  =gam0*WSED*1.e-3*SRHO [kg/m2s];
+            with gam0=1E-3 - 1E-5 (Smith & McLean, Drake&al)
+             
+  TAU_CE    Critical shear stress for sediment motion [N/m2]
+            (initiation of bedload for coarses, suspension for fines). 
+            Typically TAU_CE =tau_cb=thetcr.*(g*(srho-rhow).*d50) [N/m2]; (Shields, bedload)
+            with thetcr = 0.3./(1+1.2*D) + 0.055*(1-exp(-0.02*D)) (Soulsby & Whitehouse 97) 
+            TAU_CE   = rhow*(0.8 WSED*1E-3)^2 [N/m2] (suspended load)
+            
+  TAU_CD    Critical shear stress for depostion of cohesive sediments [N/m2]
+  
+  BED_FRAC  Volume fraction of each size class in each bed layer (NLAY columns) [0<BED_FRAC<1] 
+
+
+*** CARD 3: Sediment bed thickness, 1st field is top layer ('delt_a')
+
+  BTHK      Initial thicknesses of bed layers [m]
+            Bthk(1) active layer thickness, fixed in simulation unless SUM(Bthk(:))<Bthk(1)
+  
+*** CARD 4: Sediment bed porosity
+
+   BPOR     Initial porosity of bed layers [m]
+            used in ana_sediment ifdef ANA_SEDIMENT || not in init.nc*
+  
+*** CARD 5: Bottom ripple height         
+
+   Hrip     Initial ripple height [m]
+            used in ana_sediment ifdef ANA_SEDIMENT || not in init.nc*
+
+*** CARD 6: Bottom ripple length
+
+   Lrip     Initial ripple length [m]
+            used in ana_sediment ifdef ANA_SEDIMENT || not in init.nc*
+  
+*** Card 9 :
+
+   transC   Cohesive transition- Under that value of total mud fraction
+            entire bed behaves as a non-cohesive bed
+
+*** Card 10 :
+
+   transN   Noncohesive transition- Over that value of total mud fraction
+            entire bed behaves as a cohesive bed
+
+*** Card 11 :
+
+   tcr_min  Minimum shear for erosion
+
+*** Card 12 :
+
+   tcr_max  Maximum shear for erosion
+
+*** Card 13 :
+
+   tcr_slp  Tau_crit profile slope
+
+*** Card 14 :
+
+   tcr_off  Tau_crit profile offset
+
+*** Card 15 :
+
+   tcr_tim  Tau_crit consolidation rate
+
+*** Card 16 :
+
+   booleans for flocculation
+
+   L_ADS           Boolean set to .true. if differential settling aggregation
+  
+   L_ASH           Boolean set to .true. if shear aggregation
+ 
+   L_COLLFRAG      Boolean set to .true. if collision-induced fragmentation enable
+
+   L_TESTCASE      If .TRUE. sets G(t) to values from Verney et al., 2011 lab experiment
+
+*** Card 17 :
+
+   flocculation Sediment Parameters.
+ 
+   F_DP0           Primary particle size (m), typically 4e-6 m
+ 
+   F_NF            Floc fractal dimension, typically ranging from 1.6 to 2.6
+ 
+   F_DMAX          Maximum diameter (m)
+ 
+   F_NB_FRAG       Number of fragments by shear erosion. If binary/ternary : 2.
+ 
+   F_ALPHA         Flocculation efficiency, ranging from 0. to 1.
+  
+   F_BETA          Shear fragmentation rate
+ 
+   F_ATER          For ternary breakup, use 0.5, for binary : 0. (a boolean could be better)
+ 
+   F_ERO_FAC       Fraction of the shear fragmentation term transfered to shear erosion.
+                    Ranging from 0. (no erosion) to 1. (all erosion)
+ 
+   F_ERO_NBFRAG    Number of fragments induced by shear erosion.
+ 
+ 
+   F_COLLFRAGPARAM Fragmentation rate for collision-induced breakup
+ 
+   F_CLIM          Min concentration below which flocculation processes are not calculated
+
+   F_ERO_IV        Fragment size class (could be changed to a particle
+                   size or a particle distribution (INTEGER)
+ 
+** Card 18
+ 
+   Flocculation Decomposition in Bed Sediment Parameters
+   Only #ifdef DEFLOC
+ 
+   MUD_FRAC_EQ      Equilibrium fractional class distribution (they should add up to 1).
+                    There is no check for that, [1:NMUD] values expected.
+** Card 19
+ 
+   MUD_T_DFLOC      Time scale of flocculation decomposition in bed

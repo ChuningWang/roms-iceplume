@@ -1,0 +1,6 @@
+#!/bin/bash
+
+source ../myenv_mypath.sh
+
+# < insert here variables definitions > !!! DO NOT REMOVE THIS LINE (used by submitjob) !!!
+

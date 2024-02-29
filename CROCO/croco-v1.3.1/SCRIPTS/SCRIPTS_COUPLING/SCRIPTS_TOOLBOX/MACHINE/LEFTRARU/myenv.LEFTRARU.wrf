@@ -1,0 +1,14 @@
+#-------------
+# WRF
+#-------------
+export NETCDF4=1
+export NETCDF_classic=1
+export WRFIO_NCD_LARGE_FILE_SUPPORT=1
+#-------------
+# WPS
+#-------------
+module load JasPer/2.0.14
+jasppath="$(echo $(which jasper) | cut -d '/' -f1-11 )"
+export JASPERLIB="${jasppath}/lib64"
+export JASPERINC="${jasppath}/include/jasper"
+

@@ -1,0 +1,57 @@
+#!/bin/bash
+#==================================================================
+# many variables set in .gitlab-ci.yml
+# do not overwrite here
+#==================================================================
+#-
+FANCY_OUTPUT=1
+if [ ${FANCY_OUTPUT} -eq 1 ] ;then
+    #  FMT_BLUEBLD=$(tput setaf 14 ; tput bold)
+    FMT_BLUEBLD=$(tput setaf 14 )
+    FMT_ORD='\033[0m'
+    #FMT_ORD=$(tput sgr0)
+    FMT_GREEN=$(tput setaf 2)
+    FMT_ORANGE=$(tput setaf 172)
+    FMT_RED=$(tput setaf 1)
+    FMT_RED2=$(tput setaf 9)
+    FMT_GREENBLD=$(tput setaf 2 ; tput bold )
+    FMT_REDBLD=$(tput setaf 1 ; tput bold )
+    FMT_RVERT=$(  tput setab 7 ; tput bold )
+else
+    FMT_BLUEBLD=""
+    FMT_ORD=""
+    FMT_GREEN=""
+    FMT_ORANGE=""
+    FMT_RED=""
+    FMT_RED2=""
+    FMT_GREENBLD=""
+    FMT_REDBLD=""
+    FMT_RVERT=""
+fi
+
+
+COMPUTER=LINUX
+
+if [ "${COMPUTER}"=="LINUX" ]; then
+    # Computer dependant function to submit jobs
+    SUBMIT_DIR=$CI_CROCO_PWD
+    MPIRUN=$CROCO_CI_MPIRUN
+    
+    function Fqsub_mpi_perfrst() {
+	./comp_run_mpi_perfrst.bash
+    }
+    function Fextract_results_perfrst() {
+	FLAG_MPI=$1
+	FLAG_OPENMP=$2
+	if [[ ${FLAG_MPI} -eq 1 &&  ${FLAG_OPENMP} -eq 1 ]]; then 
+	    ./extract_results_croco_perfrst.bash
+	elif [ ${FLAG_OPENMP} -eq  1 ]; then 
+	    ./extract_results_croco_perfrst.bash
+	elif [ ${FLAG_MPI} -eq 1 ]; then 
+	    ./extract_results_croco_perfrst.bash
+	else
+	    sed -e '3c ?' ${TEST_NAME}_steps > tmp.txt 
+	    \mv tmp.txt ${TEST_NAME}_steps
+	fi
+    }
+fi

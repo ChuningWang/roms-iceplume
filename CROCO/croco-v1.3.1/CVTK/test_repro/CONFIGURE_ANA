@@ -1,0 +1,8 @@
+#!/bin/bash
+
+TEST_TYPE="KTEST"
+
+dir_home="$CVTKHOME/Scripts_ana"
+dir_test="$CVTKWORK/KTEST"
+dir_web="$CVTKWORK/ftp"
+dir_datafile="$DATAANA"

@@ -1,0 +1,39 @@
+<!--
+ ============================================================================================== 
+    WRF context
+============================================================================================== 
+-->
+<context id="wrf_d01">
+<!-- $id$ -->
+
+<!-- Fields definition -->
+    <field_definition level="1" prec="4" operation="average" enabled=".true.">
+      <!-- automaticaly defined in the code -->
+    </field_definition>
+
+
+<!-- Files definition -->
+    <file_definition src="./file_def_wrf.xml"/>  
+<!-- 
+============================================================================================================
+= grid definition = = DO NOT CHANGE =
+============================================================================================================
+-->
+    
+    <axis_definition>
+      <axis id="lev_M" />
+      <axis id="lev_W" />
+    </axis_definition>
+ 
+    <domain_definition>
+      <domain id="grid_M" />
+      <domain id="grid_U" />
+      <domain id="grid_V" />
+    </domain_definition>
+  
+    <grid_definition>
+    </grid_definition>
+
+
+</context>
+

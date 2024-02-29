@@ -1,0 +1,43 @@
+$ -------------------------------------------------------------------- $
+$ WAVEWATCH III Grid output post-processing                            $
+$--------------------------------------------------------------------- $
+$
+$ 1st output time (yyyymmdd hhmmss), increment (s), nb of outputs   -- $
+$
+  <yr1><mo1><dy1> <hr1>0000  <wav_int> 1000000
+$
+$ Fields requested --------------------------------------------------- $
+$  Defined as namelist:                                             -- $
+$      one line set to N                                            -- $
+$      next line contains parameter name                            -- $
+$
+  N
+  DPT WND HS FP DP T0M1 LM SPR DIR TWO TAW FOC BHD WLV CUR TUS USS
+$  DPT WND HS FP DP T0M1 THM LEV DIR TWO TAW FOC BHD
+$  DPT WND HS FP DP
+$
+$--------------------------------------------------------------------- $
+$ netCDF version, variable type [2=SHORT, 3=it depends , 4=REAL]    -- $
+$ swell partitions [0 1 2 3 4 5]                                    -- $   
+$ variables in same file [T] or not [F]                             -- $
+$
+  4 4
+  0 1 2
+  T
+$
+$ -------------------------------------------------------------------- $
+$ File prefix                                                       -- $
+$ Nb of characters in date [4=yearly, 6=monthly, 8=daily, 10=hourly] - $
+$ IX and IY ranges [regular:IX NX IY NY, unstructured:IP NP 1 1]     - $
+$
+  ww3.         
+  6
+  1 10000 1 10000 
+$
+$ For each field and time a new file is generated with the file name
+$ ww3.date_xxx.nc , where date is a conventional time indicator with S3
+$ characters, and xxx is a field identifier.
+$
+$ -------------------------------------------------------------------- $
+$ End of input file                                                    $
+$ -------------------------------------------------------------------- $

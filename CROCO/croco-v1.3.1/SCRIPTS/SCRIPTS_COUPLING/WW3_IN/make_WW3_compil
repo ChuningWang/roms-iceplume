@@ -1,0 +1,138 @@
+#!/bin/bash -e
+
+# --------------------------------------------------
+# Script to compile WW3 in coupled and uncoupled modes
+# --------------------------------------------------
+#
+# Further Information:   
+# http://www.croco-ocean.org
+#  
+# This file is part of CROCOTOOLS
+#
+# CROCOTOOLS is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published
+# by the Free Software Foundation; either version 2 of the License,
+# or (at your option) any later version.
+#
+# CROCOTOOLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA  02111-1307  USA
+#
+# Copyright (c) 2018 S. Jullien
+# swen.jullien@ifremer.fr
+# --------------------------------------------------
+
+#=========================================================================
+#=======================  USER CHANGES  ==================================
+#=========================================================================
+
+source ../myenv_mypath.sh
+
+# Environment variables requested for ww3 compilation:
+#
+# define your local ww3 environment file
+export WWATCH3_ENV=${CHOME}/wwatch3.env
+# define your compilers
+export WWATCH3_F77=${F77}
+export WWATCH3_CC=${CC}
+# define your netcdf format
+export WWATCH3_NETCDF=${WWATCH3_NETCDF}
+# define your ww3 source model
+export WWATCH3_DIR=${WAV}
+# define your ww3 temporary directory for compilation
+export WWATCH3_TMP=${WAV}/tmp
+# define your oasis libraries directory (where oasis has been compiled)
+export OASISDIR=${CPL}
+
+# define your compiler extension 
+# (see what is available in $ww3/bin as comp.EXTENSION)
+# for SPICA
+#mycompil=Ubuntu.intel.mpich
+# for JZA
+#mycompil=Altix.JZ
+# for DATARMOR
+#mycompil=DATARMOR
+# for linux Ubuntu with basic libraries (gfort,gcc,...)
+#mycompil=Gnu
+
+mycompil=Intel
+
+# define your switch extension to be used for compilation 
+# (see what is available in $ww3/bin or create one)
+# (some examples are given in $WAV_NAM_DIR)
+my_switches=(frc \
+	     ow \
+	     aw \
+	     owa)
+# flag to copy switches if you have defined them on your local WAV_NAM_DIR directory
+flag_copy_switches=1
+
+# define the ww3 programs you want to compile 
+# make_MPI will compile all programs...
+#my_pgm=make_MPI
+#my_pgm=w3_automake
+my_pgm='ww3_prnc ww3_grid ww3_bounc ww3_strt ww3_shel ww3_ounf'
+#my_pgm='w3_shel'
+
+#=========================================================================
+#====================== END USER CHANGES  ================================
+#=========================================================================
+
+# Creation of wwatch3.env
+
+cat << End_Of_wwatch3env > $WWATCH3_ENV
+#
+# Environment variables for wavewatch III
+# ---------------------------------------
+#
+
+WWATCH3_LPR      printer
+WWATCH3_F77      $WWATCH3_F77
+WWATCH3_CC       $WWATCH3_CC
+WWATCH3_DIR      $WWATCH3_DIR
+WWATCH3_TMP      $WWATCH3_TMP
+WWATCH3_SOURCE   yes
+WWATCH3_LIST     yes
+
+End_Of_wwatch3env
+
+# Entering ww3 model directory 
+cd ${WAV}/bin
+
+NB_switches=${#my_switches[@]}
+
+# Loop on switch cases
+for k in `seq 0 $(( ${NB_switches} - 1))` ; do
+
+    MYSWITCH=${my_switches[$k]}
+
+    # Copy switch files if necessary
+    if [ $flag_copy_switches == 1 ]; then
+        cp -f $WAV_NAM_DIR/switch_$MYSWITCH .
+    fi
+    # Check if switch file is available
+    if [ ! -e switch_$MYSWITCH ]; then
+        echo 'ERROR switch file: switch_'$MYSWITCH' does not exist'
+        exit 1 
+    fi
+    ./w3_setup .. -c $mycompil -s $MYSWITCH -q
+    ./w3_clean -c
+    ./w3_setup .. -c $mycompil -s $MYSWITCH -q
+    if [ "$my_pgm" == make_MPI ]; then
+        ./make_MPI
+    elif [ "$my_pgm" == w3_automake ]; then
+        ./w3_automake
+    else
+        ./w3_make $my_pgm
+    fi
+    mkdir -p ../exe_$MYSWITCH
+    mv -f ../exe/* ../exe_$MYSWITCH/.
+
+done
+

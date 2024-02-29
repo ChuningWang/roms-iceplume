@@ -1,0 +1,47 @@
+#!bin/bash
+# This environnement works for Ubuntu/debian. Before starting
+# you need to make sure that your system has the right compilers
+# and libraries
+
+# For CROCO, you will need:
+#     - C compiler       (sudo apt-get install gcc )
+#     - Fortran compiler (sudo apt-get install gfortran )
+#     - Netcdf library   (sudo apt-get install libnetcdf-dev libnetcdff-dev )
+#     - MPI library      (sudo apt-get install openmpi-bin libopenmpi-dev )
+# For more informations please go here:
+#    https://croco-ocean.gitlabpages.inria.fr/croco_doc/index.html 
+
+# If you are coupling with WRF you can check this page:
+#     https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php
+# to see if you have the proper architecture
+# the main libraries you need are ( in addtion to the above):
+#     - libpng (sudo apt-get install libpng-dev)
+#     - zlib   ( sudo apt-get instal zlib1g-dev)
+
+# Make sure you also have nco tools!
+
+
+#################################################################
+################### FOR COMPILATIONS ############################
+#################################################################
+# -- for NETCDF
+# -->
+export NETCDF=$( nf-config --prefix )
+export NETCDF_INC=$(nf-config --includedir)
+export NETCDF_LIB=$( nf-config --flibs)
+
+# -- Option for job launching
+export MPI_LAUNCH=mpirun
+export MPI_ext="-configfile"
+export ncomod='nco'
+
+#----------------------------------------------------------------
+# Environment variables related to compilers
+#----------------------------------------------------------------
+export CC=gcc
+export FC=gfortran
+export F77=gfortran
+export F90=gfortran
+export MPIF90=mpif90
+export MPICC=mpicc
+

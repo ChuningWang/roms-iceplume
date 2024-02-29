@@ -1,0 +1,121 @@
+!************************************************************************************************
+!************************************************************************************************
+!************************************************************************************************
+!                                 NAMELIST MODULE OA 
+!************************************************************************************************
+!************************************************************************************************
+!************************************************************************************************
+
+!************************************************************************************************
+!        Cette namelist est dédiée au module d'analyse OA
+! 
+! Elle contient les blocs: 
+! - "oa_numbers" : fixe le nombre d'analyses.
+! - "oa_names"   : détermine les noms associés à ces analyses et les fichiers de namelist associés.
+!
+!                             
+!************************************************************************************************
+
+!************************************************************************************************
+!************************************************************************************************
+!                                      bloc oa_numbers
+!************************************************************************************************
+!************************************************************************************************
+!
+! nzc_oa                   Nombre de variable analysees ou bien nombre de configuration d'analyse.
+!                          i.e., pour certain type de variables il peut y avoir plusieurs variables
+!                          par configuration.
+!
+!***********************************************************************************************
+&oa_numbers
+
+nzc_oa = 1 
+
+/
+!************************************************************************************************
+!************************************************************************************************
+!                                      bloc oa_names
+!************************************************************************************************
+!************************************************************************************************
+!
+! nzc_oa_names             Liste du ou des noms correspondants aux "nzc_oa" analyses (80 caractères max.)
+!                          Chaque nom #name de la liste permet de construire le nom de La namelist qui décrit
+!                          l'analyse et qui doit se trouver dans le répertoire NAMELIST:
+!
+!                          NAMELIST/namelist_oa_#name
+!
+!
+!***********************************************************************************************
+&oa_names
+
+nzc_oa_names  = "test_Wavelet_S2"
+nzc_oa_vartyp = 99
+
+/
+
+!************************************************************************************************
+!************************************************************************************************
+!                                      blocs oa_test et oa_test_signal
+!************************************************************************************************
+!************************************************************************************************
+! Ces blocs ne sont lus que si un des codes de variable-config nzc_oa_vartyp est egal a 99
+! Ils permettent de tester une fonction uniforme variant comme la CL de 1 ou +s cosinus 
+! nper_test 
+!    - -1 : hardcoded test function
+!    - >0 : CL of cosine functions having the following parameters read in oa_test_signal block :
+!          - amp_test_oa    as amplitude   (no unit) 
+!          - period_test_oa as pediodicity (oa_unit sec) 
+!
+!***********************************************************************************************
+&oa_test
+nper_test = 1
+/
+&oa_test_signal
+period_test_oa = 43200.D0
+amp_test_oa = 5.D0
+/
+
+!************************************************************************************************
+!************************************************************************************************
+!                                      bloc oa_checks
+!************************************************************************************************
+!************************************************************************************************
+!
+! directory_out_oa .....   Set the name of the OUTPUT folder
+! verbose_oa ...........   Level of verbosity
+! if_chks ..............   Performs checks for specific configs (requires cpp key OA_TRACES) 
+! [ij]tgt_glob .........   Global horiz-domain indices => Txt file traces for debugging purpuse
+! [k]tgt ...............   Vertical grid index => Txt file traces for debugging purpuse
+!
+!***********************************************************************************************
+&oa_checks
+if_chks       = .true.
+verbose_oa    = 6
+directory_out_oa = "OUTPUT"
+itgt_glob = 200 
+jtgt_glob = 2
+ktgt = 20
+
+/
+!************************************************************************************************
+!************************************************************************************************
+!                                      bloc oa params
+!************************************************************************************************
+!
+! unite_oa ............... Time units : i) hours unite_oa = 3600 ii) seconds unite_oa = 1   
+! msimult_oa_max ......... Not useful anymore (online caclulation of the max # of conv windows)
+!                          Can eventually be used to limit the possible memory of the OA calc.
+! if_sphe_deg2rad ........ Convert or not lon/lat spherical coord. to rad before selecting the
+!                          horiz-domain grid points where to perform OA analyses
+! if_extend_dom .......... Extend to max lat/lon domain (over MPI subdomains if any)
+!                          OBSOLETE DO NOT DECLARE or KEEP TO .false.
+!                           
+!************************************************************************************************
+!***********************************************************************************************
+&oa_params
+
+!if_extend_dom = .false.
+unite_oa = 1
+nmsimult_oa_max = 400
+if_sphe_deg2rad = .false.
+/

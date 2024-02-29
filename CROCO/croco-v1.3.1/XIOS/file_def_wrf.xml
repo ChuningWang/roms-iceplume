@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+
+    <!-- 
+============================================================================================================
+=                                           output files definition                                        =
+=                                            Define your own files                                         =
+=                                         put the variables you want...                                    =
+============================================================================================================
+    -->
+    
+    <file_definition type="one_file" sync_freq="2d" min_digits="4" enabled=".true.">
+
+      <file_group id="1d" output_freq="1d"  output_level="10" enabled=".true."> <!-- 1d files -->
+     
+	<file id="file1" name="wrfout" description="wrf M grid variables"  split_freq="1mo" split_freq_format="%y-%mo-%d"> >
+	    <field  field_ref="U" />
+	    <field  field_ref="V" />
+	    <field  field_ref="W" />
+	    <field  field_ref="PH" />
+	    <field  field_ref="PHB"  operation="once"/>
+	    <field  field_ref="T" />
+	    <field  field_ref="MU" />
+	    <field  field_ref="MUB"  operation="once"/>
+	    <field  field_ref="P" />
+	    <field  field_ref="PB"  operation="once" />
+	    <field  field_ref="PSFC" />
+	    <field  field_ref="HGT"  operation="once"/>
+	    <field  field_ref="QVAPOR" />
+	    <field  field_ref="QCLOUD" />
+	    <field  field_ref="QRAIN" />
+ 	    <field  field_ref="QICE" />
+	    <field  field_ref="QSNOW" name="QOTHER" long_name="snow and graup mixing ratio" > QSNOW + QGRAUP </field >
+	    <field  field_ref="TSK" />
+	    <field  field_ref="T2" />
+	    <field  field_ref="TH2" />
+	    <field  field_ref="Q2" />
+	    <field  field_ref="CLDFRA" />
+	    <field  field_ref="U10" />
+	    <field  field_ref="V10" />
+	    <field  field_ref="OLR" />
+	    <field  field_ref="CK" />
+	    <field  field_ref="CD" />
+	    <field  field_ref="GLW" />
+	    <field  field_ref="GSW" />
+	    <field  field_ref="LH" />
+	    <field  field_ref="HFX" />
+	    <field  field_ref="UST" />
+	    <field  field_ref="PBLH" />
+	    <field  field_ref="QFX" />
+        <field  field_ref="RAINCV" />
+	    <field  field_ref="RAINNCV" />
+	    <field  field_ref="RAINCV" name="RAIN" long_name="TIME-STEP TOTAL PRECIPITATION" > RAINCV + RAINNCV </field >
+	    <field  field_ref="SST" />
+	    <field  field_ref="EXCH_H" />
+	    <field  field_ref="EXCH_M" />
+	    <field  field_ref="U10"  name="WSPD" long_name="10m wind speed"> sqrt(U10*U10 +V10*V10) </field >
+
+	</file>
+
+    <file id="file2" name="wrf3d_1D" description="wrf M grid variables"  split_freq="1mo" split_freq_format="%y-%mo-%d">
+            <field  field_ref="T2" />
+            <field  field_ref="Q2" />
+            <field  field_ref="RAINCV" />
+            <field  field_ref="RAINNCV" />
+            <field  field_ref="RAINCV" name="RAIN" long_name="TIME-STEP TOTAL PRECIPITATION" > RAINCV + RAINNCV </field >
+            <field  field_ref="GLW" />
+            <field  field_ref="GSW" />
+            <field  field_ref="LH" />
+            <field  field_ref="HFX" />
+            <field  field_ref="UST" />
+            <field  field_ref="U10" />
+            <field  field_ref="V10" />
+            <field  field_ref="SST" />
+            <field  field_ref="U10"  name="WSPD10" long_name="10m wind speed"> sqrt(U10*U10 +V10*V10) </field> 
+            <field  field_ref="UOCE" />
+            <field  field_ref="VOCE" />
+            <field  field_ref="ZNT" />
+        </file>
+
+      </file_group>
+
+<!-- KEEP IT: Force to activate QGRAUP -->
+      <file id="trash" output_freq="1y"  output_level="10" enabled=".true." >
+	<field field_ref="QGRAUP" operation="instant" />
+      </file>
+
+      <file_group id="1h" output_freq="1h"  output_level="10" enabled=".true."> <!-- 1d files -->
+        <file id="file3" name="wrf3d_1H" description="wrf M grid variables"  split_freq="1mo" split_freq_format="%y-%mo-%d">
+           <field  field_ref="PBLH" />
+            <field  field_ref="T2" />
+            <field  field_ref="Q2" />
+            <field  field_ref="RAINCV" />
+            <field  field_ref="RAINNCV" />
+            <field  field_ref="RAINCV" name="RAIN" long_name="TIME-STEP TOTAL PRECIPITATION" > RAINCV + RAINNCV </field >
+            <field  field_ref="GLW" />
+            <field  field_ref="GSW" />
+            <field  field_ref="LH" />
+            <field  field_ref="HFX" />
+            <field  field_ref="UST" />
+            <field  field_ref="U10" />
+            <field  field_ref="U" />
+            <field  field_ref="V10" />
+            <field  field_ref="V" />
+            <field  field_ref="U_PHYL1"  />
+            <field  field_ref="V_PHYL1"  />
+            <field  field_ref="QVL1"  />
+            <field  field_ref="T_PHYL1"  />
+            <field  field_ref="U_PHYL1"  name="WSPD" long_name="Wind speed"> sqrt(U_PHYL1*U_PHYL1 +V_PHYL1*V_PHYL1) </field >
+            <field  field_ref="U_PHYL1"  name="WSPD_REL" long_name="Relative wind speed"> sqrt((U_PHYL1-UOCE)*(U_PHYL1-UOCE) +(V_PHYL1-VOCE)*(V_PHYL1-VOCE)) </field >
+            <field  field_ref="U_PHYL1"  name="TAUX" long_name="Zonal wind stress"> RHOL1*UST*UST*(U_PHYL1-UOCE)/sqrt((U_PHYL1-UOCE)*(U_PHYL1-UOCE) +(V_PHYL1-VOCE)*(V_PHYL1-VOCE))  </field >
+            <field  field_ref="U_PHYL1"  name="TAUY" long_name="Meridional wind stress"> RHOL1*UST*UST*(V_PHYL1-VOCE)/sqrt((U_PHYL1-UOCE)*(U_PHYL1-UOCE) +(V_PHYL1-VOCE)*(V_PHYL1-VOCE))  </field >
+            <field  field_ref="U_PHYL1"  name="TAUM" long_name="Wind stress intensity"> sqrt((RHOL1*UST*UST*(U_PHYL1-UOCE)/sqrt((U_PHYL1-UOCE)*(U_PHYL1-UOCE) +(V_PHYL1-VOCE)*(V_PHYL1-VOCE)))*(RHOL1*UST*UST*(U_PHYL1-UOCE)/sqrt((U_PHYL1-UOCE)*(U_PHYL1-UOCE) +(V_PHYL1-VOCE)*(V_PHYL1-VOCE)))+(RHOL1*UST*UST*(V_PHYL1-VOCE)/sqrt((U_PHYL1-UOCE)*(U_PHYL1-UOCE) +(V_PHYL1-VOCE)*(V_PHYL1-VOCE)))*(RHOL1*UST*UST*(V_PHYL1-VOCE)/sqrt((U_PHYL1-UOCE)*(U_PHYL1-UOCE) +(V_PHYL1-VOCE)*(V_PHYL1-VOCE)))) </field >
+            <field  field_ref="U_PHYL1"  name="WW" long_name="Wind Work">  (UST*UST*(U_PHYL1-UOCE)/sqrt((U_PHYL1-UOCE)*(U_PHYL1-UOCE) +(V_PHYL1-VOCE)*(V_PHYL1-VOCE))) * UOCE + (UST*UST*(V_PHYL1-VOCE)/sqrt((U_PHYL1-UOCE)*(U_PHYL1-UOCE) +(V_PHYL1-VOCE)*(V_PHYL1-VOCE))) * VOCE  </field >
+	        <field  field_ref="CD" />
+            <field  field_ref="SST" />
+            <field  field_ref="U10"  name="WSPD10" long_name="10m wind speed"> sqrt(U10*U10 +V10*V10) </field> 
+            <field  field_ref="UOCE" />
+            <field  field_ref="VOCE" />
+            <field  field_ref="ZNT" />
+        </file>
+      </file_group>
+
+   </file_definition>
+    

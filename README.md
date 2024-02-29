@@ -1,4 +1,6 @@
-**<font size=6>ROMS-ICEPLUME</font>**
+**<font size=6>CROCO-ICEPLUME</font>**
+
+Based on the work of Chuning Wang to couple ROMS and ICEPLUME. Adapting for CROCOv1.3.1
 
 [![ver info](https://img.shields.io/badge/ROMS%20ver3.9-ICEPLUME%20ver1.1.1-brightgreen.svg)](https://github.com/ChuningWang/roms-iceplume)
 
@@ -9,6 +11,8 @@ This repository contains code of the Buoyant Plume Theory (BPT)/ROMS Coupled Mod
 However, Kate's ROMS is heavily modified and contains a lot of uniform configurations, which is potentially buggy. Since so far we haven't get the chance to couple the model with sea-ice, it is reasonable to migrate back to Rutgers ROMS to maintain a tidy version of the code.
 
 This document is an introduction to the work in process ICEPLUME module for ROMS. It is modified from a similar package, IcePlume for the MITgcm, first developed by Dr. Tom Cowton. A detailed description of the MITgcm version is in [Cowton et al. (2015)](#key-references).
+
+
 
 **<font size=5>Contents</font>**
 
@@ -372,6 +376,7 @@ To run this test case, set the right path in the *build_roms.bash* file and comp
 
 Ungarish, M. (2010). An Introduction to Gravity Currents and Intrusions Introduction. Introduction to Gravity Currents and Intrusions, 1-10.
 
+[Wang, C., Chant, R. J., & Jackson, R. H. (2023). Parameterizing Subglacial Discharge in Modeling Buoyancy Driven Flow in Tidewater Glacier Fjords. Journal of Geophysical Research: Oceans, 128(8), e2023JC019924.](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2023JC019924)
 ---
 
 ## Contact Info

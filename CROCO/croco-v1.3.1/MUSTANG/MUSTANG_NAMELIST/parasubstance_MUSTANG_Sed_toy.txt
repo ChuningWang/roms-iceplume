@@ -1,0 +1,190 @@
+:=============================================================================
+:         MODULE SUBSTANCE NAMELIST with  CPP key : SUBSTANCE 
+:=============================================================================
+:
+:-----------------------------------------------------------------------------
+: nmlnbvar : number of each type of substance to be defined (other than T & S)
+:-----------------------------------------------------------------------------
+:    nv_dis : number of dissolved susbtances
+:    nv_ncp : number of  Non Constitutive Particulate subtances
+:    nv_fix : number of  fixed susbtances (not advected)
+:    nv_bent : number of benthic susbtances
+:    nv_grav : number of susbtances type GRAVELS (only if key_sed_MUSTANG)
+:    nv_sand : number of susbtances type SAND (only if key_sed_MUSTANG)
+:    nv_mud : number of susbtances type MUD (only if key_sed_MUSTANG)
+:    nv_sorb : number of particulate susbtances sorbed on an other particule
+:
+ &nmlnbvar
+    nv_dis=0
+    nv_ncp=0
+    nv_fix=0
+    nv_bent=0 
+    nv_grav=0
+    nv_sand=0
+    nv_mud=6
+    nv_sorb=0 /
+:-----------------------------------------------------------------------------    
+: nmlmuds : Characterization of MUD substances (used only if defined MUSTANG)
+:           If nv_mud = 0 this namelist is not read
+:-----------------------------------------------------------------------------
+:    name_var_n() : string, name of variable
+:    long_name_var_n() : string, long name of variable
+:    standard_name_var_n() : string, standard name of variable
+:    unit_var_n() : string, unit of concentration of variable
+:    flx_atm_n() : real, uniform atmospherical deposition (unit/m2/s) 
+:    cv_rain_n() : real, concentration in rainwater (unit/m3 of water)
+:    cini_wat_n() : real, initial concentration in water column (unit/m3)
+:    cini_air_n() : real, initial concentration in air
+:    l_out_subs_n() : boolean, saving in output file if TRUE
+:    init_cv_name_n() : string, name of substance read from initial condition 
+:                       file
+:    obc_cv_name_n() : string, name of substance read from obc file
+:    cini_sed_n() : real, initial concentration in sediment (quantity/kg of 
+:                   dry sediment)  (only if cppkey MUSTANG)
+:    cobc_wat_n() : real, boundaries uniform and constant concentration 
+:                   (kg/m3)
+:    tocd_n() : real, critical stress of deposition (N/m2) 
+:    ros_n()  : real, density of particle (kg/m3)
+:    ws_free_opt_n() : integer, choice of free settling formulation : 
+:                      0 constant, 1 Van Leussen, 2 Winterwerp, 3 Wolanski
+:    ws_free_min_n() : real, minimum setling velocity (m/s)
+:    ws_free_max_n() : real, maximum setling velocity (m/s)
+:    ws_free_para_n(1:4,num substance) : 4 additional parameters
+:    ws_hind_opt_n() : choice of hindered settling formulation : 
+:                      0 no hindered settling, 1 Scott, 2 Winterwerp, 
+:                      3 Wolanski
+:    ws_hind_para_n(1:2,num substance) : 2 additional parameters 
+:
+ &nmlmuds
+    name_var_n(1)='SED1'
+      long_name_var_n(1)='SED1'
+      standard_name_var_n(1)='SED1'
+      unit_var_n(1)='kg.m-3'
+      flx_atm_n(1)=0.0
+      cv_rain_n(1)=0.0
+      cini_wat_n(1)=0.02
+      cobc_wat_n(1)=0.02
+      cini_sed_n(1)=1.
+      cini_air_n(1)=0.0
+      l_out_subs_n(1)=.TRUE.
+      init_cv_name_n(1)='SED1'
+      obc_cv_name_n(1)='SED1'
+      tocd_n(1)=0.
+      diam_n(1)=0.
+      ros_n(1)=2600.0
+      ws_free_opt_n(1)=0
+      ws_free_min_n(1)=0.001
+      ws_free_max_n(1)=0.001
+      ws_free_para_n(1,1)=0.005,  ws_free_para_n(2,1)=0.7, ws_free_para_n(3,1)=0.3, ws_free_para_n(4,1)=0.09
+      ws_hind_opt_n(1)=0
+      ws_hind_para_n(1,1)=0.0 ,  ws_hind_para_n(2,1)=0.0
+    name_var_n(2)='SED2'
+      long_name_var_n(2)='SED2'
+      standard_name_var_n(2)='SED2'
+      unit_var_n(2)='kg.m-3'
+      flx_atm_n(2)=0.0
+      cv_rain_n(2)=0.0
+      cini_wat_n(2)=0.02
+      cobc_wat_n(2)=0.02
+      cini_sed_n(2)=1.
+      cini_air_n(2)=0.0
+      l_out_subs_n(2)=.TRUE.
+      init_cv_name_n(2)='SED2'
+      obc_cv_name_n(2)='SED2'
+      tocd_n(2)=0.
+      diam_n(2)=0.
+      ros_n(2)=2600.0
+      ws_free_opt_n(2)=0
+      ws_free_min_n(2)=0.01
+      ws_free_max_n(2)=0.01
+      ws_free_para_n(1,2)=0.005,  ws_free_para_n(2,2)=0.7, ws_free_para_n(3,2)=0.3, ws_free_para_n(4,2)=0.09
+      ws_hind_opt_n(2)=0
+      ws_hind_para_n(1,2)=0.0 ,  ws_hind_para_n(2,2)=0.0 
+    name_var_n(3)='SED3'
+      long_name_var_n(3)='SED3'
+      standard_name_var_n(3)='SED3'
+      unit_var_n(3)='kg.m-3'
+      flx_atm_n(3)=0.0
+      cv_rain_n(3)=0.0
+      cini_wat_n(3)=0.02
+      cobc_wat_n(3)=0.02
+      cini_sed_n(3)=1.
+      cini_air_n(3)=0.0
+      l_out_subs_n(3)=.TRUE.
+      init_cv_name_n(3)='SED3'
+      obc_cv_name_n(3)='SED3'
+      tocd_n(3)=0.
+      diam_n(3)=0.
+      ros_n(3)=2600.0
+      ws_free_opt_n(3)=0
+      ws_free_min_n(3)=0.02
+      ws_free_max_n(3)=0.02
+      ws_free_para_n(1,3)=0.005,  ws_free_para_n(2,3)=0.7, ws_free_para_n(3,3)=0.3, ws_free_para_n(4,3)=0.09
+      ws_hind_opt_n(3)=0
+      ws_hind_para_n(1,3)=0.0 ,  ws_hind_para_n(2,3)=0.0
+    name_var_n(4)='SED4'
+      long_name_var_n(4)='SED4'
+      standard_name_var_n(4)='SED4'
+      unit_var_n(4)='kg.m-3'
+      flx_atm_n(4)=0.0
+      cv_rain_n(4)=0.0
+      cini_wat_n(4)=0.02
+      cobc_wat_n(4)=0.02
+      cini_sed_n(4)=1.
+      cini_air_n(4)=0.0
+      l_out_subs_n(4)=.TRUE.
+      init_cv_name_n(4)='SED4'
+      obc_cv_name_n(4)='SED4'
+      tocd_n(4)=0.
+      diam_n(4)=0.
+      ros_n(4)=2600.0
+      ws_free_opt_n(4)=0
+      ws_free_min_n(4)=0.04
+      ws_free_max_n(4)=0.04
+      ws_free_para_n(1,4)=0.005,  ws_free_para_n(2,4)=0.7, ws_free_para_n(3,4)=0.3, ws_free_para_n(4,4)=0.09
+      ws_hind_opt_n(4)=0
+      ws_hind_para_n(1,4)=0.0 ,  ws_hind_para_n(2,4)=0.0
+    name_var_n(5)='SED5'
+      long_name_var_n(5)='SED5'
+      standard_name_var_n(5)='SED5'
+      unit_var_n(5)='kg.m-3'
+      flx_atm_n(5)=0.0
+      cv_rain_n(5)=0.0
+      cini_wat_n(5)=0.02
+      cobc_wat_n(5)=0.02
+      cini_sed_n(5)=1.
+      cini_air_n(5)=0.0
+      l_out_subs_n(5)=.TRUE.
+      init_cv_name_n(5)='SED5'
+      obc_cv_name_n(5)='SED5'
+      tocd_n(5)=0.
+      diam_n(5)=0.
+      ros_n(5)=2600.0
+      ws_free_opt_n(5)=0
+      ws_free_min_n(5)=0.08
+      ws_free_max_n(5)=0.08
+      ws_free_para_n(1,5)=0.005,  ws_free_para_n(2,5)=0.7, ws_free_para_n(3,5)=0.3, ws_free_para_n(4,5)=0.09
+      ws_hind_opt_n(5)=0
+      ws_hind_para_n(1,5)=0.0 ,  ws_hind_para_n(2,5)=0.0 
+    name_var_n(6)='SED6'
+      long_name_var_n(6)='SED6'
+      standard_name_var_n(6)='SED6'
+      unit_var_n(6)='kg.m-3'
+      flx_atm_n(6)=0.0
+      cv_rain_n(6)=0.0
+      cini_wat_n(6)=0.02
+      cobc_wat_n(6)=0.02
+      cini_sed_n(6)=1.
+      cini_air_n(6)=0.0
+      l_out_subs_n(6)=.TRUE.
+      init_cv_name_n(6)='SED6'
+      obc_cv_name_n(6)='SED6'
+      tocd_n(6)=0.
+      diam_n(6)=0.
+      ros_n(6)=2600.0
+      ws_free_opt_n(6)=0
+      ws_free_min_n(6)=0.1
+      ws_free_max_n(6)=0.1
+      ws_free_para_n(1,6)=0.005,  ws_free_para_n(2,6)=0.7, ws_free_para_n(3,6)=0.3, ws_free_para_n(4,6)=0.09
+      ws_hind_opt_n(6)=0
+      ws_hind_para_n(1,6)=0.0 ,  ws_hind_para_n(2,6)=0.0 /

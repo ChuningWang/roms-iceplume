@@ -1,0 +1,110 @@
+:==============================================================================
+:    MODULE MUSTANG  
+:    NAMELIST FOR SEDIMENT BEHAVIOUR AND MANAGEMENT PARAMETERS
+:==============================================================================
+:
+: namsedim_init            : relative to sediment initialization
+: namsedim_layer           : relative to sediment layers characterization and 
+:                            active layer
+: namsedim_bottomstress    : relative to bottom shear stress
+: namsedim_deposition      : relative to sediment deposition
+: namsedim_erosion         : relative to sediment erosion
+: namsedim_poro            : relative to porosity
+:                            (only if key_MUSTANG_V2)
+: namsedim_bedload         : relative to sediment bedload
+:                            (only if key_MUSTANG_V2)
+: namsedim_lateral_erosion : relative to lateral sediment erosion
+:                            (only if key_MUSTANG_lateralerosion)
+: namsedim_consolidation   : relative to sediment consolidation
+: namsedim_diffusion       : relative to dissolved diffusion in sediment 
+: namsedim_bioturb         : relative to bioturbation in sediment 
+: namsedim_morpho          : relative to morphodynamic
+: namtempsed               : relative to temperature estimation in sediment 
+:                            (only if !defined key_noTSdiss_insed)
+: namsedoutput             : parameters using for output results in the file 
+:                            sediment
+: namsedim_debug           : output for debug
+:                            (only if key_MUSTANG_debug and key_MUSTANG_V2)
+: namflocmod               : parameters using for FLOCMOD module 
+:                            (only if key_MUSTANG_flocmod)
+
+&namsedim_init
+   date_start_dyninsed='2000/01/30 00:00:00'  
+   date_start_morpho='1990/01/08 00:00:00' 
+   l_repsed=.true. 
+   filrepsed='./CROCO_FILES/sed_init.nc'
+   l_initsed_vardiss=.false.
+   l_unised = .true.    
+   fileinised =  './Init.nc' 
+   hseduni = 0.1       
+   cseduni= 1508.0  
+   l_init_hsed=.FALSE.   
+   csed_mud_ini = 300.0   
+   ksmiuni = 1      
+   ksmauni = 2   
+/ 
+&namsedim_layer
+   dzsmin=1.0e-5       
+   dzsmax_bottom=0.1   
+   l_dzsmaxuni=.TRUE.  
+   dzsmaxuni=10.     
+   nlayer_surf_sed=5 
+/
+&namsedim_bottomstress
+   l_z0seduni=.true.  
+   z0seduni = 0.0001     
+   z0sedmud = 0.0001    
+   z0sedbedrock = 0.005  
+   l_fricwave=.false.  
+/  
+&namsedim_deposition
+   cfreshmud=400.0
+   csedmin=30.
+   cmudcr=600.  
+   cvolmaxsort=0.58
+   cvolmaxmel=0.67 
+/ 
+&namsedim_erosion
+   activlayer=0.02  
+   frmudcr2=0.7 
+   coef_frmudcr1=1000.
+   x1toce_mud=0.3   
+   x2toce_mud=0.
+   E0_sand_option=0
+   E0_sand_Cst=0.0002  
+   E0_sand_para=1. 
+   n_eros_sand=1.6
+   E0_mud=0.0002  
+   n_eros_mud=1.  
+   ero_option = 1   
+   xexp_ero = 2.0     
+ /  
+&namsedim_lateral_erosion
+   coef_erolat=0.000 
+   coef_tauskin_lat=5.0  
+   l_erolat_wet_cell=.FALSE. 
+   htncrit_eros=0.0 / 
+&namsedim_consolidation
+/
+&namsedim_diffusion
+   l_diffused=.true.  
+   dt_diffused=500.0 
+   choice_flxdiss_diffsed=3 
+   xdifs1 = 1.e-8  
+   xdifsi1 = 1.e-6 
+   epdifi = 0.01 
+   fexcs=0.5 /  
+&namsedim_bioturb
+/
+&namsedim_morpho
+/
+&namtempsed
+/
+&namsedoutput
+/
+&namflocmod
+/   
+
+
+
+   

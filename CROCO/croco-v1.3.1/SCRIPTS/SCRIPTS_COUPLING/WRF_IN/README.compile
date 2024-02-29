@@ -1,0 +1,35 @@
+How to compile WRF :
+--------------------
+
+1. Using pre-defined files:
+	- On some machines (See CONFIGURE_WRF) some cases were prepared to facilitate compilation
+	- In make_WRF_compil select the cases you wish to compile
+	- Launch script on the machine you are on
+
+2. From scracth:
+	- Go in your WRF repository.
+	- Clean your repository (./clean -a)
+	- Prepare your configure.wrf using ./configure
+		- Select you environement
+		- Select your nesting type (0 no nesting)
+	- Eventually edit configure.wrf you are coupling using OASIS
+		(https://croco-ocean.gitlabpages.inria.fr/croco_doc/tutos/tutos.16.coupling.compil.html)
+	- Compile WRF (./compile em_real)
+
+
+
+Specific cases :
+----------------
+
+°If you decide to compile WRF with a moving nest you might have an issue compiling share/landread.c (look for landread in the log file).
+One possible error is that XDR librairy is not find here '/usr/include/rpc' but here '/usr/include/tirpc/rpc/'. In this case switch (in your configure.wrf) -DRPC_TYPES from 1 to 2. Else, you can directly edit the path in share/landread.c.
+
+°Still on the moving_nest case, even if your compilation worked fine, you might have strange result on the sst variable in wrfout_d02_*. This is due to wrong interpolation of sst var. To correct this, go in your WRF repository. Then, in Registry/Registry.EM uncomment:
+
+state    real   SST              ij    misc        1         -     i01245rh05d=(interp_mask_field:lu_index,iswater)f=(p2c)   "SST"              "SEA SURFACE TEMPERATURE" "K 
+
+and comment:
+
+#state    real   SST              ij     misc        1         -     i01245rh0d=(interp_mask_field:lu_index,iswater)   "SST"              "SEA SURFACE TEMPERATURE" "K"
+
+

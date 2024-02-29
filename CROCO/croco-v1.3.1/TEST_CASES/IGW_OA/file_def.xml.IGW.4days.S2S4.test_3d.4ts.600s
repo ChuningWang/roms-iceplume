@@ -1,0 +1,59 @@
+<file_definition type="one_file" name="./OUTPUT/@expname@_@freq@" sync_freq="1d" min_digits="4">
+
+	<file_group id="1ts" output_freq="1ts"  output_level="10" enabled=".false."/> <!-- 1 time step files -->
+ 	<file_group id="6s"  output_freq="6s"   output_level="10" enabled=".false."/> <!-- 6 seconds files -->
+ 	<file_group id="2mi" output_freq="2mi"  output_level="10" enabled=".false."/> <!-- 2 minutes files -->
+ 	<file_group id="3h"  output_freq="3h"   output_level="10" enabled=".false."/> <!-- 3 hours files -->
+	<file_group id="4d"  output_freq="4d"   output_level="10" enabled=".false."/> <!-- 4 days files -->
+	<file_group id="1mo" output_freq="1mo"  output_level="10" enabled=".false."/> <!-- real montly files -->
+	<file_group id="1y"  output_freq="1y"   output_level="10" enabled=".false."/> <!-- real yearly files -->
+
+	<file_group id="4ts" output_freq="4ts" output_level="10" enabled=".true.">
+		<file id="file1" name_suffix="_inst" split_freq="1152ts" split_freq_format="%y-%mo-%d-%h-%mi-%s">
+			<field_group id="grid_fields1" operation="once">
+				<field field_ref="hc"        />
+				<field field_ref="theta_s"   />
+				<field field_ref="theta_b"   />
+				<field field_ref="Tcline"    />
+				<field field_ref="Vtransform"/>
+				<field field_ref="h"         />
+				<field field_ref="f"         />
+				<field field_ref="pm"        />
+				<field field_ref="pn"        />
+				<field field_ref="lon_rho"   />
+				<field field_ref="lat_rho"   />
+				<field field_ref="lon_u"     />
+				<field field_ref="lat_u"     />
+				<field field_ref="lon_v"     />
+				<field field_ref="lat_v"     />
+                <field field_ref="angle"     />
+<!--				<field field_ref="mask_rho"  /> -->
+				<field field_ref="Cs_r"      />
+				<field field_ref="sc_r"      />
+				<field field_ref="Cs_w"      />
+				<field field_ref="sc_w"      />
+			</field_group>
+
+			<field_group id="inst_fields" operation="instant">
+				<field field_ref="zeta" />
+				<field field_ref="ubar" />
+				<field field_ref="vbar" />
+				<field field_ref="sustr"/>
+				<field field_ref="svstr"/>
+				<field field_ref="u"    />
+				<field field_ref="v"    />
+				<field field_ref="w"    />
+				<field field_ref="temp" />
+<!--				<field field_ref="salt" />  -->
+				<field field_ref="rho"  />
+				<field field_ref="bvf"  />
+				<field field_ref="test_3d_r_001_001_real"  />
+				<field field_ref="test_3d_r_001_001_imag"  />
+				<field field_ref="test_3d_r_002_002_real"  />
+				<field field_ref="test_3d_r_002_002_imag"  /> 
+			</field_group>
+		</file>
+	</file_group>
+
+
+</file_definition>

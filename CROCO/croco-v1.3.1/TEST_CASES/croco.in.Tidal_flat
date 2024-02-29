@@ -1,0 +1,65 @@
+title:
+        Tide Flat 2DV TEST MODEL
+
+time_stepping: NTIMES   dt[sec]  NDTFAST  NINFO
+                8640      15       5       100
+
+S-coord: THETA_S,   THETA_B,    Hc (m)
+           0.0d0     0.0d0      500.0d0
+
+start_date:
+2019-01-01 00:00:00
+end_date:
+2019-01-03 00:00:00
+output_time_steps: DT_HIS(H), DT_AVG(H), DT_RST(H)
+                     0.25           24         24
+
+initial: NRREC  filename
+          0 
+                          fileini
+
+restart:          NRST, NRPFRST / filename
+                   720000    -1
+                          tidal_flat_rst.nc
+
+history: LDEFHIS, NWRT, NRPFHIS / filename 
+            T     100     0
+                          tidal_flat_his.nc
+
+primary_history_fields: zeta UBAR VBAR  U  V   wrtT(1:NT)
+                          T    T   T   T  T    30*T
+
+auxiliary_history_fields:   rho Omega  W  Akv  Akt  Aks Visc3d Diff3d  HBL HBBL Bostr Wstr Ustr Vstr Shfl Swfl rsw rlw lat sen  HEL
+                             F   F     T   T    T    F    T     T       T   T    T     T    T    T    F    F   10*F             
+
+gls_history_fields:   TKE  GLS  Lscale
+                       F     F    F
+
+sediments_mustang: input file
+               MUSTANG_NAMELIST/parasubstance_MUSTANG_Tidal_flat.txt
+               MUSTANG_NAMELIST/paraMUSTANGV1_Tidal_flat.txt
+
+rho0:
+      1025.d0
+
+lin_EOS_cff:
+        30.d0 20.d0 35.5d0  0.0d-10 0.0d-10
+
+lateral_visc:   VISC2,    VISC4    [m^2/sec for all]
+                 1.27       0.
+
+tracer_diff2: TNU2(1:NT)           [m^2/sec for all]
+               30*0.d0 
+
+bottom_drag:     RDRG [m/s],  RDRG2,  Zob [m],  Cdb_min, Cdb_max
+                 0.0d-03      0.0d-3  1.0d-4     1.d-4    1.d-1 
+
+gamma2:
+                 1.d0
+
+sponge:          X_SPONGE [m],    V_SPONGE [m^2/sec]
+                    1000.               1000.  
+
+nudg_cof:    TauT_in, TauT_out, TauM_in, TauM_out  [days for all]
+                1.      360.      3.      360.
+

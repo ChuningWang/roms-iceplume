@@ -1,0 +1,17 @@
+&NAM_OASIS NB_TIME_STEPS=<toytimes>,
+           DELTA_T=<toydt>,
+           GRID_FILENAME='grid_wav.nc' /
+
+&NAM_FCT_SEND CTYPE_FCT='FILES',
+              CNAME_FILE='toy_wav.nc',
+              VALUE=1 /
+
+&NAM_RECV_FIELDS NB_RECV_FIELDS=3,
+                 CRCVFIELDS(1)='TOY__SSH',
+                 CRCVFIELDS(2)='TOY_UOCE',
+                 CRCVFIELDS(3)='TOY_VOCE' /
+
+&NAM_SEND_FIELDS NB_SEND_FIELDS=3,
+                 CSNDFIELDS(1)='TOY_T0M1',
+                 CSNDFIELDS(2)='TOY___HS',
+                 CSNDFIELDS(3)='TOY__DIR' /

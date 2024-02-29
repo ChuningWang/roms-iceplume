@@ -1,0 +1,18 @@
+#!/bin/bash
+#SBATCH --job-name=Comp_real
+#SBATCH --partition=slims
+#SBATCH --ntasks=8
+#SBATCH --ntasks-per-node=40
+#SBATCH --time=12:00:00              # temps d execution maximum demande (HH:MM:SS)
+#SBATCH --output=Comp_real.out
+#SBATCH --error=Comp_real.err
+
+cd ${SLURM_SUBMIT_DIR}
+
+#===============================================================================
+
+umask 022
+set -u
+
+./run_real.bash configure.namelist.real 8
+

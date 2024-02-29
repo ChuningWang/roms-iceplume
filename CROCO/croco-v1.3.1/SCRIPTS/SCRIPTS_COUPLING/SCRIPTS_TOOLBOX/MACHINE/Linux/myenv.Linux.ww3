@@ -1,0 +1,6 @@
+#-------------
+# WW3
+#-------------
+export NETCDF_CONFIG=${NETCDF}/bin/nf-config
+export WWATCH3_NETCDF=NC4
+
