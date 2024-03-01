@@ -47,6 +47,7 @@
 #undef  SED_TOY         /* 1DV sediment toy Example */
 #undef  TIDAL_FLAT      /* 2DV tidal flat Example */
 #undef  ESTUARY         /* 3D tidal estuary Example */
+#undef  GLACIER         /* 3D iceplume Example */
 /* 
         ... OR REALISTIC CONFIGURATIONS
 */
@@ -99,6 +100,7 @@
 # undef  SEDIMENT
 # undef  MUSTANG
 # undef  BBL
+# undef  ICEPLUME
                       /* I/O server */
 # undef  XIOS
                       /* Calendar */
@@ -276,6 +278,15 @@
 # undef PSOURCE_NCFILE
 # ifdef PSOURCE_NCFILE
 #  undef PSOURCE_NCFILE_TS
+# endif
+                      /* Iceplume - Glaciers */
+# undef ICEPLUME
+# ifdef ICEPLUME
+#  undef ICEPLUME_MELT
+#  undef ICEPLUME_TRACER
+#  undef ICEPLUME_MELT_TRACER
+#  undef ICEPLUME_DET_AVERAGE
+#  define ICEPLUME_MIX
 # endif
                       /* Open Boundary Conditions */
 # ifdef TIDES
@@ -1933,6 +1944,20 @@
 # define NO_FRCFILE
 # undef  ZETA_DRY_IO
 # undef  RVTK_DEBUG
+
+#elif defined GLACIER
+/*
+!                       Glacier  Example
+!                       =======  =======
+*/
+# define ICEPLUME
+# ifdef ICEPLUME
+#  undef ICEPLUME_MELT
+#  undef ICEPLUME_TRACER
+#  undef ICEPLUME_MELT_TRACER
+#  undef ICEPLUME_DET_AVERAGE
+#  define ICEPLUME_MIX
+# endif
 
 #endif /* END OF CONFIGURATION CHOICE */
 
