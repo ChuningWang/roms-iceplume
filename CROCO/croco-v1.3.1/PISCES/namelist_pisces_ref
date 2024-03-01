@@ -1,0 +1,373 @@
+!!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+!! PISCES  :    1  - air-sea exchange                         (nampisext)
+!! namelists    2  - biological parameters                    (nampisbio)
+!!              3  - parameters for nutrient limitations      (nampislim)    
+!!              4  - parameters for phytoplankton             (nampisprod,nampismort)
+!!              5  - parameters for zooplankton               (nampismes,nampiszoo)
+!!              6  - parameters for remineralization          (nampisrem)
+!!              7  - parameters for calcite chemistry         (nampiscal)
+!!              8  - parameters for inputs deposition         (nampissed)
+!!              9  - parameters for Kriest parameterization   (nampiskrp, nampiskrs)
+!!              10 - additional 2D/3D  diagnostics            (nampisdia)
+!!              11 - Damping                                  (nampisdmp)
+!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+!'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+&nampistrc     !   tracers definition
+!,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+!
+!              !    name   !           title of the field              !   units    
+!              !           !                                           !            
+!              !           !                                           !            
+   tracer(1)   = 'DIC     ' , 'Dissolved inorganic Concentration      ',  'mmol/m3'
+   tracer(2)   = 'Alkalini' , 'Total Alkalinity Concentration         ',  'meq/m3 '
+   tracer(3)   = 'O2      ' , 'Dissolved Oxygen Concentration         ',  'mmol/m3'
+   tracer(4)   = 'CaCO3   ' , 'Calcite Concentration                  ',  'mmol/m3'
+   tracer(5)   = 'PO4     ' , 'Phosphate Concentration                ',  'mmol/m3'
+   tracer(6)   = 'POC     ' , 'Small organic carbon Concentration     ',  'mmol/m3'
+   tracer(7)   = 'Si      ' , 'Silicate Concentration                 ',  'mmol/m3'
+   tracer(8)   = 'PHY     ' , 'Nanophytoplankton Concentration        ',  'mmol/m3'
+   tracer(9)   = 'ZOO     ' , 'Microzooplankton Concentration         ',  'mmol/m3'
+   tracer(10)  = 'DOC     ' , 'Dissolved organic Concentration        ',  'mmol/m3'
+   tracer(11)  = 'PHY2    ' , 'Diatoms Concentration                  ',  'mmol/m3'
+   tracer(12)  = 'ZOO2    ' , 'Mesozooplankton Concentration          ',  'mmol/m3'
+   tracer(13)  = 'BSi     ' , 'Diatoms Silicate Concentration         ',  'mmol/m3'
+   tracer(14)  = 'Fer     ' , 'Dissolved Iron Concentration           ',  'mmol/m3'
+   tracer(15)  = 'BFe     ' , 'Big iron particles Concentration       ',  'mmol/m3'
+   tracer(16)  = 'GOC     ' , 'Big organic carbon Concentration       ',  'mmol/m3'
+   tracer(17)  = 'SFe     ' , 'Small iron particles Concentration     ',  'mmol/m3'
+   tracer(18)  = 'DFe     ' , 'Diatoms iron  Concentration            ',  'mmol/m3'
+   tracer(19)  = 'DSi     ' , 'Sinking biogenic Silicate Concentration',  'mmol/m3'
+   tracer(20)  = 'NFe     ' , 'Nano iron Concentration                ',  'mmol/m3'
+   tracer(21)  = 'NCHL    ' , 'Nano chlorophyl Concentration          ',  'mg/m3'
+   tracer(22)  = 'DCHL    ' , 'Diatoms chlorophyl Concentration       ',  'mg/m3'
+   tracer(23)  = 'NO3     ' , 'Nitrates Concentration                 ',  'mmol/m3'
+   tracer(24)  = 'NH4     ' , 'Ammonium Concentration                 ',  'mmol/m3'
+   tracer(25)  = 'LGW     ' , 'Ligands Concentration                  ',  'mmol/m3'
+/
+!'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+&nampisext     !   air-sea exchange
+!,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+   atcco2     = 287.    ! atmospheric pCO2
+/
+!'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+&nampisbio     !   biological parameters
+!,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+   nrdttrc    =  1        ! time step frequency for biology
+   wsbio      =  2.       ! POC sinking speed
+   xkmort     =  2.E-7    ! half saturation constant for mortality
+   ferat3     =  10.E-6   ! Fe/C in zooplankton
+   wsbio2     =  50.      ! Big particles sinking speed
+   wsbio2max  =  50.      ! Big particles maximum sinking speed
+   wsbio2scale =  5000.    ! Big particles length scale of sinking
+   ln_sink_new =  .false. ! New sedimentation scheme
+   niter1max   =  10      ! Number of iterations for slow sinking particles
+   niter2max   =  50      ! Maximum number of iterations for fast sinking particles
+!                         !  ln_ligand enabled
+   ldocp      =  1.E-4    ! Phyto ligand production per unit doc
+   ldocz      =  1.E-4    ! Zoo ligand production per unit doc
+   lthet      =  1.0      ! Proportional loss of ligands due to Fe uptake
+!                         !  ln_p5z enabled
+   no3rat3    =  0.182    ! N/C ratio in zooplankton
+   po4rat3    =  0.0094   ! P/C ratio in zooplankton
+/
+!'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+&namp4zlim     !   parameters for nutrient limitations
+!,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+   concnno3   =  1.e-6    ! Nitrate half saturation of nanophytoplankton
+   concdno3   =  3.E-6    ! Nitrate half saturation for diatoms
+   concnnh4   =  1.E-7    ! NH4 half saturation for phyto
+   concdnh4   =  3.E-7    ! NH4 half saturation for diatoms
+   concnfer   =  1.E-9    ! Iron half saturation for phyto
+   concdfer   =  3.E-9    ! Iron half saturation for diatoms
+   concbfe    =  1.E-11   ! Iron half-saturation for DOC remin.
+   concbnh4   =  2.E-8    ! NH4 half saturation for DOC remin.
+   concbno3   =  2.E-7    ! Nitrate half saturation for DOC remin.
+   xsizedia   =  1.E-6    ! Minimum size criteria for diatoms
+   xsizephy   =  1.E-6    ! Minimum size criteria for phyto
+   xsizern    =  3.0      ! Size ratio for nanophytoplankton
+   xsizerd    =  3.0      ! Size ratio for diatoms
+   xksi1      =  2.E-6    ! half saturation constant for Si uptake
+   xksi2      =  20E-6    ! half saturation constant for Si/C
+   xkdoc      =  417.E-6  ! half-saturation constant of DOC remineralization
+   qnfelim    =  7.E-6    ! Optimal quota of phyto
+   qdfelim    =  7.E-6    ! Optimal quota of diatoms
+   caco3r     =  0.3      ! mean rain ratio
+   oxymin     =  1.E-6    ! Half-saturation constant for anoxia
+/
+!-----------------------------------------------------------------------
+&namp5zlim     !   parameters for nutrient limitations PISCES QUOTA    - ln_p5z
+!-----------------------------------------------------------------------
+   concnno3   =  3e-6     ! Nitrate half saturation of nanophytoplankton
+   concpno3   =  1e-6
+   concdno3   =  4E-6     ! Phosphate half saturation for diatoms
+   concnnh4   =  1.5E-6   ! NH4 half saturation for phyto
+   concpnh4   =  4E-7
+   concdnh4   =  2E-6     ! NH4 half saturation for diatoms
+   concnpo4   =  3E-6     ! PO4 half saturation for phyto
+   concppo4   =  1.5E-6
+   concdpo4   =  4E-6     ! PO4 half saturation for diatoms
+   concnfer   =  3E-9   ! Iron half saturation for phyto
+   concpfer   =  1.5E-9
+   concdfer   =  4E-9   ! Iron half saturation for diatoms
+   concbfe    =  1.E-11   ! Half-saturation for Fe limitation of Bacteria
+   concbnh4   =  1.E-7    ! NH4 half saturation for phyto
+   concbno3   =  5.E-7    ! Phosphate half saturation for diatoms
+   concbpo4   =  1E-7     ! Phosphate half saturation for bacteria
+   xsizedia   =  1.E-6    ! Minimum size criteria for diatoms
+   xsizephy   =  1.E-6    ! Minimum size criteria for phyto
+   xsizepic   =  1.E-6
+   xsizern    =  1.0      ! Size ratio for nanophytoplankton
+   xsizerp    =  1.0
+   xsizerd    =  4.0      ! Size ratio for diatoms
+   xksi1      =  2.E-6    ! half saturation constant for Si uptake
+   xksi2      =  20E-6  ! half saturation constant for Si/C
+   xkdoc      =  417.E-6  ! half-saturation constant of DOC remineralization
+   caco3r     =  0.35     ! mean rain ratio
+   oxymin     =  1.E-6    ! Half-saturation constant for anoxia
+/
+!-----------------------------------------------------------------------
+&namp5zquota   !   parameters for nutrient limitations PISCES quota    - ln_p5z
+!-----------------------------------------------------------------------
+   qfnopt     =  7.E-6    ! Optimal Fe quota of nanophyto
+   qfpopt     =  7.E-6    ! Optimal Fe quota of picophyto
+   qfdopt     =  7.E-6    ! Optimal quota of diatoms
+   qnnmin     =  0.29     ! Minimal N quota for nano
+   qnnmax     =  1.39     ! Maximal N quota for nano
+   qpnmin     =  0.28     ! Minimal P quota for nano
+   qpnmax     =  1.06     ! Maximal P quota for nano
+   qnpmin     =  0.42     ! Minimal N quota for pico
+   qnpmax     =  1.39     ! Maximal N quota for pico
+   qppmin     =  0.25     ! Minimal P quota for pico
+   qppmax     =  0.7      ! Maximal P quota for pico
+   qndmin     =  0.25     ! Minimal N quota for diatoms
+   qndmax     =  1.39     ! Maximal N quota for diatoms
+   qpdmin     =  0.29     ! Minimal P quota for diatoms
+   qpdmax     =  1.32     ! Maximal P quota for diatoms
+   qfnmax     =  40E-6    ! Maximal Fe quota for nano
+   qfpmax     =  40E-6    ! Maximal Fe quota for pico
+   qfdmax     =  40E-6    ! Maximal Fe quota for diatoms
+/
+!-----------------------------------------------------------------------
+&nampisopt     !   parameters for optics
+!-----------------------------------------------------------------------
+   parlux      =  0.43      ! Fraction of shortwave as PAR
+/
+!-----------------------------------------------------------------------
+&namp4zprod    !   parameters for phytoplankton growth for PISCES std  - ln_p4z
+!-----------------------------------------------------------------------
+   pislopen   =  2.       ! P-I slope
+   pisloped   =  2.       ! P-I slope  for diatoms
+   xadap      =  0.       ! Adaptation factor to low light
+   excretn    =  0.05     ! excretion ratio of phytoplankton
+   excretd    =  0.05     ! excretion ratio of diatoms
+   bresp      =  0.033    ! Basal respiration rate
+   chlcnm     =  0.033    ! Maximum Chl/C in nanophytoplankton
+   chlcdm     =  0.05     ! Maximum Chl/C in diatoms
+   chlcmin    =  0.004    ! Minimum Chl/c in phytoplankton
+   fecnm      =  80E-6    ! Maximum Fe/C in nanophytoplankton
+   fecdm      =  80E-6    ! Maximum Fe/C in diatoms
+   grosip     =  0.159    ! mean Si/C ratio
+/
+!-----------------------------------------------------------------------
+&namp5zprod    !   parameters for phytoplankton growth for PISCES quota- ln_p5z
+!-----------------------------------------------------------------------
+   pislopen   =  3.       ! P-I slope
+   pislopep   =  3.       ! P-I slope for picophytoplankton
+   pisloped   =  3.       ! P-I slope  for diatoms
+   excretn    =  0.05     ! excretion ratio of phytoplankton
+   excretp    =  0.05     ! excretion ratio of picophytoplankton
+   excretd    =  0.05     ! excretion ratio of diatoms
+   xadap      =  0.       ! Adaptation factor to low light
+   bresp      =  0.02     ! Basal respiration rate
+   thetannm   =  0.25     ! Maximum Chl/N in nanophytoplankton
+   thetanpm   =  0.25     ! Maximum Chl/N in picophytoplankton
+   thetandm   =  0.3      ! Maximum Chl/N in diatoms
+   chlcmin    =  0.004    ! Minimum Chl/c in phytoplankton
+   grosip     =  0.131    ! mean Si/C ratio
+/
+!-----------------------------------------------------------------------
+&namp4zmort    !   parameters for phytoplankton sinks for PISCES std   - ln_p4z
+!-----------------------------------------------------------------------
+   wchl       =  0.01     ! quadratic mortality of phytoplankton
+   wchld      =  0.01     ! maximum quadratic mortality of diatoms
+   wchldm     =  0.03     ! maximum quadratic mortality of diatoms
+   mprat      =  0.01     ! phytoplankton mortality rate
+   mprat2     =  0.01     ! Diatoms mortality rate
+/
+!-----------------------------------------------------------------------
+&namp5zmort    !   parameters for phytoplankton sinks for PISCES quota - ln_p5z
+!-----------------------------------------------------------------------
+   wchln      =  0.01     ! quadratic mortality of nanophytoplankton
+   wchlp      =  0.01     ! quadratic mortality of picophytoplankton
+   wchld      =  0.01     ! maximum quadratic mortality of diatoms
+   wchldm     =  0.02     ! maximum quadratic mortality of diatoms
+   mpratn     =  0.01     ! nanophytoplankton mortality rate
+   mpratp     =  0.01     ! picophytoplankton mortality rate
+   mpratd     =  0.01     ! Diatoms mortality rate
+/
+!-----------------------------------------------------------------------
+&namp4zmes     !   parameters for mesozooplankton for PISCES std       - ln_p4z
+!-----------------------------------------------------------------------
+   part2      =  0.75     ! part of calcite not dissolved in mesozoo guts
+   grazrat2   =  0.75     ! maximal mesozoo grazing rate
+   resrat2    =  0.005    ! exsudation rate of mesozooplankton
+   mzrat2     =  0.03     ! mesozooplankton mortality rate
+   xpref2d    =  1.       ! mesozoo preference for diatoms
+   xpref2n    =  0.3      ! mesozoo preference for nanophyto.
+   xpref2z    =  1.       ! mesozoo preference for microzoo.
+   xpref2c    =  0.3      ! mesozoo preference for poc
+   xthresh2zoo = 1E-8     ! zoo feeding threshold for mesozooplankton
+   xthresh2dia = 1E-8     ! diatoms feeding threshold for mesozooplankton
+   xthresh2phy = 1E-8     ! nanophyto feeding threshold for mesozooplankton
+   xthresh2poc = 1E-8     ! poc feeding threshold for mesozooplankton
+   xthresh2   =  3E-7     ! Food threshold for grazing
+   xkgraz2    =  20.E-6   ! half saturation constant for meso grazing
+   epsher2    =  0.35     ! Efficicency of Mesozoo growth
+   epsher2min =  0.35     ! Minimum efficiency of mesozoo growth
+   sigma2     =  0.6      ! Fraction of mesozoo excretion as DOM
+   unass2     =  0.3      ! non assimilated fraction of P by mesozoo
+   grazflux   =  3.e3     ! flux-feeding rate
+/
+!-----------------------------------------------------------------------
+&namp5zmes     !   parameters for mesozooplankton
+!-----------------------------------------------------------------------
+   part2      =  0.75     ! part of calcite not dissolved in mesozoo guts
+   grazrat2   =  0.85     ! maximal mesozoo grazing rate
+   bmetexc2   =  .true.   ! Metabolic use of excess carbon
+   resrat2    =  0.005    ! exsudation rate of mesozooplankton
+   mzrat2     =  0.02     ! mesozooplankton mortality rate
+   xpref2d    =  1.       ! zoo preference for phyto
+   xpref2n    =  0.3      ! mesozoo preference for nanophyto.
+   xpref2z    =  1.       ! zoo preference for zoo
+   xpref2m    =  0.2      ! meso preference for zoo
+   xpref2c    =  0.3      ! zoo preference for poc
+   xthresh2zoo = 1E-8     ! zoo feeding threshold for mesozooplankton
+   xthresh2dia = 1E-8     ! diatoms feeding threshold for mesozooplankton
+   xthresh2phy = 1E-8     ! nanophyto feeding threshold for mesozooplankton
+   xthresh2mes = 1E-8     ! meso feeding threshold for mesozooplankton
+   xthresh2poc = 1E-8     ! poc feeding threshold for mesozooplankton
+   xthresh2    =  3E-7     ! Food threshold for grazing
+   xkgraz2     =  20.E-6   ! half sturation constant for meso grazing
+   epsher2     =  0.5      ! Efficicency of Mesozoo growth
+   epsher2min  =  0.2     ! Minimum efficiency of mesozoo growth
+   ssigma2     =  0.5     ! Fraction excreted as semi-labile DOM
+   srespir2    =  0.2     ! Active respiration
+   unass2c     =  0.3     ! non assimilated fraction of P by mesozoo
+   unass2n     =  0.3     ! non assimilated fraction of N by mesozoo
+   unass2p     =  0.3     ! non assimilated fraction of P by mesozoo
+   grazflux   =  3.e3     ! flux-feeding rate
+/
+!-----------------------------------------------------------------------
+&namp4zzoo     !   parameters for microzooplankton for PISCES std      - ln_p4z
+!-----------------------------------------------------------------------
+   part       =  0.5      ! part of calcite not dissolved in microzoo guts
+   grazrat    =  3.0      ! maximal zoo grazing rate
+   resrat     =  0.03     ! exsudation rate of zooplankton
+   mzrat      =  0.004    ! zooplankton mortality rate
+   xprefc     =  0.1      ! Microzoo preference for POM
+   xprefn     =  1.       ! Microzoo preference for Nanophyto
+   xprefd     =  0.6      ! Microzoo preference for Diatoms
+   xthreshdia =  1.E-8    ! Diatoms feeding threshold for microzooplankton
+   xthreshphy =  1.E-8    ! Nanophyto feeding threshold for microzooplankton
+   xthreshpoc =  1.E-8    ! POC feeding threshold for microzooplankton
+   xthresh    =  3.E-7    ! Food threshold for feeding
+   xkgraz     =  20.E-6   ! half sturation constant for grazing
+   epsher     =  0.3      ! Efficiency of microzoo growth
+   epshermin  =  0.3      ! Minimum efficiency of microzoo growth
+   sigma1     =  0.6      ! Fraction of microzoo excretion as DOM
+   unass      =  0.3      ! non assimilated fraction of phyto by zoo
+/
+!-----------------------------------------------------------------------
+&namp5zzoo     !   parameters for microzooplankton
+!-----------------------------------------------------------------------
+   part       =  0.5      ! part of calcite not dissolved in microzoo gutsa
+   grazrat    =  2.75     ! maximal zoo grazing rate
+   bmetexc    =  .true.   ! Metabolic use of excess carbon
+   resrat     =  0.03     ! exsudation rate of zooplankton
+   mzrat      =  0.005    ! zooplankton mortality rate
+   xprefc     =  0.1      ! Microzoo preference for POM
+   xprefn     =  1.       ! Microzoo preference for Nanophyto
+   xprefp     =  1.6      ! Microzoo preference for picophyto
+   xprefd     =  1.0      ! Microzoo preference for Diatoms
+   xprefz     =  0.3      ! Microzoo preference for microzooplankton
+   xthreshdia =  1.E-8    ! Diatoms feeding threshold for microzooplankton
+   xthreshphy =  1.E-8    ! Nanophyto feeding threshold for microzooplankton
+   xthreshpic =  1.E-8
+   xthreshzoo =  1.E-8    ! Nanophyto feeding threshold for microzooplankton
+   xthreshpoc =  1.E-8    ! POC feeding threshold for microzooplankton
+   xthresh    =  3.E-7    ! Food threshold for feeding
+   xkgraz     =  20.E-6   ! half sturation constant for grazing
+   epsher     =  0.5      ! Efficiency of microzoo growth
+   epshermin  =  0.2      ! Minimum efficiency of microzoo growth
+   ssigma     =  0.5      ! Fraction excreted as semi-labile DOM
+   srespir    =  0.2      ! Active respiration
+   unassc     =  0.3      ! non assimilated fraction of C by zoo
+   unassn     =  0.3      ! non assimilated fraction of C by zoo
+   unassp     =  0.3      ! non assimilated fraction of C by zoo
+/
+!-----------------------------------------------------------------------
+&nampisfer     !   parameters for iron chemistry
+!-----------------------------------------------------------------------
+   ln_ligvar =  .false.   ! variable ligand concentration
+   xlam1     =  0.15     ! scavenging rate of Iron
+   xlamdust  =  150.0     ! Scavenging rate of dust
+   ligand    =  0.7E-9    ! Ligands concentration
+   kfep      =  0.01      ! Nanoparticle formation rate constant
+/
+!-----------------------------------------------------------------------
+&nampisrem     !   parameters for remineralization
+!-----------------------------------------------------------------------
+   xremik    =  0.3       ! remineralization rate of DOC
+   nitrif    =  0.05      ! NH4 nitrification rate
+   xsirem    =  0.003     ! remineralization rate of Si
+   xsiremlab =  0.03      ! fast remineralization rate of Si
+   xsilab    =  0.5       ! Fraction of labile biogenic silica
+   feratb    =  10.E-6    ! Fe/C quota in bacteria
+   xkferb    =  3E-10     ! Half-saturation constant for bacteria Fe/C
+!                         ! ln_p5z
+   xremikc   =  0.25      ! remineralization rate of DOC
+   xremikn   =  0.35      ! remineralization rate of DON
+   xremikp   =  0.4       ! remineralization rate of DOP
+!   feratb    =  20E-6     ! Bacterial Fe/C ratio
+!   xkferb    =  3E-10     ! Half-saturation constant for bact. Fe/C
+/
+!-----------------------------------------------------------------------
+&nampispoc     !   parameters for organic particles
+!-----------------------------------------------------------------------
+   xremip    =  0.035     ! remineralisation rate of PON
+   jcpoc     =  15        ! Number of lability classes
+   rshape    =  1.0       ! Shape of the gamma function
+!                         ! ln_p5z
+   xremipc   =  0.02      ! remineralisation rate of POC
+   xremipn   =  0.025     ! remineralisation rate of PON
+   xremipp   =  0.03      ! remineralisation rate of POP
+/
+!-----------------------------------------------------------------------
+&nampiscal     !   parameters for Calcite chemistry
+!-----------------------------------------------------------------------
+   kdca       =  6.       ! calcite dissolution rate constant (1/time)
+   nca        =  1.       ! order of dissolution reaction (dimensionless)
+/
+!'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+&nampissbc     !   parameters for inputs deposition
+!,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+   ln_dust     =  .true.   ! boolean for dust input from the atmosphere
+   ln_river    =  .false.  ! boolean for river input of nutrients
+   ln_ndepo    =  .false.   ! boolean for atmospheric deposition of N
+   ln_ironsed  =  .true.   ! boolean for Fe input from sediments
+   sedfeinput  =  2E-9     ! Coastal release of Iron
+   dustsolub   =  0.014    ! Solubility of the dust
+   mfrac       =  0.035    ! Fe mineral fraction of dust
+   wdust       =  2.0      ! Dust sinking speed
+   diazolight  = 50        ! Diazotrophs sensitivity to light (W/m2)
+   nitrfix     = 1.E-7     ! Nitrogen fixation rate
+   concfediaz  = 1.E-10    ! Diazotrophs half-saturation Cste for Iron
+/
+!-----------------------------------------------------------------------
+&nampislig     !   Namelist parameters for ligands, nampislig
+!-----------------------------------------------------------------------
+   rlgw        =  100.     ! Lifetime (years) of weak ligands
+   rlig        =  1.E-4    ! Remin ligand production per unit C
+   prlgw       =  1.E-4    ! Photolysis of weak ligand
+   rlgs        =  1.       ! Lifetime (years) of strong ligands
+/

@@ -1,0 +1,12 @@
+
+#-------------
+# WRF
+#-------------
+export NETCDF4=1
+export WRFIO_NCD_LARGE_FILE_SUPPORT=1
+# #-------------
+# # for WPS  
+# #-------------
+export JASPERLIB=$NETCDF/lib
+export JASPERINC=$NETCDF/include/jasper
+

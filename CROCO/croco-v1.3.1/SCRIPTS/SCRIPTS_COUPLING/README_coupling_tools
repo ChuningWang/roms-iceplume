@@ -1,0 +1,68 @@
+CROCO coupling tools
+--------------------
+Coupling_tools are provided to help building coupled configuration with CROCO, WRF, and WW3.
+
+Organization
+------------
+Tools are divided into preprocessing and run tools. 
+Preprocessing tools are provided in the croco_tools repository. 
+Tools to run the coupled configuration are provided in the CROCO sources repository.
+ 
+- croco_tools/Coupling_tools
+- croco/SCRIPTS/SCRIPTS_COUPLING
+
+More information
+----------------
+https://croco-ocean.gitlabpages.inria.fr/croco_doc/
+-> see the Coupling section and Coupling Tutorial
+
+Summary of steps for building a coupled configuration
+-----------------------------------------------------
+1. Get source codes
+2. Compile OASIS
+3. Compile your models in coupled mode (with the same netcdf libraries and compilers, NB: CROCO can alternatively be compiled when launching the run within the coupling toolbox)
+4. Set-up your configuration architecture and environment using: croco/create_config.bash (all-prod-cpl option)
+5. Perform pre-processing for your different models
+6. Use the coupling toolbox to set-up and run your coupled configuration
+
+Coupling toolbox philosophy and workflow:
+
+  - The user edit:
+      * myenv_mypath.sh : environment settings, and paths
+      * mynamelist.sh   : settings for the experiment (which models, time stepping, input files…)
+      * myjob.sh        : settings for the job (dates notably)
+
+  - Then the user launch the job with ./submitjob.sh
+
+The coupling toolbox manages:  
+
+  - CROCO compilation if requested
+  - getting models input files
+  - preparing OASIS restart files
+  - editing namelists (for models and OASIS)
+  - launching the run
+  - putting output files
+  - eventually looping for another job
+
+The usual configuration architecture is: 
+
+HOMEDIR/CONFIGS/MY_CONFIF_NAME
+             create_config.bash.bck
+             myenv_mypath.sh
+             mynamelist.sh
+             myjob.sh
+             submitjob.sh
+             - SCRIPTS_TOOLBOX
+             - OASIS_IN
+             - CROCO_IN
+             - WW3_IN
+             - WRF_IN
+             - XIOS_IN
+             - PREPRO
+
+WORKDIR/CONFIGS/MY_CONFIF_NAME
+             - OASIS_FILES
+             - CROCO_FILES
+             - WW3_FILES
+             - WRF_FILES
+

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+LIST_KEY0='REGIONAL MPI OPENMP'
+# => Keys that will put to undef at the begining of the rvtk scripts
+
+TEST_NAME='BASIN'
+CONFIG_NAME='BASIN'
+LIST_KEY_PHYS='BASIN'
+FLAG_OPENMP=1 ; FLAG_MPI=1
+NBPROCS_X=2
+NBPROCS_Y=2
+NBPROCS=$(( $NBPROCS_X * $NBPROCS_Y ))
+LIST_KEY_NEST=''
+KEY_DEBUG='RVTK_DEBUG'
+CROCOIN=''

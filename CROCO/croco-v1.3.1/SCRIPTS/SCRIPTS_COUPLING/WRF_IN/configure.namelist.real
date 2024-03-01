@@ -1,0 +1,126 @@
+#========================================================================
+# Configuration parameters to be used in run_wps.bash and run_real.bash
+# to generate namelist.wps and namelist.input
+#========================================================================
+#
+# Further Information:   
+# http://www.croco-ocean.org
+#  
+# This file is part of CROCOTOOLS
+#
+# CROCOTOOLS is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published
+# by the Free Software Foundation; either version 2 of the License,
+# or (at your option) any later version.
+#
+# CROCOTOOLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA  02111-1307  USA
+#
+# Copyright (c) 2018 S. Jullien
+# swen.jullien@ifremer.fr
+# --------------------------------------------------
+
+domain_name="BENGUELA"
+# Nb domains (ie nests)
+max_domains=1
+#-------------------------------------------------------------------------
+# Data Sources
+#
+# LBC_type       : data source for initial and boundary conditions
+# LSM_type       : data source for  surface forcing
+# obc_freq_h     : boundary condition frequency        [hour]
+# sst_interval_m : interval between SST updates  [minutes]
+#-------------------------------------------------------------------------
+LBC_type="CFSR_press_pgbh06"
+LSM_type="CFSR_sfc_flxf06"
+obc_freq_h=6
+sst_interval_m=360
+#-------------------------------------------------------------------------
+#  Grid parameters
+#
+#    dx                    : horizontal resolution in [km]
+#    xdim                  : number of points in x
+#    ydim                  : number of points in y
+#    central_lat           : latitude at the center of the domain
+#    central_lon           : longitude at the center of the domain
+#    topo_res_d01          : horizontal resolution of orography data
+#
+#  Nesting
+#
+#    dimensions must check:
+#    xdim_child=N*refine_coef+1
+#    ydim_child=M*refine_coef+1
+#
+#  Variables for real.exe
+#
+#    nbvertlevel           : number of vertical levels
+#    nbmetlevel            : number of boundary data levels
+#
+#  Physics
+#    isftcflx              : Cd formulation for tropical storm application
+#                            default 0 / wave cpl 5  ( cf README)
+#-------------------------------------------------------------------------
+#
+dt=150
+nbvertlevel=60
+nbmetlevel=38
+nbmetsoil=4
+ptop=5000
+isftcflx=0
+#
+# Parent domain (d01)
+dx=30
+xdim_d01=56
+ydim_d01=50
+central_lat=-32.0
+central_lon=15.0
+topo_res_d01='30s'
+#topo_res_d01='3s+30s+10m'
+
+# Nest 1 (d02) 
+refine_d02=5
+i_str_d02=32
+j_str_d02=153
+xdim_d02=456
+ydim_d02=476
+topo_res_d02='3s'
+#topo_res_d02='2s+3s+30s'
+#
+# Nest 2 (d03)
+refine_d03=3
+i_str_d03=35
+j_str_d03=24
+xdim_d03=277
+ydim_d03=349
+topo_res_d03='3s+30s'
+
+#-------------------------------------------------------------------------
+# Dates of parent simulation
+#-------------------------------------------------------------------------
+# real-time mode
+start_y=2005
+start_m=01
+start_d=01
+start_h=00
+
+end_y=2005
+end_m=01
+end_d=31
+end_h=18
+
+start_date_d01=$start_y'-'$start_m'-'$start_d'_'$start_h:00:00
+end_date_d01=$end_y'-'$end_m'-'$end_d'_'$end_h:00:00
+
+start_date_d02=$start_date_d01
+end_date_d02=$end_date_d01
+
+start_date_d03=$start_date_d01
+end_date_d03=$end_date_d01
+

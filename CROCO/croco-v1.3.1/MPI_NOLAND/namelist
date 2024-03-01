@@ -1,0 +1,51 @@
+!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+!  MPP_OPTIMIZ namelist
+! ---------------------------
+!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+!
+!'''''''''''''''''''''''''''''''''''''''''
+!       namspace  spatial indexes
+!,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+! jpk     = number of vertical levels (for memory computation)
+! Npts    = number of ghost cells
+!
+&NAMSPACE
+    jpk =30
+    Npts = 2
+/
+!'''''''''''''''''''''''''''''''''''''
+!      namproc
+!''''''''''''''''''''''''''''''''''''
+!   jprocx = maximum number of proc
+!   jpmem = 0 : dont care about the use of memory
+!           1 : try to optimize the use of memory (deprecated)
+!
+&NAMPROC
+     jprocx=220
+     jpmem = 0
+/
+!''''''''''''''''''''''''''''''''''''''
+!      namparam
+!''''''''''''''''''''''''''''''''''''''
+!  only if jpmeme =1 
+!  ppmcal = CPU memory (octet)
+!  ppmin = ??
+!  ppmax = ??
+!
+&NAMPARAM
+   ppmcal = 225000000.
+   ppmin = 0.4
+   ppmax = 0.9
+/
+!
+!'''''''''''''''''''''''''''''''''''''''
+!      namfile  of filename
+!,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+! NAMELIST /namfile/ cbathy
+! cbathy = name of the  bathy/mask file(nc)
+! covdta = Root for the overdata file name .
+! Complete name will be {covdta}.{NP_XI}x{NP_ETA}_{NPP}
+&NAMFILE
+     cbathy='croco_grd.nc'
+     covdta = 'benguela'
+/

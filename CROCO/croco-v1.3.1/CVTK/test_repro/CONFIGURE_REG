@@ -1,0 +1,8 @@
+#!/bin/bash
+
+TEST_TYPE="REG"
+
+dir_home="$CVTKHOME/Scripts_reg"
+dir_test="$CVTKWORK/REG"
+dir_web="$CVTKWORK/ftp"
+dir_datafile="$DATAREG"

@@ -1,0 +1,114 @@
+title:
+        SANDBAR Example 
+
+time_stepping: NTIMES   dt[sec]  NDTFAST  NINFO
+               36000     0.025      12      100
+time_stepping_nbq: NDTNBQ    CSOUND_NBQ    VISC2_NBQ
+                    1          100           0.0
+
+S-coord: THETA_S,   THETA_B,    Hc (m)
+           0.         8.        2.
+
+initial: NRREC  filename
+          0
+                sandbar_rst.nc
+
+sediments: input file
+           TEST_CASES/sediment_sandbar_1B_nbq.in
+
+sediment_history_fields: bed_thick bed_poros bed_fra(sand,silt)
+                         20*F          
+
+bbl_history_fields: Abed Hripple Lripple Zbnot Zbapp Bostrw
+                     10*F
+
+wci_history_fields:  SUP UST2D VST2D UST VST WST AKB AKW KVF CALP KAPS
+                      T   T     T     T   T   T   T   T  T    T    T
+
+restart:          NRST, NRPFRST / filename
+                  36000   -1
+                          sandbar_rst.nc
+
+history: LDEFHIS, NWRT, NRPFHIS / filename
+            T     6000       0
+                          sandbar_his.nc
+
+primary_history_fields: zeta UBAR VBAR  U  V   wrtT(1:NT)
+                        T    T    T     T  T   10*T
+
+averages: NTSAVG, NAVG, NRPFAVG / filename
+            1     6000     0
+                          sandbar_avg.nc
+
+auxiliary_history_fields:   rho Omega  W  Akv  Akt  Aks Visc3d Diff3d  HBL HBBL Bostr Wstr Ustr Vstr Shfl Swfl rsw rlw lat sen  HEL
+                             F   F     T   T    F    F    F     F       T   T    T     T    T    T    T    T   10*T             
+gls_history_fields:   Akk Akp  TKE  GLS  Lscale
+                       T   T    T     T    T
+
+primary_averages: zeta UBAR VBAR  U  V   wrtT(1:NT)
+                   T    T    T    T  T   30*T
+auxiliary_averages: rho Omega  W  Akv  Akt  Aks  Visc3d Diff3d HBL HBBL Bostr Wstr Ustr Vstr Shfl Swfl rsw rlw lat sen HEL
+                     F   F     T   T    T    F     F     F      T   T    T     T   T    T     T    T   10*T
+
+gls_averages:   TKE  GLS  Lscale
+                 T     T    T
+
+diagnostics:   ldefdia   nwrtdia    nrpfdia /filename
+                  T        300         0
+                                 sandbar_dia.nc
+
+diag_avg: ldefdia_avg  ntsdia_avg  nwrtdia_avg  nprfdia_avg /filename
+               T          1           250            0
+                                 sandbar_dia_avg.nc
+
+diag3D_history_fields:    diag_tracers3D(1:NT) 
+                            30*T
+
+diag2D_history_fields:    diag_tracers2D(1:NT)
+                            30*T
+
+diag3D_average_fields:    diag_tracers3D_avg(1:NT)
+                            30*T
+
+diag2D_average_fields:    diag_tracers2D_avg(1:NT)
+                            30*T
+
+
+rho0:
+      1024.4
+
+bottom_drag:     RDRG(m/s),      RDRG2,   Zob [m],  Cdb_min, Cdb_max
+                   0.             0.      5.e-4      1.e-7    1.e-1
+
+gamma2:
+                 1.
+
+lin_EOS_cff:  R0 [86kg/m3], T0 [Celsius], S0 [PSU], TCOEF [1/Celsius], SCOEF [1/PSU]
+               30.           0.            0.        0.28                0.
+
+vertical_mixing: Akv_bak, Akt_bak [m^2/sec]
+                   0.       30*0.
+
+sponge:          X_SPONGE [m],    V_SPONGE [m^2/sec]
+                   XXX               XXX
+
+nudg_cof:    TauT_in, TauT_out, TauM_in, TauM_out  [days for all]
+              1.e-5    1.e-3     1.e-5    1.e-3 
+
+lateral_visc:   VISC2,    VISC4    [m^2/sec for all]
+                 0.        0.
+
+tracer_diff2: TNU2(1:NT)           [m^2/sec for all]
+              10*0.d0
+
+diags_eddy:   ldefdiags_eddy, nwrtdiags_eddy, nrpfdiags_eddy /filename
+                   F            6000                  0
+                                               sandbar_diags_eddy.nc
+diags_eddy_avg: ldefdiags_eddy_avg  ntsdiags_eddy_avg  nwrtdiags_eddy_avg  nprfdiags_eddy_avg /filename
+                   T                       1               6000                  0
+                                               sandbar_diags_eddy_avg.nc
+diags_eddy_history_fields: diags_eddy
+                            F
+diags_eddy_average_fields: diags_eddy_avg
+                            T
+

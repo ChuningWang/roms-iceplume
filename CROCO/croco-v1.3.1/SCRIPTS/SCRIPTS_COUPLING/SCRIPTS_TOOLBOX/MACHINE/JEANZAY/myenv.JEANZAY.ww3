@@ -1,0 +1,6 @@
+#-------------
+# WW3
+#-------------
+export LD_LIBRARY_PATH=$NETCDF/lib:$LD_LIBRARY_PATH
+export WWATCH3_NETCDF=NC4
+

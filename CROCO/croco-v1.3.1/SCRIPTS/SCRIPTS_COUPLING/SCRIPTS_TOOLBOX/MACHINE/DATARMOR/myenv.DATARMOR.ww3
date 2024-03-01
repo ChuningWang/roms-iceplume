@@ -1,0 +1,6 @@
+#-------------
+# WW3
+#-------------
+export NETCDF_CONFIG=/home/datawork-wave/NETCDF2019/INTEL/bin/nf-config
+export WWATCH3_NETCDF=NC4
+

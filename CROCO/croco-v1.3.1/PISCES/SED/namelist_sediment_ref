@@ -1,0 +1,132 @@
+!!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+!! SEDIMENT reference namelist 
+!!              1  - run characteristics                      (nam_run) 
+!!              2  - sediment geometry                        (nam_geom)
+!!              3  - prognostic variables                     (nam_trased)
+!!              4  - diagnostic arrays                        (nam_diased)    
+!!              5  - parameters for clay/silicium             (nam_reac)
+!!              6  - parameters for redox reactions           (nam_poc)
+!!              7  - parameters for calcite                   (nam_cal)
+!!              8  - parameters for restarting                (nam_rst)
+!-----------------------------------------------------------------------
+&nam_run      !  Characteristics of the simulation
+!-----------------------------------------------------------------------
+  nrseddt   = 2          ! Nb of iterations for fast species
+  ln_sed_2way = .false.  ! 2 way coupling with pisces
+/
+!-----------------------------------------------------------------------
+&nam_geom     !  Characteristics of the sediment columns
+!-----------------------------------------------------------------------
+  jpksed  = 18         ! Number of vertical layers
+  sedzmin = 0.1        ! Minimum vertical spacing
+  sedhmax = 15.0       ! Maximum depth of the sediment
+  sedkth  = 9.0        ! Default parameters
+  sedacr  = 2.0        ! Default parameters
+  porsurf = 0.9        ! Sediment porosity at the surface
+  porinf  = 0.75       ! Sediment porosity at infinite depth
+  rhox    = 0.33       ! Length scale of porosity variation (cm)
+/
+!-----------------------------------------------------------------------
+&nam_trased     !   Prognostic variables
+!-----------------------------------------------------------------------
+!                 !           !                                          !             !
+!                 !    name   !           title of the field             !   units     ! initial data from file or not !
+!                 !           !                                          !             !
+   sedsol(1)      = 'SedBSi  ' , 'Biogenic Silicate Concentration        ',  '%'
+   sedsol(2)      = 'SedClay ' , 'Clay Concentration                     ',  '%'
+   sedsol(3)      = 'SedPOC  ' , 'POC Concentration                      ',  '%'
+   sedsol(4)      = 'SedCaCO3' , 'Calcite Concentration                  ',  '%'
+   sedsol(5)      = 'SedPOS  ' , 'Semi-ref POC Concentration             ',  '%'
+   sedsol(6)      = 'SedPOR  ' , 'Refractory POC Concentration           ',  '%'
+   sedsol(7)      = 'SedFeO  ' , 'Fe(OH)3 Concentration                  ',  '%'
+   sedsol(8)      = 'SedFeS  ' , 'FeS Concentration                      ',  '%'
+   sedwat(1)      = 'SedSil  ' , 'Silicate Concentration                 ',  'mol/L' 
+   sedwat(2)      = 'SedO2   ' , 'Dissolved Oxygen Concentration         ',  'mol/L'
+   sedwat(3)      = 'SedDIC  ' , 'Dissolved inorganic Concentration      ',  'mol/L'
+   sedwat(4)      = 'SedNO3  ' , 'Nitrates Concentration                 ',  'mol/L'
+   sedwat(5)      = 'SedPO4  ' , 'Phosphate Concentration                ',  'mol/L'
+   sedwat(6)      = 'SedAlkalini' , 'Total Alkalinity Concentration      ',  'eq/L '
+   sedwat(7)      = 'SedNH4  ' , 'Total Ammonium Concentration           ',  'mol/L '
+   sedwat(8)      = 'SedH2S  ' , 'Total H2S Concentration                ',  'mol/L '
+   sedwat(9)      = 'SedSO4  ' , 'Total SO4 Concentration                ',  'mol/L '
+   sedwat(10)     = 'SedFe2  ' , 'Total Fe2+ Concentration               ',  'mol/L '
+/
+!-----------------------------------------------------------------------
+&nam_diased     !  Diagnostic arrays
+!-----------------------------------------------------------------------
+!
+   seddiag3d(1)   = 'SedpH      ' , 'pH                                     ',  '-      '
+   seddiag3d(2)   = 'SedCO3por  ' , 'Dissolved CO3 cocnentration            ',  'mol/L'
+   seddiag3d(3)   = 'Sedligand  ' , 'Fe ligands concentration               ',  'mol/L'
+   seddiag2d(1)   = 'FlxSi      ' , 'Silicate flux                          ',  'mol/cm2/s'
+   seddiag2d(2)   = 'FlxO2      ' , 'Dissolved Oxygen Flux                  ',  'mol/L'
+   seddiag2d(3)   = 'FlxDIC     ' , 'Dissolved inorganic carbon flux        ',  'mol/cm2/s'
+   seddiag2d(4)   = 'FlxNO3     ' , 'Nitrates flux                          ',  'mol/cm2/s'
+   seddiag2d(5)   = 'FlxPO4     ' , 'Phosphate flux                         ',  'mol/cm2/s'
+   seddiag2d(6)   = 'FlxAlkalini' , 'Total Alkalinity flux                  ',  'mol/cm2/s'
+   seddiag2d(7)   = 'FlxNH4     ' , 'Total Ammonium flux                    ',  'mol/cm2/s'
+   seddiag2d(8)   = 'FlxH2S     ' , 'Total H2S flux                         ',  'mol/cm2/s'
+   seddiag2d(9)   = 'FlxSO4     ' , 'Total SO4 flux                         ',  'mol/cm2/s'
+   seddiag2d(10)  = 'FlxFe2     ' , 'Total Fe2+ flux                        ',  'mol/cm2/s'
+   seddiag2d(11)  = 'Flxtot     ' , 'Total net sediment burial rate         ',  'cm/s'
+   seddiag2d(12)  = 'dzdep      ' , 'Sedimentation rate                     ',  'cm/s'
+/
+!-----------------------------------------------------------------------
+&nam_inorg     !   Inorganic chemistry in sediments (CacO3, Si)
+!-----------------------------------------------------------------------
+   rcopal   =  0.1      ! Reactivity for clay  [l.mol-1.an-1]
+   dcoef    =  8.0E-6   ! Diffusion coefficient in sediments (in cm**2/s)
+   rccal    =  1.4      ! Dissolution rate of calcite [in yr-1]
+   rcligc   =  0.1      ! Degradation rate of ligands [in yr-1]
+   ratligc  =  1.E-4    ! L/C ratio in POC
+/
+!-----------------------------------------------------------------------
+&nam_poc     !   parameters for the redox reactions of the sediment module
+!-----------------------------------------------------------------------
+   redO2    =  140.    ! Redfield coef for Oxygen
+   redNo3   =  16.     ! Redfield coef for Nitrate
+   redPo4   =  1.      ! Redfield coef for Phosphate
+   redC     =  122.    ! Redfield coef for Carbon
+   redfep   =  0.05    ! Ration of Fe bound P
+   rcorgl   =  10.     ! Reactivity for labile POC [an-1]
+   rcorgs   =  0.1     ! Reactivity for semi-refractory POC [an-1]
+   rcorgr   =  5.E-4   ! Reactivity for refractory POC [an-1]
+   rcnh4    =  1E7     ! Reactivity for O2/NH4 [l.mol-1.an-1]
+   rch2s    =  2E8     ! Reactivity for O2/H2S [l.mol-1.an-1]
+   rcfe2    =  1E8     ! Reactivity for O2/Fe2+ [l.mol-1.an-1]
+   rcfeh2s  =  1E4     ! Reactivity for FEOH/H2S [l.mol-1.an-1]
+   rcfes    =  1E6     ! Reactivity for FE2+/H2S [l.mol-1.an-1]
+   rcfeso   =  2E7     ! Reactivity for FES/O2 [l.mol-1.an-1]
+   xksedo2  =  4.E-6   ! Half-saturation constant for oxic remin [mol/l]
+   xksedno3 =  10.E-6  ! Half-saturation constant for denitrification [mol/l] 
+   xksedfeo =  0.007   ! Half-saturation constant for iron remin [%]
+   xksedso4 =  2E-3    ! Half-saturation constant for SO4 remin [mol/l]
+/
+!-----------------------------------------------------------------------
+&nam_btb     !   parameters for bioturbation and bioirrigation
+!-----------------------------------------------------------------------
+   dbiot       =  10.       ! Bioturbation coefficient (in cm2/yr)
+   ln_btbz     =  .true.    ! Depth varying bioturbation 
+   dbtbzsc     =  6.0       ! coefficient for btb attenuation. If no variation, depth of the mixed layer
+   adsnh4      =  1.3       ! Adsorption coefficient of NH4
+   ln_irrig    =  .true.    ! Bioirrigation in sediment
+   xirrzsc     =  1.5       ! Vertical scale of the attentuation of bioirrigation [cm]
+/ 
+!-----------------------------------------------------------------------
+&nam_rst     !   parameters for restarting the sediment module
+!-----------------------------------------------------------------------
+   ln_rst_sed   =  .false.         !  restart flag
+   cn_sedrst_in  = "restart_sed"   !  name of the input restart file name of the sediment module
+   cn_sedrst_indir = "."           !  directory from which to read input sediment restarts
+   cn_sedrst_out = "restart_sed"   !  suffix of pass. [sediment] restart name (output)
+   cn_sedrst_outdir = "."          !  directory to which to write output sediment restarts
+/
+!-----------------------------------------------------------------------
+&nam_output     !   parameters for outputing the sediment module
+!-----------------------------------------------------------------------
+   ldefsedpis_avg = .true.            !  write averaged output variables
+   cn_sedwri_out  = "output_sed.nc"   !  name of the input restart file name of the sediment module
+   nrpfsedpis_avg = 0                 ! Frequency of the averaged outputs
+   nwrtsedpis_avg = 24                ! Frequency of the averaged outputs
+   ntssedpis_avg  =  1                ! ???
+/

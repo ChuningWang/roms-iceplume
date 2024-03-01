@@ -1,0 +1,29 @@
+&NAM_OASIS NB_TIME_STEPS=<toytimes>,
+           DELTA_T=<toydt>,
+           GRID_FILENAME='grid_oce.nc' /
+
+&NAM_FCT_SEND CTYPE_FCT='FILES',
+              CNAME_FILE='toy_oce.nc',
+              VALUE=10 /
+
+&NAM_RECV_FIELDS NB_RECV_FIELDS=14,
+                 CRCVFIELDS(1)='TOYOT0M1',
+                 CRCVFIELDS(2)='TOY__OHS',
+                 CRCVFIELDS(3)='TOY_ODIR',
+                 CRCVFIELDS(5)='TOYOTWOX', 
+                 CRCVFIELDS(6)='TOYOTWOY',
+                 CRCVFIELDS(7)='TOYOTAWX', 
+                 CRCVFIELDS(8)='TOYOTAWY', 
+                 CRCVFIELDS(9)='TOYOTAUX',
+                 CRCVFIELDS(10)='TOYOTAUY',
+                 CRCVFIELDS(11)='TOYOTAUM',
+                 CRCVFIELDS(12)='TOYSTFLO',
+                 CRCVFIELDS(13)='TOYSRFLO',
+                 CRCVFIELDS(14)='TOY_OEMP',
+		 CRCVFIELDS(14)='TOYPSFCO' /
+
+&NAM_SEND_FIELDS NB_SEND_FIELDS=4, 
+                 CSNDFIELDS(1)='TOY__SSH', 
+                 CSNDFIELDS(2)='TOY_UOCE',
+                 CSNDFIELDS(3)='TOY_VOCE', 
+                 CSNDFIELDS(4)='TOY__SST' /

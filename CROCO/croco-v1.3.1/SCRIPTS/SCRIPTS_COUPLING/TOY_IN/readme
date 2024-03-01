@@ -1,0 +1,34 @@
+
+********************************************
+*** Manual installation of the toy model ***
+********************************************
+
+Compile the toy model
+---------------------
+
+ First source your myenv_mypath.sh script
+ And eventually edit Makefile for your compiler settings
+ Then:
+ make clean > toy_clean.out
+ make > toy_make.out
+
+To use the toy model
+--------------------
+
+ Edit namelist : TOYNAMELIST.nam
+ **************
+
+&NAM_OASIS 
+number of time steps for the toy model
+dt for the toy model
+grid file for the toy. Must contain : longitude(nlat,nlon), latitude(nlat,nlon), imask_t(nlat,nlon) : 1 for sea, 0 for land 
+
+&NAM_FCT_SEND
+type of sent data : can be FILES if from external file, CNSTE or SINUS 
+name of the external file
+value of the constant 
+
+&NAM_RECV_FIELD and &NAM_SEND_FIELDS
+number of received or sent fields
+oasis name of fields
+

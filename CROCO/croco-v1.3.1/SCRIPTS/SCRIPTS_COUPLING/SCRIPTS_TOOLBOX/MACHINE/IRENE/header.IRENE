@@ -1,0 +1,19 @@
+#!/bin/bash
+#MSUB -r <exp>       # request name
+#MSUB -o <exp>.jobid_%I.o
+#MSUB -e <exp>.jobid_%I.e
+#MSUB -j oe 
+#MSUB -n <nmpi>        # Total number of mpi task to use
+#MSUB -T <timedur>         
+#MSUB -x
+#MSUB -q skylake 
+#MSUB -A <projectid>
+#MSUB -m scratch,store,work
+#===============================================================================
+
+#cd ${BRIDGE_MSUB_PWD}
+
+source ../myenv_mypath.sh
+
+# < insert here variables definitions > !!! DO NOT REMOVE THIS LINE (used by submitjob) !!!
+

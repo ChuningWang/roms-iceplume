@@ -1,0 +1,349 @@
+<file_definition type="one_file" name="@expname@_@freq@" sync_freq="2d" min_digits="4">
+
+  <!-- <!-\- !! GC to use @expname@_@freq@
+       - use file_group id="3h"
+       - use file1, file2, file3 in file id definition
+       - file_3h KO => it will write @expname@_@freq@ in name of files
+       -\-> -->
+
+  <file_group id="1ts" output_freq="1ts"  output_level="10" enabled=".false."/> <!-- 1 time step files -->
+  <file_group id="6s"  output_freq="6s"   output_level="10" enabled=".false."/> <!-- 6 seconds files -->
+  <file_group id="2mi" output_freq="2mi"  output_level="10" enabled=".false."/> <!-- 2 minutes files -->
+  <file_group id="3h"  output_freq="3h"   output_level="10" enabled=".false."/> <!-- 3 hours files -->
+  <file_group id="4d"  output_freq="4d"   output_level="10" enabled=".false."/> <!-- 4 days files -->
+  <file_group id="1mo" output_freq="1mo"  output_level="10" enabled=".false."/> <!-- real montly files -->
+  <file_group id="1y"  output_freq="1y"   output_level="10" enabled=".false."/> <!-- real yearly files -->
+
+  <file_group id="3h" output_freq="3h" output_level="10" enabled=".true.">
+    <file id="file1" name_suffix="_inst" split_freq="5d" split_freq_format="%y-%mo-%d">
+
+      <field_group id="inst_grid" operation="once">
+	<field field_ref="hc"        />
+	<field field_ref="theta_s"   />
+	<field field_ref="theta_b"   />
+	<field field_ref="Tcline"    />
+	<field field_ref="Vtransform"/>
+	<field field_ref="h"         />
+	<field field_ref="f"         />
+	<field field_ref="pm"        />
+	<field field_ref="pn"        />
+	<field field_ref="lon_rho"   />
+	<field field_ref="lat_rho"   />
+	<field field_ref="lon_u"     />
+	<field field_ref="lat_u"     />
+	<field field_ref="lon_v"     />
+	<field field_ref="lat_v"     />
+	<field field_ref="angle"     />
+	<field field_ref="mask_rho"  />
+	<field field_ref="Cs_r"      />
+	<field field_ref="sc_r"      />
+	<field field_ref="Cs_w"      />
+	<field field_ref="sc_w"      />
+      </field_group>
+
+      <field_group id="inst_fields1" operation="instant">
+	<field field_ref="zeta" name="zeta" />
+	<field field_ref="ubar" name="ubar" />
+	<field field_ref="vbar" name="vbar" />
+	<field field_ref="sustr" name="sustr" />
+	<field field_ref="svstr" name="svstr" />
+	<field field_ref="u" name="u" />
+	<field field_ref="v" name="v" />
+	<field field_ref="temp" name="temp" />
+	<field field_ref="salt" name="salt" />
+	<field field_ref="AKv" name="AKv" />
+	<field field_ref="AKt" name="AKt" />
+      </field_group>
+    </file>
+  </file_group>
+
+# if defined  HOURLY_VELOCITIES || defined HOURLY_3D
+<file_group id="1h" output_freq="1h"  output_level="10" enabled=".TRUE."> <!-- 1 time step files -->
+  <file id="file2" name_suffix="_avg_3d" split_freq="5d" split_freq_format="%y-%mo-%d">
+    
+    <field_group id="hourly_grid" operation="once">
+      <field field_ref="hc"        />
+      <field field_ref="theta_s"   />
+      <field field_ref="theta_b"   />
+      <field field_ref="Tcline"    />
+      <field field_ref="Vtransform"/>
+      <field field_ref="h"         />
+      <field field_ref="f"         />
+      <field field_ref="pm"        />
+      <field field_ref="pn"        />
+      <field field_ref="lon_rho"   />
+      <field field_ref="lat_rho"   />
+      <field field_ref="lon_u"     />
+      <field field_ref="lat_u"     />
+      <field field_ref="lon_v"     />
+      <field field_ref="lat_v"     />
+      <field field_ref="angle"     />
+      <field field_ref="mask_rho"  />
+      <field field_ref="Cs_r"      />
+      <field field_ref="sc_r"      />
+      <field field_ref="Cs_w"      />
+      <field field_ref="sc_w"      />
+    </field_group>
+
+    <field_group id="hourly_fields" operation="average">
+      <field field_ref="time" name="time" />
+      <field field_ref="u" name="u" />
+      <field field_ref="v" name="v" />
+      <field field_ref="zeta" name="zeta" />
+# if defined HOURLY_3D
+      <field field_ref="temp" name="temp" />
+      <field field_ref="salt" name="salt" />
+# endif
+    </field_group>
+  </file>
+</file_group>
+# endif
+
+# ifdef  OUTPUTS_SURFACE
+<file_group id="1h" output_freq="1h"  output_level="10" enabled=".TRUE."> <!-- 1 time step files -->
+    <file id="file3" name_suffix="_inst_surf" split_freq="5d" split_freq_format="%y-%mo-%d"> 
+      <field_group id="surf_grid" operation="once">
+	<field field_ref="hc"        />
+	<field field_ref="theta_s"   />
+	<field field_ref="theta_b"   />
+	<field field_ref="Tcline"    />
+	<field field_ref="Vtransform"/>
+	<field field_ref="h"         />
+	<field field_ref="f"         />
+	<field field_ref="pm"        />
+	<field field_ref="pn"        />
+	<field field_ref="lon_rho"   />
+	<field field_ref="lat_rho"   />
+	<field field_ref="lon_u"     />
+	<field field_ref="lat_u"     />
+	<field field_ref="lon_v"     />
+	<field field_ref="lat_v"     />
+	<field field_ref="angle"     />
+	<field field_ref="mask_rho"  />
+	<field field_ref="Cs_r"      />
+	<field field_ref="sc_r"      />
+	<field field_ref="Cs_w"      />
+	<field field_ref="sc_w"      />
+      </field_group>
+      
+      <field_group id="surf_fields" operation="instant">
+        <field field_ref="time" name="time" />
+        <field field_ref="zeta" name="zeta"/>
+        <field field_ref="u_surf" name="u" />
+        <field field_ref="v_surf" name="v" />
+        <field field_ref="temp_surf" name="temp" />
+        <field field_ref="salt_surf" name="salt" />
+      </field_group>     
+    </file>
+  </file_group>
+# endif
+
+<file_group id="5d" output_freq="5d"  output_level="10" enabled=".TRUE."> <!-- 1 time step files -->
+  <file id="file4" name_suffix="_aver" split_freq="5d" split_freq_format="%y-%mo-%d">
+
+    <field_group id="ave_grid" operation="once">
+      <field field_ref="hc"        />
+      <field field_ref="theta_s"   />
+      <field field_ref="theta_b"   />
+      <field field_ref="Tcline"    />
+      <field field_ref="Vtransform"/>
+      <field field_ref="h"         />
+      <field field_ref="f"         />
+      <field field_ref="pm"        />
+      <field field_ref="pn"        />
+      <field field_ref="lon_rho"   />
+      <field field_ref="lat_rho"   />
+      <field field_ref="lon_u"     />
+      <field field_ref="lat_u"     />
+      <field field_ref="lon_v"     />
+      <field field_ref="lat_v"     />
+      <field field_ref="angle"     />
+      <field field_ref="mask_rho"  />
+      <field field_ref="Cs_r"      />
+      <field field_ref="sc_r"      />
+      <field field_ref="Cs_w"      />
+      <field field_ref="sc_w"      />
+    </field_group>
+        
+    <field_group id="ave_fields" operation="average">
+      <field field_ref="zeta" />
+      <field field_ref="ubar" name="ubar"  />
+      <field field_ref="vbar" name="vbar"  />
+      <field field_ref="bustr" name="bustr"  />
+      <field field_ref="bvstr" name="bvstr"  />
+      <field field_ref="sustr" name="sustr"  />
+      <field field_ref="svstr" name="svstr"  />
+# ifdef DEBUG_BULK
+      <field field_ref="uwnd" name="uwnd"  />
+      <field field_ref="vwnd" name="vwnd"  />
+      <field field_ref="shflx" name="shflx"  />
+      <field field_ref="swflx" name="swflx"  />
+# endif
+      <field field_ref="u" name="u" />
+      <field field_ref="v" name="v"  />
+      <field field_ref="w" name="w" />
+      <field field_ref="temp" name="temp"  />
+      <field field_ref="salt" name="salt"  />
+      <field field_ref="rho" name="rho"  />
+      <field field_ref="bvf" name="bvf" />
+      <field field_ref="AKv" name="AKv" />
+      <field field_ref="AKt" name="AKt" />
+# ifdef GLS_MIXING
+      <field field_ref="tke" name="tke" />
+      <field field_ref="gls" name="gls" />
+# endif
+# ifdef DIF_COEF_3D
+      <field field_ref="diff3d" name="diff3d" />
+# endif
+    </field_group>
+  </file>
+</file_group>
+
+# ifdef DIAGNOSTICS_UV
+<file_group id="M" output_freq="5d"  output_level="10" enabled=".TRUE."> <!-- 1 time step files -->
+  <file id="file5" name_suffix="_M" split_freq="5d" split_freq_format="%y-%mo-%d">
+    <field_group id="M_fields" operation="average">
+      <field field_ref="u_rate" name="u_rate"  />
+      <field field_ref="u_adv" name="u_adv"  />
+      <field field_ref="u_Cor" name="u_cor"  />
+      <field field_ref="u_Prsgrd" name="u_prsgrd"  />
+      <field field_ref="u_Hmix" name="u_hmix"  />
+      <field field_ref="u_Hdiff" name="u_hdiff" />
+      <field field_ref="u_Vmix" name="u_vmix"  />
+      <!--                                                <field field_ref="u_Vmix2" name="u_nudg" /> -->
+      <field field_ref="u_Baro" name="u_baro" />
+#  ifdef M3FAST
+      <field field_ref="u_fast" name="u_fast" />
+#  endif
+      <field field_ref="v_rate" name="v_rate"  />
+      <field field_ref="v_adv" name="v_adv"  />
+      <field field_ref="v_Cor" name="v_cor"  />
+      <field field_ref="v_Prsgrd" name="v_prsgrd"  />
+      <field field_ref="v_Hmix" name="v_hmix"  />
+      <field field_ref="v_Hdiff" name="v_hdiff" />
+      <field field_ref="v_Vmix" name="v_vmix"  />
+      <!--                        <field field_ref="v_Vmix2" name="v_nudg" /> -->
+      <field field_ref="v_Baro" name="v_baro" />
+#  ifdef M3FAST
+      <field field_ref="v_fast" name="v_fast" />
+#  endif
+    </field_group>
+  </file>
+</file_group>
+# endif
+
+# ifdef DIAGNOSTICS_TS
+<file_group id="TS" output_freq="5d"  output_level="10" enabled=".TRUE."> <!-- 1 time step files -->
+  <file id="file6" name_suffix="_TS" split_freq="5d" split_freq_format="%y-%mo-%d">
+    
+    <field_group id="TS_fields" operation="average">
+      <field field_ref="T_rate" name="T_rate"  />
+      <field field_ref="T_adv" name="T_adv"  />
+      <field field_ref="T_Hmix" name="T_hmix"  />
+      <field field_ref="T_Vmix" name="T_vmix"  />
+      <field field_ref="T_Forc" name="T_forc" />
+#  ifdef SALINITY
+      <field field_ref="S_rate" name="S_rate"  />
+      <field field_ref="S_adv" name="S_adv"  />
+      <field field_ref="S_Hmix" name="S_hmix"  />
+      <field field_ref="S_Vmix" name="S_vmix"  />
+      <field field_ref="S_Forc" name="S_forc" />
+#  endif
+    </field_group>
+  </file>
+</file_group>
+# endif
+
+# ifdef DIAGNOSTICS_EK
+<file_group id="KE" output_freq="5d"  output_level="10" enabled=".TRUE."> <!-- 1 time step files -->
+  <file id="file7" name_suffix="_KE" split_freq="5d" split_freq_format="%y-%mo-%d">
+    
+    <field_group id="KE_fields" operation="average">
+      <field field_ref="ekrate" name="ke_rate"  />
+      <field field_ref="ekadv" name="ke_adv"  />
+      <field field_ref="ekCor" name="ke_cor"  />
+      <field field_ref="ekPrsgrd" name="ke_prsgrd"  />
+      <field field_ref="ekHmix" name="ke_hmix"  />
+      <field field_ref="ekHdiff" name="ke_hdiff" />
+      <field field_ref="ekVmix" name="ke_vmix"  />
+      <!--                                                <field field_ref="ekVmix2" name="ke_nudg" /> -->
+      <field field_ref="ekvol" name="ke_vol" />
+      <field field_ref="ekBaro" name="ke_baro" />
+      <field field_ref="ekDrag" name="ke_drag" />
+      <field field_ref="ekWind" name="ke_wind" />
+#  ifdef M3FAST
+      <field field_ref="ekfast" name="ke_fast" />
+#  endif
+    </field_group>
+    
+  </file>
+</file_group>
+# endif
+
+# ifdef DIAGNOSTICS_VRT
+<file_group id="VRT" output_freq="5d"  output_level="10" enabled=".TRUE."> <!-- 1 time step files -->
+  <file id="file8" name_suffix="_VRT" split_freq="5d" split_freq_format="%y-%mo-%d">
+    
+    <field_group id="vrt_fields" operation="average">
+      <field field_ref="vrtrate" name="vrt_rate"  />
+      <field field_ref="vrtadv" name="vrt_adv"  />
+      <field field_ref="vrtCor" name="vrt_cor"  />
+      <field field_ref="vrtPrsgrd" name="vrt_prsgrd"  />
+      <field field_ref="vrtHmix" name="vrt_hmix"  />
+      <field field_ref="vrtHdiff" name="vrt_hdiff" />
+      <!--                                                <field field_ref="vrtVmix2" name="vrt_nudg" />  -->
+      <field field_ref="vrtBaro" name="vrt_baro" />
+      <field field_ref="vrtDrag" name="vrt_drag" />
+      <field field_ref="vrtWind" name="vrt_wind" />
+#  ifdef M3FAST
+      <field field_ref="vrtfast" name="vrt_fast" />
+#  endif
+    </field_group>
+    
+  </file>
+</file_group>
+# endif
+
+# ifdef DIAGNOSTICS_EDDY
+<field_definition>
+  <field id="workru" name="workru" />
+  <field id="workrv" name="workrv" />
+</field_definition>
+
+<file_group id="EDDY" output_freq="5d"  output_level="10" enabled=".TRUE."> <!-- 1 time step files -->
+  <file id="file9" name_suffix="_EDDY" split_freq="5d" split_freq_format="%y-%mo-%d">
+    
+    <field_group id="eddy_fields" operation="average">
+      <field id="uu" field_ref="workru"> workru * workru </field>
+      <field id="uv" field_ref="workru"> workru * workrv </field>
+      <field id="vv" field_ref="workru"> workrv * workrv </field>
+      <field id="uw" field_ref="workru"> workru * w </field>
+      <field id="vw" field_ref="workru"> workrv * w </field>
+      <field id="wb" field_ref="workru"> w * buoy </field>
+    </field_group>
+  </file>
+</file_group>
+# endif
+
+# ifdef DIAGNOSTICS_PV
+<file_group id="PV" output_freq="5d"  output_level="10" enabled=".TRUE."> <!-- 1 time step files -->
+  <file id="file10" name_suffix="_PV" split_freq="5d" split_freq_format="%y-%mo-%d">
+    
+    <field_group id="PV_fields" operation="average">
+      <field field_ref="u_rhs" name="u_rhs"  />
+      <field field_ref="v_rhs" name="v_rhs"  />
+      <field field_ref="T_rhs" name="temp_rhs"  />
+      <field field_ref="S_rhs" name="salt_rhs"  />
+#  ifdef DIAGNOSTICS_PV_FULL
+      <field field_ref="u_vmix_trans" name="u_vmix_trans"  />
+      <field field_ref="v_vmix_trans" name="v_vmix_trans"  />
+#  endif
+    </field_group>
+    
+  </file>
+</file_group>
+# endif
+
+</file_definition>
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->

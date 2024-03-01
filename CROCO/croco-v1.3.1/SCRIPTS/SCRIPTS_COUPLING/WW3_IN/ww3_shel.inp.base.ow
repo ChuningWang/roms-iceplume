@@ -1,0 +1,115 @@
+$ -------------------------------------------------------------------- $
+$ WAVEWATCH III shell input file                                       $
+$ -------------------------------------------------------------------- $
+$                                                                   -- $
+$ F/T/C flag for use or not or coupling ------------------------------ $
+$ and T/F flag for definition as a homogeneous field                -- $
+$
+$   F F     Ice parameter 1
+$   F F     Ice parameter 2
+$   F F     Ice parameter 3
+$   F F     Ice parameter 4
+$   F F     Ice parameter 5
+$   F F     Mud parameter 1
+$   F F     Mud parameter 2
+$   F F     Mud parameter 3
+   C F     Water levels
+   C F     Currents
+   T F     Winds
+   F F     Ice concentrations
+   F       Assimilation data : Mean parameters
+   F       Assimilation data : 1-D spectra
+   F       Assimilation data : 2-D spectra
+$
+$ Time frame of calculations ----------------------------------------- $
+$   Starting time in yyyymmdd hhmmss format                         -- $
+$   Ending time in yyyymmdd hhmmss format                           -- $
+$
+   <yr1><mo1><dy1> <hr1>0000
+   <yr2><mo2><dy2> <hr2>0000
+$
+$ Processes for output data ------------------------------------------ $
+$                                                                   -- $
+$ 0 : No data server processes, direct access output from each process $
+$ 1 : No dedicated processes for outputs                            -- $
+$ 2 : Last process dedicated for outputs                            -- $
+$ 3 : Multiple dedicated output processes                           -- $
+$
+   1
+$
+$ Define output data ------------------------------------------------- $
+$                                                                   -- $
+$ For all output types: 1st line with time settings:                -- $
+$    1st time in yyyymmdd hhmmss, output interval (s), last time    -- $
+$    NB: Output is disabled by setting the output interval to 0     -- $
+$ -------------------------------------------------------------------- $
+$ Type 1 : Fields of mean wave parameter                            -- $
+$          Define outputs fields as namelists:                      -- $
+$                 one line set to N                                 -- $
+$                 next line contains parameter name                 -- $
+$
+  <yr1><mo1><dy1> <hr1>0000  <wav_int>  <yr2><mo2><dy2> <hr2>0000
+  N
+  DPT WND HS FP DP T0M1 LM SPR DIR TWO TAW FOC BHD WLV CUR TUS USS CHA
+$ DPT FP EF T02 T01 T0M1 LEV HS FP THM DIR DP WLV CUR WND BHD TWO UBR FOC TAW LM
+$
+$ -------------------------------------------------------------------- $
+$ Type 2 : Point output                                             -- $
+$          Lines with lon, lat, name (C*10) of output points        -- $
+$          The list is closed by defining a point named 'STOPSTRING' - $
+$
+  <yr1><mo1><dy1> <hr1>0000  0  <yr2><mo2><dy2> <hr2>0000
+$
+$ -------------------------------------------------------------------- $
+$ Type 3 : Output along track : flag T/F                            -- $
+$
+  <yr1><mo1><dy1> <hr1>0000  0  <yr2><mo2><dy2> <hr2>0000
+$
+$ -------------------------------------------------------------------- $
+$ Type 4 : Restart files (no additional data required)              -- $
+$
+  <yr1><mo1><dy1> <hr1>0000  <wav_rst>  <yr2><mo2><dy2> <hr2>0000
+$
+$ -------------------------------------------------------------------- $
+$ Type 5 : Boundary data (no additional data required)              -- $
+$
+  <yr1><mo1><dy1> <hr1>0000  0  <yr2><mo2><dy2> <hr2>0000
+$
+$ -------------------------------------------------------------------- $
+$ Type 6 : Separated wave field data (dummy for now)                -- $
+$
+  <yr1><mo1><dy1> <hr1>0000  0  <yr2><mo2><dy2> <hr2>0000
+$
+$ -------------------------------------------------------------------- $
+$ Type 7 : Coupled fields                                           -- $
+$          (must be fully commented if not used with switch COU)    -- $
+$          Time stride must be the same as the maximum global time step$
+$          Namelist type selection is used here                     -- $
+$                   start with N                                    -- $
+$                   Possibly sent fields by ww3 :                   -- $
+$                      T0M1 OHS DIR THM BHD TWO UBR FOC TAW TUS USS -- $
+$                      LM DRY ACHA OCHA AHS TP (or FP)              -- $
+$                   Possibly received fields by ww3 :               -- $
+$                      SSH CUR WND                                  -- $
+$                   NB: SSH and CUR cannot be used separately       -- $
+$
+  <yr1><mo1><dy1> <hr1>0000  <wavdt>  <yr2><mo2><dy2> <hr2>0000
+  N
+  T0M1 OHS THM
+  SSH CUR
+$
+$ -------------------------------------------------------------------- $
+$ Homogeneous field data                                            -- $
+$ for ID string : 'LEV', 'CUR', 'WND', 'MOV' (moving grid speed)    -- $
+$ ID, yyyymmdd, hhmmss, value (S.I. units)                          -- $
+$                      and for 'CUR', 'WND', and 'MOV' : dir        -- $
+$                      and for 'WND' : air-sea temperature diff.    -- $
+$ 'STP' is mandatory stop string
+$
+$  'WND'  <yr1><mo1><dy1> <hr1>0000 20. 145. 2.0
+$  'LEV'  <yr1><mo1><dy1> <hr1>0000 -2
+  'STP'
+$
+$ -------------------------------------------------------------------- $
+$ End of input file                                                    $
+$ -------------------------------------------------------------------- $

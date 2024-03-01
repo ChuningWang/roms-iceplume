@@ -1,0 +1,32 @@
+#!/bin/bash
+
+#################################################################
+################### FOR COMPILATIONS ############################
+#################################################################
+
+source /usr/share/Modules/3.2.10/init/bash
+module purge
+module load intel-comp/18
+module load impi/2018.1.163
+module load matlab/2016a
+alias matlab='matlab -nodesktop'
+export PATH=${PATH}:/home/datawork-wave/NETCDF2019/INTEL/bin
+export CPATH=${CPATH}:/home/datawork-wave/NETCDF2019/INTEL/include
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/home/datawork-wave/NETCDF2019/INTEL/lib
+export NETCDF=/home/datawork-wave/NETCDF2019/INTEL
+export NETCDF_CONFIG=${NETCDF}/bin/nf-config
+
+# -- Option for job launching
+export MPI_ext="-configfile"
+export ncomod='nco'
+
+#----------------------------------------------------------------
+# Environment variables related to compilers
+#----------------------------------------------------------------
+export CC=icc
+export FC=ifort
+export F90=ifort
+export F77=ifort
+export MPIF90=mpiifort
+export MPICC=mpiicc
+

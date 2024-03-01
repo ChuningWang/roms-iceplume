@@ -1,0 +1,8 @@
+#!/bin/bash
+
+TEST_TYPE="REG"
+
+dir_home="$PERFRSTHOME/Scripts_reg_perfrst"
+dir_test="$PERFRSTWORK/REG"
+dir_web="$PERFRSTWORK/ftp"
+dir_datafile="$DATAREG"

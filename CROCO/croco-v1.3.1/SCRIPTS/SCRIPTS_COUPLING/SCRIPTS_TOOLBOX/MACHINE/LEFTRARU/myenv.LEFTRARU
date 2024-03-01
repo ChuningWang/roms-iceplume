@@ -1,0 +1,41 @@
+#!/bin/bash
+module purge
+
+module load intel/2019b
+module load netCDF/4.6.2
+module load netCDF-Fortran/4.4.4
+module load JasPer/2.0.14
+module load HDF5/1.10.4
+module load cURL/7.64.0
+module load zlib/1.2.11
+module load Szip/2.1.1
+module load NCO/4.7.9
+module load ncview/2.1.7
+
+# -- Change default language
+export LANG=en_US.utf8
+export LC_ALL=en_US.utf8
+
+# -- for NETCDF
+# --> 
+export NETCDF_CONFIG0=nf-config
+export NETCDF=$( $NETCDF_CONFIG0 --prefix )
+export NETCDF_CONFIG=$NETCDF/bin/nf-config
+export NETCDF_LIBDIR=$NETCDF/lib
+export NETCDF_INCDIR=$NETCDF/include
+
+# -- Option for job launching
+export MPI_LAUNCH=srun
+export MPI_ext="--multi-prog"
+export ncomod='NCO'
+
+#----------------------------------------------------------------
+# Environment variables related to compilers
+#----------------------------------------------------------------
+export CC=icc
+export FC=ifort
+export F77=ifort
+export F90=ifort
+export MPIF90=mpif90
+export MPICC=mpicc
+

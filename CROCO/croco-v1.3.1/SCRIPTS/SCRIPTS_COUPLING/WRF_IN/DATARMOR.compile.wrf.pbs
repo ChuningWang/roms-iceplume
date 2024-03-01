@@ -1,0 +1,11 @@
+#!/bin/bash
+#PBS -q omp
+#PBS -l walltime=05:00:00
+#PBS -l ncpus=8
+#PBS -l mem=20g
+#PBS -m n
+cd $PBS_O_WORKDIR
+
+#source /usr/share/Modules/3.2.10/init/bash
+source ../myenv_mypath.sh
+./make_WRF_compil

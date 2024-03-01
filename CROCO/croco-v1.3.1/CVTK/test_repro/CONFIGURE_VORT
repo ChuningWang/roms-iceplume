@@ -1,0 +1,8 @@
+#!/bin/bash
+
+TEST_TYPE="VORT"
+
+dir_home="$CVTKHOME/Scripts_vort"
+dir_test="$CVTKWORK/VORT"
+dir_web="$CVTKWORK/ftp"
+dir_datafile="$DATAVOR"

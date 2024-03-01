@@ -1,0 +1,47 @@
+#!/bin/bash
+
+#-------------------------------------------------------------------
+### PBS queue 
+### (example on DATARMOR cluster the queues are named mpi_X with X the number of nodes where 1 node = 28 CPUs)
+#-------------------------------------------------------------------
+#PBS -q mpi_1
+
+#--------------------------------------------------------------------------------------------
+### select the number of nodes after "select" (this has to be coherent with the chosen queue)
+### keep ncpus=28 as each node has 28 CPUs
+### choose the number of MPIPROCS (this has to be coherent with your compilation settings)
+### PBS memory: default for one job: 60gb
+#--------------------------------------------------------------------------------------------
+#PBS -l select=1:ncpus=28:mpiprocs=16:mem=8g
+
+#--------------------------------------
+### PBS walltime: max for one job: 48h
+#--------------------------------------
+#PBS -l walltime=01:00:00
+
+#-----------------
+### PBS job name
+#----------------
+#PBS -N RUN_CROCO
+
+
+# cd to the directory you submitted your job
+cd $PBS_O_WORKDIR
+echo "working in $PBS_O_WORKDIR"
+
+# add your environment variables, modules, etc
+source /usr/share/Modules/3.2.10/init/bash
+
+# source your environment file
+source myenv_mypath.sh
+
+# submit your job
+date
+
+export NPROCS="cat $PBS_NODEFILE  | wc -l"
+
+echo "submit MPI job on $NPROCS CPUs"
+time run_croco.bash >& run_croco.out
+
+date
+

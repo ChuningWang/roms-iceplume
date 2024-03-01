@@ -1,0 +1,18 @@
+# Logs and databases #
+######################
+*.log
+*.output
+*.sql
+*.sqlite
+
+# OS generated files #
+######################
+.DS_Store*
+
+# Misc               #
+######################
+doc/build
+Run/*
+Run/amr.in
+
+OCEAN.bak/cpl_prism_getlistvals.F
